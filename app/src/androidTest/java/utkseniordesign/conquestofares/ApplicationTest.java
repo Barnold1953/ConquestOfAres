@@ -1,4 +1,4 @@
-package MainGame;
+package utkseniordesign.conquestofares;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

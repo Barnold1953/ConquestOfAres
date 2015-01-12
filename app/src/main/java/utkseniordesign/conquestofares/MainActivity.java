@@ -1,14 +1,10 @@
-package MainGame;
+package utkseniordesign.conquestofares;
 
-import android.app.ActivityManager;
-import android.content.Context;
-import android.content.pm.ConfigurationInfo;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.utkseniordesign.conquestofares.R;
 
 public class MainActivity extends ActionBarActivity {
 
