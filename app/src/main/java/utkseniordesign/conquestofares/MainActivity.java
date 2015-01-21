@@ -1,39 +1,135 @@
 package utkseniordesign.conquestofares;
 
+import android.support.v4.view.PagerTabStrip;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
-
+import android.view.View;
+import android.view.MenuInflater;
+import android.view.ViewGroup;
 
 public class MainActivity extends ActionBarActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    protected void onCreate( Bundle savedInstanceState ) {
+        super.onCreate( savedInstanceState );
+
+        //Sets tabbed layout
+        setContentView( R.layout.activity_main );
+
+        //Action bar is uneccessary for our game, and it looks weird. Hide it.
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
+
+        //Create a view pager in the container specified by @id.pager
+        ViewPager viewPager = ( ViewPager ) findViewById( R.id.pager );
+
+        //Create an adapter to populate the view pager with fragments (tabs)
+        viewPager.setAdapter( new SampleFragmentPagerAdapter() );
+
+        PagerTabStrip pagerTabStrip = ( PagerTabStrip ) findViewById( R.id.pager_header );
+        pagerTabStrip.setTabIndicatorColor( getResources().getColor( R.color.lightBlue ));
     }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    public class SampleFragmentPagerAdapter extends FragmentPagerAdapter {
+        //Set the tab count
+        final int PAGE_COUNT = 3;
+        public SampleFragmentPagerAdapter() {
+            super(getSupportFragmentManager());
         }
 
-        return super.onOptionsItemSelected(item);
+        //Override super class functions appropriately
+        @Override
+        public int getCount()
+        {
+            return PAGE_COUNT;
+        }
+
+        //Get item creates a 1-indexed page fragment off a position
+        @Override
+        public Fragment getItem( int position )
+        {
+            return PageFragment.create( position + 1 );
+        }
+
+        //Returns title
+        @Override
+        public CharSequence getPageTitle( int position )
+        {
+            if( position == 0 ) { return "Main Menu"; }
+            else return "Other Page";
+        }
+    }
+
+    public static class PageFragment extends Fragment {
+        public static final String ARG_PAGE = "ARG_PAGE";
+
+        private int mPage;
+
+        public static PageFragment create( int page )
+        {
+            //creates and returns page with appropriate page number
+            Bundle args = new Bundle();
+            args.putInt( ARG_PAGE, page );
+            PageFragment fragment = new PageFragment();
+            fragment.setArguments( args );
+            return fragment;
+        }
+
+        @Override
+        public void onCreate( Bundle savedInstanceState )
+        {
+            super.onCreate( savedInstanceState );
+
+            //Everytime a page is created, use the arguments passed from create() to get a unique page #
+            mPage = getArguments().getInt( ARG_PAGE );
+        }
+
+        @Override
+        public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState )
+        {
+            //function for creating the view of each individual page fragment (tab)
+            View view;
+            if( mPage == 1 ) { view = inflater.inflate(R.layout.main_page, container, false); }
+            else if( mPage == 2 ) { view = inflater.inflate(R.layout.activegames_page, container, false); }
+            else if( mPage == 3 ) { view = inflater.inflate(R.layout.activegames_page, container, false); }
+            else { view = null; }
+
+            //make sure it isn't null before returning
+            try
+            {
+                if(view == null) {
+                    throw new NullPointerException("Creating an illegal view!\n");
+                }
+            }
+            catch( NullPointerException e)
+            {
+                Log.e("Error",e.toString());
+            }
+            return view;
+        }
+    }
+
+    /* I don't think this is necessary, since we ditched the action bar
+    @Override
+    public boolean onCreateOptionsMenu( Menu menu ) {
+        // Inflate the menu items for use in the action bar
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate( R.menu.menu_main, menu );
+        return super.onCreateOptionsMenu( menu );
+    }
+    */
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        //Clean up everything here
     }
 }
