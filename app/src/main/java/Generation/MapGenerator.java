@@ -41,5 +41,19 @@ public class MapGenerator {
         return total / maxAmplitude;
     }
 
+    private double ridgedOctaveNoise2D(double x, double y, double persistence, double frequency, int octaves) {
+        double total = 0.0;
+        double amplitude = 1.0;
+        double maxAmplitude = 0.0;
+
+        for (int i = 0; i < octaves; i++) {
+            total += ((1.0 - abs(osNoise.eval(x * frequency, y * frequency))) * 2.0 - 1.0) * amplitude;
+            frequency *= 2.0;
+            maxAmplitude += amplitude;
+            amplitude *= persistence;
+        }
+        return total / maxAmplitude;
+    }
+
     private OpenSimplexNoise osNoise;
 }
