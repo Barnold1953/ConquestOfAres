@@ -33,15 +33,17 @@ public class MainActivity extends ActionBarActivity {
         //Create an adapter to populate the view pager with fragments (tabs)
         viewPager.setAdapter( new SampleFragmentPagerAdapter() );
 
+        //Frustratingly, you can't set the indicator color in xml without changing the font color
+        //So I was forced to do it programatically
         PagerTabStrip pagerTabStrip = ( PagerTabStrip ) findViewById( R.id.pager_header );
-        pagerTabStrip.setTabIndicatorColor( getResources().getColor( R.color.lightBlue ));
+        pagerTabStrip.setTabIndicatorColor(getResources().getColor(R.color.lightBlue));
     }
 
     public class SampleFragmentPagerAdapter extends FragmentPagerAdapter {
         //Set the tab count
         final int PAGE_COUNT = 3;
         public SampleFragmentPagerAdapter() {
-            super(getSupportFragmentManager());
+            super( getSupportFragmentManager() );
         }
 
         //Override super class functions appropriately
@@ -62,8 +64,16 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public CharSequence getPageTitle( int position )
         {
-            if( position == 0 ) { return "Main Menu"; }
-            else return "Other Page";
+            switch( position ) {
+                case 0:
+                    return "Main Menu";
+                case 1:
+                    return "Active Games";
+                case 2:
+                    return "Leaderboards";
+                default:
+                    return "Unexpected page!";
+            }
         }
     }
 
@@ -96,10 +106,19 @@ public class MainActivity extends ActionBarActivity {
         {
             //function for creating the view of each individual page fragment (tab)
             View view;
-            if( mPage == 1 ) { view = inflater.inflate(R.layout.main_page, container, false); }
-            else if( mPage == 2 ) { view = inflater.inflate(R.layout.activegames_page, container, false); }
-            else if( mPage == 3 ) { view = inflater.inflate(R.layout.activegames_page, container, false); }
-            else { view = null; }
+            switch( mPage ) {
+                case 1:
+                    view = inflater.inflate(R.layout.main_page, container, false);
+                    break;
+                case 2:
+                    view = inflater.inflate(R.layout.activegames_page, container, false);
+                    break;
+                case 3:
+                    view = inflater.inflate(R.layout.leaderboard_page, container, false);
+                    break;
+                default:
+                    view = null;
+            }
 
             //make sure it isn't null before returning
             try
