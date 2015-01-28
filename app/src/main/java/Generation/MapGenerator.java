@@ -25,6 +25,30 @@ public class MapGenerator {
                         0.9, 0.001, 8);
             }
         }
+
+        // Generate pixel data for texture
+        byte[][][] pixelData = new byte[height][width][3];
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (heightMap[y][x] > 0.65) { // Mountains
+                    pixelData[y][x][0] = 127;
+                    pixelData[y][x][1] = 127;
+                    pixelData[y][x][2] = 127;
+                } else if (heightMap[y][x] < 0.0) { // Oceans
+                    pixelData[y][x][0] = 0;
+                    pixelData[y][x][1] = 12;
+                    pixelData[y][x][2] = 100;
+                } else if (heightMap[y][x] < 0.05) { // Beach
+                    pixelData[y][x][0] = 120;
+                    pixelData[y][x][1] = 100;
+                    pixelData[y][x][2] = 80;
+                } else { // Grass
+                    pixelData[y][x][0] = 0;
+                    pixelData[y][x][1] = 80;
+                    pixelData[y][x][2] = 0;
+                }
+            }
+        }
     }
 
     private double octaveNoise2D(double x, double y, double persistence, double frequency, int octaves) {
