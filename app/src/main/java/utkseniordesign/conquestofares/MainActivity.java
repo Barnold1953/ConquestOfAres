@@ -1,5 +1,9 @@
 package utkseniordesign.conquestofares;
 
+import android.app.ActivityManager;
+import android.content.Context;
+import android.opengl.GLSurfaceView;
+import android.content.pm.ConfigurationInfo;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -14,14 +18,35 @@ import android.view.View;
 import android.view.MenuInflater;
 import android.view.ViewGroup;
 
+import Graphics.CoARenderer;
+
 public class MainActivity extends ActionBarActivity {
+    private GLSurfaceView mGLSurfaceView;
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
+        Log.d("Begin", "Before");
         super.onCreate( savedInstanceState );
 
+        Log.d("Create", "Before new surface call\n");
+
+        mGLSurfaceView = new GLSurfaceView(this);
+
+        final ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        final ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
+        final boolean supportsEs2 = configurationInfo.reqGlEsVersion >= 0x20000;
+
+        if(supportsEs2) {
+            mGLSurfaceView.setEGLContextClientVersion(2);
+            mGLSurfaceView.setRenderer(new CoARenderer());
+            Log.d("Create", "After set renderer call");
+        }
+        Log.d("Create", "if done");
+
+        setContentView(mGLSurfaceView);
+/*
         //Sets tabbed layout
-        setContentView( R.layout.activity_main );
+        setContentView(R.layout.activity_main);
 
         //Action bar is uneccessary for our game, and it looks weird. Hide it.
         ActionBar actionBar = getSupportActionBar();
@@ -37,8 +62,8 @@ public class MainActivity extends ActionBarActivity {
         //So I was forced to do it programatically
         PagerTabStrip pagerTabStrip = ( PagerTabStrip ) findViewById( R.id.pager_header );
         pagerTabStrip.setTabIndicatorColor(getResources().getColor(R.color.lightBlue));
-    }
-
+*/    }
+/*
     public class SampleFragmentPagerAdapter extends FragmentPagerAdapter {
         //Set the tab count
         final int PAGE_COUNT = 3;
@@ -94,7 +119,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void onCreate( Bundle savedInstanceState )
-        {
+       {
             super.onCreate( savedInstanceState );
 
             //Everytime a page is created, use the arguments passed from create() to get a unique page #
@@ -114,7 +139,8 @@ public class MainActivity extends ActionBarActivity {
                     view = inflater.inflate(R.layout.activegames_page, container, false);
                     break;
                 case 3:
-                    view = inflater.inflate(R.layout.leaderboard_page, container, false);
+                    view = null;
+                    //view = inflater.inflate(R.layout.leaderboard_page, container, false);
                     break;
                 default:
                     view = null;
@@ -134,7 +160,7 @@ public class MainActivity extends ActionBarActivity {
             return view;
         }
     }
-
+*/
     /* I don't think this is necessary, since we ditched the action bar
     @Override
     public boolean onCreateOptionsMenu( Menu menu ) {
@@ -146,9 +172,24 @@ public class MainActivity extends ActionBarActivity {
     */
 
     @Override
+    protected void onResume()
+    {
+        // The activity must call the GL surface view's onResume() on activity onResume().
+        super.onResume();
+        mGLSurfaceView.onResume();
+    }
+
+    @Override
+    protected void onPause()
+    {
+        // The activity must call the GL surface view's onPause() on activity onPause().
+        super.onPause();
+        mGLSurfaceView.onPause();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
-
         //Clean up everything here
     }
 }

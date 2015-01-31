@@ -24,17 +24,19 @@ public class ShaderHelper {
 
     public static int compileShader(String shader) throws IOException{
         //String frag = "", vert = "";
-        String filePath = "@Shaders/";
+        String filePath = "@raw/";
         int vertexShaderHandle, fragmentShaderHandle;
         File fragFile, vertFile;
 
         Log.d("1", "Before loading shader");
 
-        //vertFile = new File(filePath + shader + ".vert");
-        //fragFile = new File(filePath + shader + ".frag");
+        vertFile = new File(filePath + shader + ".vert");
+        fragFile = new File(filePath + shader + ".frag");
 
         //vert = FileIO.readFileToString(vertFile);
         //frag = FileIO.readFileToString(fragFile);
+        //vert = FileIO.readFileToString("@raw/simple.vert");
+        //frag = FileIO.readFileToString("@raw/simple.frag");
         final String vert = "uniform mat4 uMVPMatrix;\n" +
                 "\n" +
                 "attribute vec3 vPosition;\n" +
@@ -58,6 +60,8 @@ public class ShaderHelper {
                 "  gl_FragColor = color;\n" +
                 "}\n";
 
+        Log.d("Shader", vert);
+        Log.d("Shader", frag);
         vertexShaderHandle = loadShader(GLES20.GL_VERTEX_SHADER, vert);
         fragmentShaderHandle = loadShader(GLES20.GL_FRAGMENT_SHADER, frag);
 
