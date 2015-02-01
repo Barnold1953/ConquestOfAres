@@ -19,9 +19,10 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     GeometryHelper gHelper = new GeometryHelper();
     DrawHelper dHelper = new DrawHelper(mHelper);
 
+    @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
         // Set the background frame color
-        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
         Log.d("Setup", "Surface created.");
         Log.d("Setup", "Shader handle created.");
@@ -38,14 +39,17 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         Log.d("Setup", "Geometry buffers initialized and filled.");
     }
 
+    @Override
     public void onDrawFrame(GL10 unused) {
         // Redraw background color
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
+        //GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
         mHelper.updateMatrix();
-        dHelper.DrawCube(programHandle, gHelper.mVertexBuffer, gHelper.mColorBuffer, gHelper.mTextCoordBuffer);
+        dHelper.DrawCube(programHandle, gHelper.mVertexBuffer, gHelper.mColorBuffer, gHelper.mTextCoordBuffer, gHelper.ibo);
     }
 
+    @Override
     public void onSurfaceChanged(GL10 unused, int width, int height) {
         GLES20.glViewport(0, 0, width, height);
 

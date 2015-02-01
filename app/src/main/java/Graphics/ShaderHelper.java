@@ -37,9 +37,10 @@ public class ShaderHelper {
         //frag = FileIO.readFileToString(fragFile);
         //vert = FileIO.readFileToString("@raw/simple.vert");
         //frag = FileIO.readFileToString("@raw/simple.frag");
-        final String vert = "uniform mat4 uMVPMatrix;\n" +
+        final String vert =
+                "uniform mat4 uMVPMatrix;\n" +
                 "\n" +
-                "attribute vec3 vPosition;\n" +
+                "attribute vec4 vPosition;\n" +
                 "attribute vec4 vColor;\n" +
                 "attribute vec2 vTextCoords;\n" +
                 "\n" +
@@ -49,9 +50,10 @@ public class ShaderHelper {
                 "void main() {\n" +
                 "  color = vColor;\n" +
                 "  tCoords = vTextCoords;\n" +
-                "  gl_Position =  unWVP * vPosition;\n" +
+                "  gl_Position =  uMVPMatrix * vPosition;\n" +
                 "}";
-        final String frag = "precision mediump float;\n" +
+        final String frag =
+                "precision mediump float;\n" +
                 "\n" +
                 "varying vec4 color;\n" +
                 "varying vec2 tCoords;\n" +
@@ -62,24 +64,48 @@ public class ShaderHelper {
 
         Log.d("Shader", vert);
         Log.d("Shader", frag);
-        vertexShaderHandle = loadShader(GLES20.GL_VERTEX_SHADER, vert);
-        fragmentShaderHandle = loadShader(GLES20.GL_FRAGMENT_SHADER, frag);
 
-        Log.d("2", "After loading shader");
+        vertexShaderHandle = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
 
-        if(vertexShaderHandle != 0 && fragmentShaderHandle != 0) {
+        if(vertexShaderHandle != 0) {
+            Log.d("Shader", "Creating Vertex Shader");
+            GLES20.glShaderSource(vertexShaderHandle, vert);
+
+            GLES20.glCompileShader(vertexShaderHandle);
+
             int[] compileStatus = new int[1];
             GLES20.glGetShaderiv(vertexShaderHandle, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
-            if (compileStatus[0] == 0) {
+
+            if(compileStatus[0] == 0){
+                Log.d("Shader", GLES20.glGetShaderInfoLog(vertexShaderHandle));
                 GLES20.glDeleteShader(vertexShaderHandle);
-            }
-            GLES20.glGetShaderiv(fragmentShaderHandle, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
-            if (compileStatus[0] == 0){
-                GLES20.glDeleteShader(vertexShaderHandle);
+                vertexShaderHandle = 0;
             }
         }
-        if(vertexShaderHandle == 0 || fragmentShaderHandle == 0){
-            throw new RuntimeException("Error creating shader");
+        if(vertexShaderHandle == 0) {
+            Log.d("Shader", "Error creating vertex shader");
+            throw new RuntimeException("Error creating vertex shader");
+        }
+
+        fragmentShaderHandle = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
+
+        if(fragmentShaderHandle != 0){
+            Log.d("Shader", "Creating Fragment Shader");
+            GLES20.glShaderSource(fragmentShaderHandle, frag);
+
+            GLES20.glCompileShader(fragmentShaderHandle);
+
+            int[] compileStatus = new int[1];
+            GLES20.glGetShaderiv(fragmentShaderHandle, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
+
+            if(compileStatus[0] == 0){
+                GLES20.glDeleteShader(fragmentShaderHandle);
+                fragmentShaderHandle = 0;
+            }
+        }
+        if(fragmentShaderHandle == 0) {
+            Log.d("String", "Error creating fragment shader");
+            throw new RuntimeException("Error creating fragment shader");
         }
 
         int programHandle = GLES20.glCreateProgram();

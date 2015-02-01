@@ -17,7 +17,7 @@ public class DrawHelper {
     private final int mBytesPerFloat = 4;
     private final int mStrideBytes = 9 * mBytesPerFloat;
 
-    public void DrawCube(int programHandle, FloatBuffer mVertexBuffer, FloatBuffer mColorBuffer, FloatBuffer mTextCoordBuffer){
+    public void DrawCube(int programHandle, FloatBuffer mVertexBuffer, FloatBuffer mColorBuffer, FloatBuffer mTextCoordBuffer, int[] ibo){
         mMVPMatrixHandle = GLES20.glGetUniformLocation(programHandle, "uMVPMatrix");
         mPositionHandle = GLES20.glGetAttribLocation(programHandle, "vPosition");
         mColorHandle = GLES20.glGetAttribLocation(programHandle, "vColor");
@@ -36,7 +36,11 @@ public class DrawHelper {
         GLES20.glEnableVertexAttribArray(mTCoordHandle);
 
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mHelper.getmMVPMatrix(), 0);
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
+
+        //GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, ibo[0]);
+        //GLES20.glDrawElements(GLES20.GL_TRIANGLES, 36, GLES20.GL_FLOAT, 0);
+        //GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 36);
     }
 
     public DrawHelper(MatrixHelper mh){

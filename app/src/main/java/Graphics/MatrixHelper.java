@@ -19,11 +19,11 @@ public class MatrixHelper {
 
     final float eyeX = 0.0f;
     final float eyeY = 0.0f;
-    final float eyeZ = 1.5f;
+    final float eyeZ = 10.0f;
 
-    final float lookX = 0.0f;
-    final float lookY = 0.0f;
-    final float lookZ = -5.0f;
+    final float lookX = 0.5f;
+    final float lookY = 0.5f;
+    final float lookZ = 0.5f;
 
     final float upX = 0.0f;
     final float upY = 1.0f;
@@ -41,7 +41,7 @@ public class MatrixHelper {
         final float bottom = -1.0f;
         final float top = 1.0f;
         final float near = 1.0f;
-        final float far = 10.0f;
+        final float far = 10000.0f;
 
         Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
     }
@@ -51,7 +51,8 @@ public class MatrixHelper {
         float angleInDegrees = (360.0f / 10000.0f) * ((int) time);
 
         Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 1.0f);
+        //Matrix.translateM(mModelMatrix, 0, 0.0f, 0.0f, -5.0f);
+        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 1.0f, 0.0f);
     }
 
     public float[] getmMVPMatrix(){

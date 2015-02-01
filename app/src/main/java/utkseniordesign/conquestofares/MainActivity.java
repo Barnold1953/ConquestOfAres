@@ -36,11 +36,11 @@ public class MainActivity extends ActionBarActivity {
         final ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
         final boolean supportsEs2 = configurationInfo.reqGlEsVersion >= 0x20000;
 
-        if(supportsEs2) {
-            mGLSurfaceView.setEGLContextClientVersion(2);
-            mGLSurfaceView.setRenderer(new CoARenderer());
-            Log.d("Create", "After set renderer call");
-        }
+        //if(supportsEs2) {
+        mGLSurfaceView.setEGLContextClientVersion(2);
+        mGLSurfaceView.setRenderer(new CoARenderer());
+        Log.d("Create", "After set renderer call");
+        //}
         Log.d("Create", "if done");
 
         setContentView(mGLSurfaceView);
