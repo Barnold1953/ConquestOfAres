@@ -2,6 +2,7 @@ package utkseniordesign.conquestofares;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.content.pm.ConfigurationInfo;
 import android.support.v4.view.PagerTabStrip;
