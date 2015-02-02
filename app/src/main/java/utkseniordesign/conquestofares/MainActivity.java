@@ -38,6 +38,7 @@ public class MainActivity extends ActionBarActivity {
 
         //if(supportsEs2) {
         mGLSurfaceView.setEGLContextClientVersion(2);
+        mGLSurfaceView.setEGLConfigChooser(8 , 8, 8, 8, 16, 0);
         mGLSurfaceView.setRenderer(new CoARenderer());
         Log.d("Create", "After set renderer call");
         //}
