@@ -13,7 +13,7 @@ public class AI {
         //so that new priorities and attributes
         //can be assigned
     }
-    public class GameInterpreter {
+    class GameInterpreter {
         //code to read game state
     }
 
@@ -32,13 +32,13 @@ public class AI {
             //in the context of the situation
         }
 
-        public void gortAssignments(){
+        public void sortAssignments(){
             //sort possible actions based on
             //priority system
         }
     }
 
-    public class Reactor {
+    class Reactor {
         //react to current game state based on
         //priority system
         //change NPCs accordingly
