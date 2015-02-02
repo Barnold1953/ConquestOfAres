@@ -2,6 +2,7 @@ package utkseniordesign.conquestofares;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.content.pm.ConfigurationInfo;
 import android.support.v4.view.PagerTabStrip;
@@ -38,6 +39,8 @@ public class MainActivity extends ActionBarActivity {
 
         //if(supportsEs2) {
         mGLSurfaceView.setEGLContextClientVersion(2);
+
+
         mGLSurfaceView.setRenderer(new CoARenderer());
         Log.d("Create", "After set renderer call");
         //}
