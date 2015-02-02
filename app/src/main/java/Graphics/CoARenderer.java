@@ -32,6 +32,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         catch (IOException e){
             Log.d("Shader", "Error occurred during compilation");
         }
+        dHelper.setProgHandles(sHelper.mMVPMatrixHandle, sHelper.mPositionHandle, sHelper.mColorHandle, sHelper.mTCoordHandle);
         Log.d("Setup", "Shader successfully initialized.");
         mHelper.matrixSetup(programHandle);
         Log.d("Setup", "Matrix successfully initialized.");
@@ -46,7 +47,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         //GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
         mHelper.updateMatrix();
-        dHelper.DrawCube(programHandle, gHelper.mVertexBuffer, gHelper.mColorBuffer, gHelper.mTextCoordBuffer, gHelper.ibo);
+        dHelper.DrawCube(programHandle, gHelper.mVertexBuffer, gHelper.mColorBuffer, gHelper.mTextCoordBuffer, gHelper.mIndicesBuffer);
     }
 
     @Override

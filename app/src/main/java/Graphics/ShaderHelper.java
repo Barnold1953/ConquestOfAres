@@ -13,6 +13,11 @@ import Utility.FileIO;
  * Created by Nathan on 1/17/2015.
  */
 public class ShaderHelper {
+    public int mPositionHandle;
+    public int mColorHandle;
+    public int mMVPMatrixHandle;
+    public int mTCoordHandle;
+
     public static int loadShader(int type, String shaderCode) throws IOException{
         int shader = GLES20.glCreateShader(type);
 
@@ -22,7 +27,7 @@ public class ShaderHelper {
         return shader;
     }
 
-    public static int compileShader(String shader) throws IOException{
+    public int compileShader(String shader) throws IOException{
         //String frag = "", vert = "";
         String filePath = "@raw/";
         int vertexShaderHandle, fragmentShaderHandle;
@@ -133,6 +138,13 @@ public class ShaderHelper {
         }
 
         Log.d("shader", "Shader successfully compiled");
+
+        mMVPMatrixHandle = GLES20.glGetUniformLocation(programHandle, "uMVPMatrix");
+        mPositionHandle = GLES20.glGetAttribLocation(programHandle, "vPosition");
+        mColorHandle = GLES20.glGetAttribLocation(programHandle, "vColor");
+        mTCoordHandle = GLES20.glGetAttribLocation(programHandle, "vTextCoords");
+
+        GLES20.glUseProgram(programHandle);
 
         return programHandle;
     }
