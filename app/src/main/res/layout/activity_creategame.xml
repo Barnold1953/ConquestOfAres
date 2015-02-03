@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/scrollView"
+    android:layout_gravity="center_horizontal"
+    android:fillViewport="true">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="1">
+
+        <!-- Page header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:background="@color/silver">
+
+            <ImageView
+                android:layout_width="160dp"
+                android:layout_height="33dp"
+                android:id="@+id/imageView"
+                android:src="@drawable/header_create_game_page"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp" />
+
+        </LinearLayout>
+
+        <!-- settings dialog -->
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:padding="20dp">
+
+            <!-- Player Count Dialog -->
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                >
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Player Count"
+                    android:textSize="16sp" />
+                <LinearLayout
+                    style="@style/border"
+                    android:background="@color/lightBlue"/>
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:padding="10dp"
+                    android:gravity="center"
+                    android:background="@color/silver">
+                    <ToggleButton style="@style/MultiToggleButtonTheme" android:textOn="1" android:textOff="1" />
+                    <ToggleButton style="@style/MultiToggleButtonTheme" android:textOn="2" android:textOff="2" />
+                    <ToggleButton style="@style/MultiToggleButtonTheme" android:textOn="3" android:textOff="3" />
+                    <ToggleButton style="@style/MultiToggleButtonTheme" android:textOn="4" android:textOff="4" />
+                    <ToggleButton style="@style/MultiToggleButtonTheme" android:textOn="5" android:textOff="5" />
+                    <ToggleButton style="@style/MultiToggleButtonTheme" android:textOn="6" android:textOff="6" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Map Selection Dialog -->
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content">
+                <!-- Dialog Label -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Map Settings"
+                    android:textSize="16sp" />
+
+                <!-- Border -->
+                <LinearLayout
+                    style="@style/border"
+                    android:background="@color/lightBlue" />
+
+                <!-- Map Options -->
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:gravity="center"
+                    android:background="@color/silver">
+
+                    <!-- Random/Custom Toggle -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <ToggleButton
+                            style="@style/MultiToggleButtonTheme"
+                            android:textOn="Random"
+                            android:textOff="Random"
+                            android:id="@+id/RandomMap"
+                            android:layout_width="0dp"
+                            android:layout_weight=".50" />
+
+                        <ToggleButton
+                            style="@style/MultiToggleButtonTheme"
+                            android:textOn="Custom"
+                            android:textOff="Custom"
+                            android:id="@+id/CustomMap"
+                            android:layout_width="0dp"
+                            android:layout_weight=".50" />
+                    </LinearLayout>
+
+                    <!-- Random Options -->
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/RandomMapOptions">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <Spinner
+                                android:id="@+id/mapSizeSpinner"
+                                android:layout_width="0dp"
+                                android:layout_weight=".1975"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:background="@color/silver" />
+
+                            <ImageView
+                                android:layout_width="0dp"
+                                android:layout_weight=".0275"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom"
+                                android:layout_marginRight="4dp"
+                                android:src="@drawable/ic_spinner_arrow" />
+
+                            <Spinner
+                                android:id="@+id/mapSymmetrySpinner"
+                                android:layout_width="0dp"
+                                android:layout_weight=".2975"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:background="@color/silver" />
+
+                            <ImageView
+                                android:layout_width="0dp"
+                                android:layout_weight=".0275"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom"
+                                android:src="@drawable/ic_spinner_arrow" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                style="@style/border"
+                                android:layout_width="0dp"
+                                android:layout_weight=".40"
+                                android:background="@color/lightBlue"
+                                android:layout_margin="4dp" />
+
+                            <LinearLayout
+                                style="@style/border"
+                                android:layout_width="0dp"
+                                android:layout_weight=".60"
+                                android:background="@color/lightBlue"
+                                android:layout_margin="4dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Custom Options -->
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/CustomMapOptions">
+
+                        <!-- Map Name Spinner -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <Spinner
+                                android:id="@+id/mapNameSpinner"
+                                android:layout_width="0dp"
+                                android:layout_weight=".9725"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:background="@color/silver" />
+
+                            <ImageView
+                                android:layout_width="0dp"
+                                android:layout_weight=".0275"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom"
+                                android:src="@drawable/ic_spinner_arrow" />
+                        </LinearLayout>
+
+                        <!-- Border -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <LinearLayout
+                                style="@style/border"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:background="@color/lightBlue"
+                                android:layout_margin="4dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

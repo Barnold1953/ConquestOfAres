@@ -1,5 +1,6 @@
 package utkseniordesign.conquestofares;
 
+import android.content.Intent;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -9,9 +10,7 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
-import android.view.MenuInflater;
 import android.view.ViewGroup;
 
 public class MainActivity extends ActionBarActivity {
@@ -23,7 +22,7 @@ public class MainActivity extends ActionBarActivity {
         //Sets tabbed layout
         setContentView( R.layout.activity_main );
 
-        //Action bar is uneccessary for our game, and it looks weird. Hide it.
+        //Action bar is unnecessary for our game, and it looks weird. Hide it.
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
 
@@ -36,7 +35,7 @@ public class MainActivity extends ActionBarActivity {
         //Frustratingly, you can't set the indicator color in xml without changing the font color
         //So I was forced to do it programatically
         PagerTabStrip pagerTabStrip = ( PagerTabStrip ) findViewById( R.id.pager_header );
-        pagerTabStrip.setTabIndicatorColor(getResources().getColor(R.color.lightBlue));
+        pagerTabStrip.setTabIndicatorColor( getResources().getColor( R.color.lightBlue ) );
     }
 
     public class SampleFragmentPagerAdapter extends FragmentPagerAdapter {
@@ -108,13 +107,13 @@ public class MainActivity extends ActionBarActivity {
             View view;
             switch( mPage ) {
                 case 1:
-                    view = inflater.inflate(R.layout.main_page, container, false);
+                    view = inflater.inflate(R.layout.activity_main_subtab_main, container, false);
                     break;
                 case 2:
-                    view = inflater.inflate(R.layout.activegames_page, container, false);
+                    view = inflater.inflate(R.layout.activity_main_subtab_activegames, container, false);
                     break;
                 case 3:
-                    view = inflater.inflate(R.layout.leaderboard_page, container, false);
+                    view = inflater.inflate(R.layout.activity_main_subtab_leaderboards, container, false);
                     break;
                 default:
                     view = null;
@@ -135,15 +134,10 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    /* I don't think this is necessary, since we ditched the action bar
-    @Override
-    public boolean onCreateOptionsMenu( Menu menu ) {
-        // Inflate the menu items for use in the action bar
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate( R.menu.menu_main, menu );
-        return super.onCreateOptionsMenu( menu );
+    public void launchNewGame( View v ) {
+        Intent intent = new Intent( this, LaunchGameActivity.class );
+        startActivity( intent );
     }
-    */
 
     @Override
     protected void onDestroy() {
