@@ -7,5 +7,6 @@ import java.util.*;
 public class Territory {
     public Vector<Territory> neighbors = new Vector<Territory>(); ///< Pointers to neighbor territories
     public Army army = null; ///< Pointer to residing army
-    public int power = 0;
+    public Player owner = null; ///< Owning player
+    public int power = 0; ///< Power of the territory
 }

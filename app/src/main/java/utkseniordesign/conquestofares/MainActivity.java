@@ -15,13 +15,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-<<<<<<< HEAD
 import android.view.MenuItem;
-=======
 import android.view.View;
 import android.view.MenuInflater;
 import android.view.ViewGroup;
->>>>>>> 3eab3986a31ae0a4bf11c96f9809c1d4caecfd4f
 
 import Graphics.CoARenderer;
 

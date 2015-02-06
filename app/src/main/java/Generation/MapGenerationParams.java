@@ -1,17 +1,33 @@
 package Generation;
 import java.util.*;
 import Game.Territory;
+import Game.GameSettings;
 
 /**
  * Created by brb55_000 on 2/6/2015.
  */
+
+enum MapSize {
+    CRAMPED,
+    SMALL,
+    AVERAGE,
+    LARGE
+}
+
+enum MapSymmetry {
+    NONE,
+    HORIZONTAL,
+    VERTICAL,
+    RADIAL
+}
+
 /// Parameters for generating a map
 public class MapGenerationParams {
     /// Parameters
-    public int width; ///< Width of the map. Set by caller.
-    public int height; ///< Height of the map. Set by caller.
-    public int seed; ///< Generation seed. Set by caller
+    public int seed = 0; ///< Generation seed. Set by caller
+    public MapSize mapSize = MapSize.AVERAGE; ///< Size of map
+    public MapSymmetry mapSymmetry = MapSymmetry.NONE; ///< Symmetry of generated map
     /// Returns
-    public int texture; ///< ID for the openGL texture that is generated. Gets set by generator
-    Vector<Territory> territories; ///< Generated territories. Gets set by generator
+    public int texture = 0; ///< ID for the openGL texture that is generated. Gets set by generator
+    public Vector<Territory> territories = null; ///< Generated territories. Gets set by generator
 }
