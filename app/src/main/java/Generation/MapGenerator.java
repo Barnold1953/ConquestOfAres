@@ -4,19 +4,18 @@ package Generation;
  * Created by brb55_000 on 1/21/2015.
  */
 public class MapGenerator {
-    public MapGenerator() {
-        osNoise = new OpenSimplexNoise();
-    }
 
-    public void generateMap(int width, int height, int seed) {
-        double[][] heightMap = new double[height][width];
+    /// Generates a map and stores the result in p
+    public void generateMap(MapGenerationParams p) {
+        double[][] heightMap = new double[p.height][p.width];
 
-        generateHeightmap(width, height, heightMap, seed);
+        generateHeightmap(p.width, p.height, heightMap, p.seed);
 
         // TODO(Ben): Render the heightmap
         // TODO(Ben): Segment heightmap into territories
     }
 
+    /// Generates a raw heightmap
     public void generateHeightmap(int width, int height, double[][] heightMap, int seed) {
         // Generate the height data
         for (int y = 0; y < height; y++) {
@@ -79,5 +78,5 @@ public class MapGenerator {
         return total / maxAmplitude;
     }
 
-    private OpenSimplexNoise osNoise;
+    private OpenSimplexNoise osNoise = new OpenSimplexNoise();
 }
