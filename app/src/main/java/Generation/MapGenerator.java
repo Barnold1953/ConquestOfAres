@@ -1,22 +1,47 @@
 package Generation;
+import java.lang.Math.*;
 
 /**
  * Created by brb55_000 on 1/21/2015.
  */
 public class MapGenerator {
-    public MapGenerator() {
-        osNoise = new OpenSimplexNoise();
-    }
 
-    public void generateMap(int width, int height, int seed) {
+    /// Generates a map and stores the result in p
+    // TODO(Ben): Finish this
+    public void generateMap(MapGenerationParams p) {
+        int width = 1;
+        int height = 1;
+        // TODO: These are arbitrary. Pick better values.
+        switch (p.mapSize) {
+            case CRAMPED:
+                width = 256;
+                height = 256;
+                break;
+            case SMALL:
+                width = 512;
+                height = 512;
+                break;
+            case AVERAGE:
+                width = 768;
+                height = 768;
+                break;
+            case LARGE:
+                width = 1024;
+                height = 1024;
+                break;
+            default:
+                break;
+        }
+
         double[][] heightMap = new double[height][width];
 
-        generateHeightmap(width, height, heightMap, seed);
+        generateHeightmap(width, height, heightMap, p.seed);
 
         // TODO(Ben): Render the heightmap
         // TODO(Ben): Segment heightmap into territories
     }
 
+    /// Generates a raw heightmap
     public void generateHeightmap(int width, int height, double[][] heightMap, int seed) {
         // Generate the height data
         for (int y = 0; y < height; y++) {
@@ -71,7 +96,7 @@ public class MapGenerator {
         double maxAmplitude = 0.0;
 
         for (int i = 0; i < octaves; i++) {
-            total += ((1.0 - abs(osNoise.eval(x * frequency, y * frequency))) * 2.0 - 1.0) * amplitude;
+            total += ((1.0 - Math.abs(osNoise.eval(x * frequency, y * frequency))) * 2.0 - 1.0) * amplitude;
             frequency *= 2.0;
             maxAmplitude += amplitude;
             amplitude *= persistence;
@@ -79,5 +104,5 @@ public class MapGenerator {
         return total / maxAmplitude;
     }
 
-    private OpenSimplexNoise osNoise;
+    private OpenSimplexNoise osNoise = new OpenSimplexNoise();
 }
