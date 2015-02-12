@@ -1,23 +1,46 @@
 package Graphics;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
+
+import utkseniordesign.conquestofares.FileIO;
+import utkseniordesign.conquestofares.MainActivity;
 
 /**
  * Created by Nathan on 1/16/2015.
  */
 public class CoARenderer implements GLSurfaceView.Renderer {
     int programHandle;
-    MatrixHelper mHelper = new MatrixHelper();
-    ShaderHelper sHelper = new ShaderHelper();
-    GeometryHelper gHelper = new GeometryHelper();
-    DrawHelper dHelper = new DrawHelper(mHelper);
+    Context context;
+    HashMap<String,String> shaders;
+    MatrixHelper mHelper;
+    ShaderHelper sHelper;
+    GeometryHelper gHelper;
+    DrawHelper dHelper;
+
+
+    public CoARenderer(Context c, HashMap<String,String> s) {
+        context = c;
+        shaders = s;
+
+
+        mHelper = new MatrixHelper();
+        sHelper = new ShaderHelper(shaders);
+        gHelper = new GeometryHelper();
+        dHelper = new DrawHelper(mHelper);
+
+        Log.d("Render", shaders.get("simple.frag"));
+    }
 
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
@@ -37,6 +60,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         mHelper.matrixSetup(programHandle);
         Log.d("Setup", "Matrix successfully initialized.");
         gHelper.createBuffers();
+        gHelper.createQuad(-1,-1,0,1,1);
         Log.d("Setup", "Geometry buffers initialized and filled.");
 
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);

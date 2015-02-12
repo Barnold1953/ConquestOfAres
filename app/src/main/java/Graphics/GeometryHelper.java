@@ -39,17 +39,17 @@ public class GeometryHelper {
     };
 
     final float[] cubeTextCoords = {
-                0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
 
-                0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
 
-                0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
 
-                0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
 
-                0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
 
-                0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f
     };
 
     final float[] cubeColors = {
@@ -68,7 +68,7 @@ public class GeometryHelper {
 
     final float[] quad = {0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f};
     final float[] quadNormals = {0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f};
-    final float[] quadTextCoords = {0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f};
+    final float[] quadTextCoords = {0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f};
     final float[] quadColors = {1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f};
 
     //final float[] cube = {0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f};
@@ -108,14 +108,27 @@ public class GeometryHelper {
         mTextCoordBuffer = ByteBuffer.allocateDirect(cubeTextCoords.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
         mIndicesBuffer = ByteBuffer.allocateDirect(indices.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
 
-        mVertexBuffer.put(cube).position(0);
-        mColorBuffer.put(cubeColors).position(0);
-        mTextCoordBuffer.put(cubeTextCoords).position(0);
-        mIndicesBuffer.put(indices).position(0);
+        //mVertexBuffer.put(cube).position(0);
+        //mColorBuffer.put(cubeColors).position(0);
+        //mTextCoordBuffer.put(cubeTextCoords).position(0);
+        //mIndicesBuffer.put(indices).position(0);
 
-        //mVertexBuffer.put(quad).position(0);
-        //mColorBuffer.put(quadColors).position(0);
-        //mTextCoordBuffer.put(quadTextCoords).position(0);
+        mVertexBuffer.put(quad).position(0);
+        mColorBuffer.put(quadColors).position(0);
+        mTextCoordBuffer.put(quadTextCoords).position(0);
         mIndicesBuffer.put(indices).position(0);
+    }
+
+    public void createQuad(int x, int y, int z, int width, int height){
+        float[] newV = new float[18];
+
+        for(int i = 0; i < quad.length; i+=3) {
+            newV[i] = quad[i] + x;
+            newV[i+1] = quad[i+1] + y;
+            newV[i+2] = quad[i+2] + z;
+        }
+
+        mVertexBuffer = ByteBuffer.allocateDirect(newV.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
+        mVertexBuffer.put(newV).position(0);
     }
 }
