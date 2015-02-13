@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="C:\Users\Carson Flint\Desktop\android-basic-samples-master\BasicSamples\TypeANumber\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.0\classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="686344a780033e4ba22b926cd225f8d4941247e6">
+        <dex dex="C:\Users\Carson Flint\Desktop\android-basic-samples-master\BasicSamples\TypeANumber\build\intermediates\pre-dexed\debug\classes-de0e2cc8c5e6735c333f3ed817f20e5df732bc86.jar" />
+    </item>
+    <item
+        jar="C:\Users\Carson Flint\Desktop\android-basic-samples-master\BasicSamples\TypeANumber\build\intermediates\exploded-aar\BasicSamples.libraries\BaseGameUtils\unspecified\classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="02f15297169e6342f95a28bfa335dbbf5ef742ab">
+        <dex dex="C:\Users\Carson Flint\Desktop\android-basic-samples-master\BasicSamples\TypeANumber\build\intermediates\pre-dexed\debug\classes-188d9ab7e1ad11cfa86e47501d7a1b242f37ceaa.jar" />
+    </item>
+    <item
+        jar="C:\Users\Carson Flint\Desktop\android-basic-samples-master\BasicSamples\TypeANumber\build\intermediates\exploded-aar\com.google.android.gms\play-services\6.5.87\classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="dd9247ea0fabe8ee479638c4b4a23e93752be256">
+        <dex dex="C:\Users\Carson Flint\Desktop\android-basic-samples-master\BasicSamples\TypeANumber\build\intermediates\pre-dexed\debug\classes-d1eaa85e024fd4e515ccce723737ccd9e52497e1.jar" />
+    </item>
+    <item
+        jar="C:\Users\Carson Flint\Desktop\android-basic-samples-master\BasicSamples\SkeletonTbmp\build\intermediates\exploded-aar\BasicSamples.libraries\BaseGameUtils\unspecified\classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="02f15297169e6342f95a28bfa335dbbf5ef742ab">
+        <dex dex="C:\Users\Carson Flint\Desktop\android-basic-samples-master\BasicSamples\SkeletonTbmp\build\intermediates\pre-dexed\debug\classes-476435b792c6f5c867e935ffd5fed9d86f8c1e83.jar" />
+    </item>
+    <item
+        jar="C:\Users\Carson Flint\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\21.0.0\support-annotations-21.0.0.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="1a578b9607b36266c63d43a4fa0ab5664dbe911e">
+        <dex dex="C:\Users\Carson Flint\Desktop\android-basic-samples-master\BasicSamples\TypeANumber\build\intermediates\pre-dexed\debug\support-annotations-21.0.0-64071471175e27e105029a71ea19c9d4c37e901d.jar" />
+    </item>
+    <item
+        jar="C:\Users\Carson Flint\Desktop\android-basic-samples-master\BasicSamples\SkeletonTbmp\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.0\classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="686344a780033e4ba22b926cd225f8d4941247e6">
+        <dex dex="C:\Users\Carson Flint\Desktop\android-basic-samples-master\BasicSamples\SkeletonTbmp\build\intermediates\pre-dexed\debug\classes-d85f08c7d52336cd2ff74a458e127a116c84bea0.jar" />
+    </item>
+    <item
+        jar="C:\Users\Carson Flint\Desktop\android-basic-samples-master\BasicSamples\SkeletonTbmp\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.0\libs\internal_impl-21.0.0.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="1609e6d42d0480b0f4188e2c29f75388fa12a8f0">
+        <dex dex="C:\Users\Carson Flint\Desktop\android-basic-samples-master\BasicSamples\SkeletonTbmp\build\intermediates\pre-dexed\debug\internal_impl-21.0.0-5daaf86241d1030d76924402b34790884a4acd98.jar" />
+    </item>
+    <item
+        jar="C:\Users\Carson Flint\Desktop\android-basic-samples-master\BasicSamples\SkeletonTbmp\build\intermediates\exploded-aar\com.google.android.gms\play-services\6.5.87\classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="dd9247ea0fabe8ee479638c4b4a23e93752be256">
+        <dex dex="C:\Users\Carson Flint\Desktop\android-basic-samples-master\BasicSamples\SkeletonTbmp\build\intermediates\pre-dexed\debug\classes-5e05b770add78da0eb4ffa4f886262292bb1b7de.jar" />
+    </item>
+    <item
+        jar="C:\Users\Carson Flint\Desktop\android-basic-samples-master\BasicSamples\TypeANumber\build\intermediates\exploded-aar\com.android.support\appcompat-v7\20.0.0\classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="f21927d22fe31889ecce94dd697a2e75b137e0ef">
+        <dex dex="C:\Users\Carson Flint\Desktop\android-basic-samples-master\BasicSamples\TypeANumber\build\intermediates\pre-dexed\debug\classes-3daf2da746af62b197f6463f1ee232098991d6a7.jar" />
+    </item>
+    <item
+        jar="C:\Users\Carson Flint\Desktop\android-basic-samples-master\BasicSamples\TypeANumber\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.0\libs\internal_impl-21.0.0.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="1609e6d42d0480b0f4188e2c29f75388fa12a8f0">
+        <dex dex="C:\Users\Carson Flint\Desktop\android-basic-samples-master\BasicSamples\TypeANumber\build\intermediates\pre-dexed\debug\internal_impl-21.0.0-783c61a9f87498561b8a5eb3cafc76a2e1aa734f.jar" />
+    </item>
+    <item
+        jar="C:\Users\Carson Flint\Desktop\android-basic-samples-master\BasicSamples\SkeletonTbmp\build\intermediates\exploded-aar\com.android.support\appcompat-v7\20.0.0\classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="f21927d22fe31889ecce94dd697a2e75b137e0ef">
+        <dex dex="C:\Users\Carson Flint\Desktop\android-basic-samples-master\BasicSamples\SkeletonTbmp\build\intermediates\pre-dexed\debug\classes-ba83d12376cd4ad6ea188f81badb39a26a5328f9.jar" />
+    </item>
+
+</items>
