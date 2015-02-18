@@ -26,7 +26,7 @@ public class DrawHelper {
         mTCoordHandle = tHandle;
     }
 
-    public void DrawCube(int programHandle, FloatBuffer mVertexBuffer, FloatBuffer mColorBuffer, FloatBuffer mTextCoordBuffer, FloatBuffer mIndicesBuffer){
+    public void DrawCube(Camera camera, FloatBuffer mVertexBuffer, FloatBuffer mColorBuffer, FloatBuffer mTextCoordBuffer, FloatBuffer mIndicesBuffer){
         mVertexBuffer.position(0);
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 0, mVertexBuffer);
         GLES20.glEnableVertexAttribArray(mPositionHandle);
@@ -39,7 +39,7 @@ public class DrawHelper {
         GLES20.glVertexAttribPointer(mTCoordHandle, 2, GLES20.GL_FLOAT, false, 0, mTextCoordBuffer);
         GLES20.glEnableVertexAttribArray(mTCoordHandle);
 
-        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mHelper.getmMVPMatrix(), 0);
+        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, camera.getVPMatrix(), 0);
 
         //GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, ibo[0]);
         //GLES20.glDrawElements(GLES20.GL_TRIANGLES, 36, GLES20.GL_FLOAT, 0);

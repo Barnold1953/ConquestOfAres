@@ -36,7 +36,6 @@ import Graphics.TextureHelper;
 
 public class MainActivity extends ActionBarActivity {
     private GLSurfaceView mGLSurfaceView;
-    FileIO mFileIO;
 
     private HashMap<String,String> getShaders(){
         HashMap<String, String> shaders = new HashMap<String, String>();
@@ -60,7 +59,6 @@ public class MainActivity extends ActionBarActivity {
 
         Log.d("Create", "Before new surface call\n");
 
-        mFileIO = new FileIO(this);
         mGLSurfaceView = new GLSurfaceView(this);
 
         final ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
