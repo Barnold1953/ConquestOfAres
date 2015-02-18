@@ -8,7 +8,9 @@ import java.nio.FloatBuffer;
  * Created by Nathan on 1/21/2015.
  */
 public class DrawHelper {
-    private MatrixHelper mHelper;
+    private Camera mHelper;
+    private GeometryHelper gHelper;
+    private TextureHelper tHelper;
     private int mPositionHandle;
     private int mColorHandle;
     private int mMVPMatrixHandle;
@@ -42,10 +44,12 @@ public class DrawHelper {
         //GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, ibo[0]);
         //GLES20.glDrawElements(GLES20.GL_TRIANGLES, 36, GLES20.GL_FLOAT, 0);
         //GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 36);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, gHelper.getVertices().length/3);
     }
 
-    public DrawHelper(MatrixHelper mh){
+    public DrawHelper(Camera mh, GeometryHelper gh, TextureHelper th){
+        gHelper = gh;
         mHelper = mh;
+        tHelper = th;
     }
 }

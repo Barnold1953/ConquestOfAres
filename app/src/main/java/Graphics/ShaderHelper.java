@@ -1,22 +1,33 @@
 package Graphics;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Shader;
 import android.opengl.GLES20;
 import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
-import Utility.FileIO;
+import utkseniordesign.conquestofares.R;
 
 /**
  * Created by Nathan on 1/17/2015.
  */
 public class ShaderHelper {
+    HashMap<String,String> shaders;
     public int mPositionHandle;
     public int mColorHandle;
     public int mMVPMatrixHandle;
     public int mTCoordHandle;
+
+    public ShaderHelper(HashMap<String,String> s){
+        shaders = s;
+    }
 
     public static int loadShader(int type, String shaderCode) throws IOException{
         int shader = GLES20.glCreateShader(type);
@@ -28,47 +39,14 @@ public class ShaderHelper {
     }
 
     public int compileShader(String shader) throws IOException{
-        //String frag = "", vert = "";
         String filePath = "@raw/";
         int vertexShaderHandle, fragmentShaderHandle;
-        File fragFile, vertFile;
 
         Log.d("1", "Before loading shader");
 
-        vertFile = new File(filePath + shader + ".vert");
-        fragFile = new File(filePath + shader + ".frag");
-
-        //vert = FileIO.readFileToString(vertFile);
-        //frag = FileIO.readFileToString(fragFile);
-        //vert = FileIO.readFileToString("@raw/simple.vert");
-        //frag = FileIO.readFileToString("@raw/simple.frag");
-        final String vert =
-                "uniform mat4 uMVPMatrix;\n" +
-                "\n" +
-                "attribute vec4 vPosition;\n" +
-                "attribute vec4 vColor;\n" +
-                "attribute vec2 vTextCoords;\n" +
-                "\n" +
-                "varying vec4 color;\n" +
-                "varying vec2 tCoords;\n" +
-                "\n" +
-                "void main() {\n" +
-                "  color = vColor;\n" +
-                "  tCoords = vTextCoords;\n" +
-                "  gl_Position =  uMVPMatrix * vPosition;\n" +
-                "}";
-        final String frag =
-                "precision mediump float;\n" +
-                "\n" +
-                "varying vec4 color;\n" +
-                "varying vec2 tCoords;\n" +
-                "\n" +
-                "void main() {\n" +
-                "  gl_FragColor = color;\n" +
-                "}\n";
-
-        Log.d("Shader", vert);
-        Log.d("Shader", frag);
+        String vert, frag;
+        vert = shaders.get("simple.vert");
+        frag = shaders.get("simple.frag");
 
         vertexShaderHandle = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
 

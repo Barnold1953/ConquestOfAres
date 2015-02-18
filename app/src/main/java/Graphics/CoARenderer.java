@@ -1,10 +1,12 @@
 package Graphics;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
@@ -14,10 +16,25 @@ import android.util.Log;
  */
 public class CoARenderer implements GLSurfaceView.Renderer {
     int programHandle;
-    MatrixHelper mHelper = new MatrixHelper();
-    ShaderHelper sHelper = new ShaderHelper();
-    GeometryHelper gHelper = new GeometryHelper();
-    DrawHelper dHelper = new DrawHelper(mHelper);
+    Context context;
+    HashMap<String,String> shaders;
+    Camera mHelper;
+    ShaderHelper sHelper;
+    GeometryHelper gHelper;
+    DrawHelper dHelper;
+    TextureHelper tHelper;
+
+
+    public CoARenderer(Context c, HashMap<String,String> s) {
+        context = c;
+        shaders = s;
+
+        mHelper = new Camera();
+        sHelper = new ShaderHelper(shaders);
+        gHelper = new GeometryHelper();
+        tHelper = new TextureHelper();
+        dHelper = new DrawHelper(mHelper, gHelper, tHelper);
+    }
 
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
@@ -25,7 +42,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
         Log.d("Setup", "Surface created.");
-        Log.d("Setup", "Shader handle created.");
         try {
             programHandle = sHelper.compileShader("simple");
         }
@@ -37,6 +53,9 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         mHelper.matrixSetup(programHandle);
         Log.d("Setup", "Matrix successfully initialized.");
         gHelper.createBuffers();
+        gHelper.createQuad(-1, -1, 0, 1, 1);
+        gHelper.createQuad(-1, 0, 0, 1, 1);
+        gHelper.createQuad(0,-1,0,1,1);
         Log.d("Setup", "Geometry buffers initialized and filled.");
 
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
