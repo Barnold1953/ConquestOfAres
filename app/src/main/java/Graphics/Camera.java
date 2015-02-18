@@ -11,7 +11,7 @@ import android.os.SystemClock;
 /**
  * Created by Nathan on 1/21/2015.
  */
-public class MatrixHelper {
+public class Camera {
     private float[] mModelMatrix = new float[16];
     private float[] mViewMatrix = new float[16];
     private float[] mProjectionMatrix = new float[16];

@@ -2,19 +2,14 @@ package Graphics;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
-
-import utkseniordesign.conquestofares.FileIO;
-import utkseniordesign.conquestofares.MainActivity;
 
 /**
  * Created by Nathan on 1/16/2015.
@@ -23,23 +18,22 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     int programHandle;
     Context context;
     HashMap<String,String> shaders;
-    MatrixHelper mHelper;
+    Camera mHelper;
     ShaderHelper sHelper;
     GeometryHelper gHelper;
     DrawHelper dHelper;
+    TextureHelper tHelper;
 
 
     public CoARenderer(Context c, HashMap<String,String> s) {
         context = c;
         shaders = s;
 
-
-        mHelper = new MatrixHelper();
+        mHelper = new Camera();
         sHelper = new ShaderHelper(shaders);
         gHelper = new GeometryHelper();
-        dHelper = new DrawHelper(mHelper);
-
-        Log.d("Render", shaders.get("simple.frag"));
+        tHelper = new TextureHelper();
+        dHelper = new DrawHelper(mHelper, gHelper, tHelper);
     }
 
     @Override
@@ -48,7 +42,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
         Log.d("Setup", "Surface created.");
-        Log.d("Setup", "Shader handle created.");
         try {
             programHandle = sHelper.compileShader("simple");
         }
@@ -60,7 +53,9 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         mHelper.matrixSetup(programHandle);
         Log.d("Setup", "Matrix successfully initialized.");
         gHelper.createBuffers();
-        gHelper.createQuad(-1,-1,0,1,1);
+        gHelper.createQuad(-1, -1, 0, 1, 1);
+        gHelper.createQuad(-1, 0, 0, 1, 1);
+        gHelper.createQuad(0,-1,0,1,1);
         Log.d("Setup", "Geometry buffers initialized and filled.");
 
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);

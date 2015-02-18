@@ -43,7 +43,6 @@ public class ShaderHelper {
         int vertexShaderHandle, fragmentShaderHandle;
 
         Log.d("1", "Before loading shader");
-        Log.d("Shader", shaders.get("simple.frag"));
 
         String vert, frag;
         vert = shaders.get("simple.vert");

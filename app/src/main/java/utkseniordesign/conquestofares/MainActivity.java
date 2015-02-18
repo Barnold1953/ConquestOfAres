@@ -19,16 +19,19 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.MenuInflater;
+import android.view.ViewDebug;
 import android.view.ViewGroup;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
 import Graphics.CoARenderer;
+import Graphics.TextureHelper;
 
 public class MainActivity extends ActionBarActivity {
     private GLSurfaceView mGLSurfaceView;
@@ -42,6 +45,12 @@ public class MainActivity extends ActionBarActivity {
 
         return shaders;
     }
+
+    /*private HashMap<String, FloatBuffer> getTextures(){
+        HashMap<String, FloatBuffer> textures = new HashMap<String, FloatBuffer>();
+
+
+    }*/
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -58,7 +67,10 @@ public class MainActivity extends ActionBarActivity {
         final boolean supportsEs2 = configurationInfo.reqGlEsVersion >= 0x20000;
 
         HashMap<String,String> shaders = getShaders();
-        Log.d("test", shaders.get("simple.vert"));
+
+        TextureHelper th = new TextureHelper();
+        int handle = th.ImageToTexture(this, R.drawable.texture1);
+        Log.d("Texture", "Done");
 
         mGLSurfaceView.setEGLContextClientVersion(2);
         mGLSurfaceView.setEGLConfigChooser(8 , 8, 8, 8, 16, 0);
