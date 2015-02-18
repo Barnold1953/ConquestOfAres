@@ -1,10 +1,17 @@
 package Generation;
 import java.lang.Math.*;
+import java.nio.*;
+import java.util.*;
 
 /**
  * Created by brb55_000 on 1/21/2015.
  */
 public class MapGenerator {
+
+    private final int mBytesPerFloat = 4;
+    Vertex[] diagram;
+    List<Vertex> vertices = new LinkedList<Vertex>();
+    Random random = new Random();
 
     /// Generates a map and stores the result in p
     // TODO(Ben): Finish this
@@ -34,8 +41,19 @@ public class MapGenerator {
         }
 
         double[][] heightMap = new double[height][width];
-
         generateHeightmap(width, height, heightMap, p.seed);
+
+        FloatBuffer pixelBuffer = ByteBuffer.allocateDirect(height * width * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
+
+        // Solid red for now
+        for (int i = 0; i < width * height; i++) {
+            pixelBuffer.put(1.0f);
+            pixelBuffer.put(0.0f);
+            pixelBuffer.put(0.0f);
+            pixelBuffer.put(1.0f);
+        }
+        random.setSeed(p.seed);
+        generateTerritories(width, height, heightMap);
 
         // TODO(Ben): Render the heightmap
         // TODO(Ben): Segment heightmap into territories
@@ -74,6 +92,18 @@ public class MapGenerator {
                 }
             }
         }
+    }
+
+    public void generateTerritories(int width, int height, double[][] heightMap) {
+        int numPoints = 10;
+        Coord[] points = new Coord[numPoints];
+
+        for (int i = 0; i < numPoints; i++) {
+            points[i].x = random.nextDouble() * width;
+            points[i].y = random.nextDouble() * height;
+        }
+
+        diagram = Voronoi.generate(points);
     }
 
     private double octaveNoise2D(double x, double y, double persistence, double frequency, int octaves) {
