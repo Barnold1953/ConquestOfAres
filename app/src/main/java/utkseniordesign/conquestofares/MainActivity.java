@@ -4,9 +4,12 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.content.pm.ConfigurationInfo;
+import android.opengl.GLUtils;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -46,11 +49,26 @@ public class MainActivity extends ActionBarActivity {
         return shaders;
     }
 
-    /*private HashMap<String, FloatBuffer> getTextures(){
-        HashMap<String, FloatBuffer> textures = new HashMap<String, FloatBuffer>();
+    private HashMap<String, int[]> getTextures(){
+        HashMap<String, int[]> textures = new HashMap<String, int[]>();
+        int[] texture = new int[1];
 
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.texture1);
 
-    }*/
+        GLES20.glGenTextures(1, texture, 0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture[0]);
+
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+
+        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+
+        bitmap.recycle();
+
+        textures.put("texture1", texture);
+
+        return textures;
+    }
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -67,14 +85,13 @@ public class MainActivity extends ActionBarActivity {
         final boolean supportsEs2 = configurationInfo.reqGlEsVersion >= 0x20000;
 
         HashMap<String,String> shaders = getShaders();
-
-        TextureHelper th = new TextureHelper();
-        int handle = th.ImageToTexture(this, R.drawable.texture1);
-        Log.d("Texture", "Done");
+        Log.d("Main", "Before texture loading");
+        HashMap<String, int[]> textures = getTextures();
+        Log.d("Main", "After texture loading");
 
         mGLSurfaceView.setEGLContextClientVersion(2);
         mGLSurfaceView.setEGLConfigChooser(8 , 8, 8, 8, 16, 0);
-        mGLSurfaceView.setRenderer(new CoARenderer(this, shaders));
+        mGLSurfaceView.setRenderer(new CoARenderer(this, shaders, textures));
 
         setContentView(mGLSurfaceView);
     }

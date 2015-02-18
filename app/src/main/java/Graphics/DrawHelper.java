@@ -15,18 +15,24 @@ public class DrawHelper {
     private int mColorHandle;
     private int mMVPMatrixHandle;
     private int mTCoordHandle;
+    private int mTextureHandle;
 
     private final int mBytesPerFloat = 4;
     private final int mStrideBytes = 9 * mBytesPerFloat;
 
-    public void setProgHandles(int mHandle, int pHandle, int cHandle, int tHandle){
-        mMVPMatrixHandle = mHandle;
-        mPositionHandle = pHandle;
-        mColorHandle = cHandle;
-        mTCoordHandle = tHandle;
+    public void setProgHandles(int ph){
+        mMVPMatrixHandle = GLES20.glGetUniformLocation(ph, "uMVPMatrix");
+        mPositionHandle = GLES20.glGetAttribLocation(ph, "vPosition");
+        mColorHandle = GLES20.glGetAttribLocation(ph, "vColor");
+        mTCoordHandle = GLES20.glGetAttribLocation(ph, "vTextCoords");
+        mTextureHandle = GLES20.glGetAttribLocation(ph, "texture");
     }
 
-    public void DrawCube(int programHandle, FloatBuffer mVertexBuffer, FloatBuffer mColorBuffer, FloatBuffer mTextCoordBuffer, FloatBuffer mIndicesBuffer){
+    public void Draw(int programHandle, FloatBuffer mVertexBuffer, FloatBuffer mColorBuffer, FloatBuffer mTextCoordBuffer, FloatBuffer mIndicesBuffer){
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, tHelper.getTexture("texture1"));
+        GLES20.glUniform1i(mTextureHandle, 0);
+
         mVertexBuffer.position(0);
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 0, mVertexBuffer);
         GLES20.glEnableVertexAttribArray(mPositionHandle);

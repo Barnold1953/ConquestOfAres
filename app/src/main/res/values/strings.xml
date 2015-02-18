@@ -24,11 +24,13 @@
     <string name="simple.frag">
                 precision mediump float;\n
                 \n
+                uniform sampler2D texture;\n
                 varying vec4 color;\n
                 varying vec2 tCoords;\n
                 \n
                 void main() {\n
-                  gl_FragColor = color;\n
+                  //gl_FragColor = color;\n
+                  gl_FragColor = texture2D(texture, tCoords);
                 }\n
     </string>
 </resources>
