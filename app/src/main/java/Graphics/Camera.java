@@ -12,10 +12,9 @@ import android.os.SystemClock;
  * Created by Nathan on 1/21/2015.
  */
 public class Camera {
-    private float[] mModelMatrix = new float[16];
-    private float[] mViewMatrix = new float[16];
-    private float[] mProjectionMatrix = new float[16];
-    private float[] mMVPMatrix = new float[16];
+    private float[] m_viewMatrix = new float[16];
+    private float[] m_projectionMatrix = new float[16];
+    private float[] m_vpMatrix = new float[16];
 
     final float eyeX = 0.0f;
     final float eyeY = 0.0f;
@@ -29,38 +28,57 @@ public class Camera {
     final float upY = 1.0f;
     final float upZ = 0.0f;
 
-    public void matrixSetup(int programHandle) {
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-        Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
+    public Camera() {
+        // Initialize matrices to identity
+        clearViewMatrix();
+        clearProjectionMatrix();
     }
 
-    public void surfaceChanged(int width, int height){
+    public void clearProjectionMatrix() {
+        Matrix.setIdentityM(m_projectionMatrix, 0);
+    }
+
+    public void clearViewMatrix() {
+        Matrix.setIdentityM(m_viewMatrix, 0);
+    }
+
+    /// Sets the view matrix for a camera located at eyeXYZ to point at
+    /// lookXYZ, with up vector upXYZ
+    public void lookAt(float eyeX, float eyeY, float eyeZ,
+                            float lookX, float lookY, float lookZ,
+                            float upX, float upY, float upZ) {
+        Matrix.setLookAtM(m_viewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
+    }
+    /// Sets the view matrix to orthographic (2D) rendering
+    public void ortho(int width, int height) {
+        float aspectRatio = (float) width / (float) height;
+        Matrix.orthoM(m_projectionMatrix, 0, -aspectRatio, aspectRatio, -1, 1, -1, 1);
+    }
+    /// Sets the viewport and projection matrix
+    /// @param width: Width of the viewport
+    /// @param height: Height of the viewport
+    /// @param zNear: Near clipping planet
+    /// @param zFar: Far clipping plane
+    public void setSurface(int width, int height, float zNear, float zFar){
+        // Set the viewport
         GLES20.glViewport(0, 0, width, height);
 
         final float ratio = (float) width / height;
+        // TODO(Ben): maybe should use different values for these
         final float left = -ratio;
         final float right = ratio;
         final float bottom = -1.0f;
         final float top = 1.0f;
-        final float near = 1.0f;
-        final float far = 10000.0f;
-
-        Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
+        // Update projection matrix
+        Matrix.frustumM(m_projectionMatrix, 0, left, right, bottom, top, zNear, zFar);
+    }
+    /// Currently does nothing
+    public void update(){
+        // Empty for now
     }
 
-    public void updateMatrix(){
-        long time = SystemClock.uptimeMillis() % 10000L;
-        float angleInDegrees = (360.0f / 10000.0f) * ((int) time);
-
-        Matrix.setIdentityM(mModelMatrix, 0);
-        //Matrix.translateM(mModelMatrix, 0, 0.0f, 0.0f, 0.0f);
-        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 1.0f, 0.0f, 1.0f);
-    }
-
-    public float[] getmMVPMatrix(){
-        Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
-        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
-
-        return mMVPMatrix;
+    public float[] getVPMatrix(){
+        Matrix.multiplyMM(m_vpMatrix, 0, m_projectionMatrix, 0, m_viewMatrix, 0);
+        return m_vpMatrix;
     }
 }

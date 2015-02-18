@@ -109,13 +109,13 @@ public class GeometryHelper {
             indices[i + 5] = j;
         }
 
-
+        /*
         mVertexBuffer = ByteBuffer.allocateDirect(cube.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
         mColorBuffer = ByteBuffer.allocateDirect(cubeColors.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
         mTextCoordBuffer = ByteBuffer.allocateDirect(cubeTextCoords.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
         mIndicesBuffer = ByteBuffer.allocateDirect(indices.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
+        */
 
-/*
         vertices = new float[0];
         //System.arraycopy(quad, 0, vertices, 0, quad.length);
         normals = new float[0];
@@ -129,21 +129,21 @@ public class GeometryHelper {
         mColorBuffer = ByteBuffer.allocateDirect(colors.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
         mTextCoordBuffer = ByteBuffer.allocateDirect(textureCoordinates.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
         mIndicesBuffer = ByteBuffer.allocateDirect(indices.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
-*/
-        mVertexBuffer.put(cube).position(0);
-        mColorBuffer.put(cubeColors).position(0);
-        mTextCoordBuffer.put(cubeTextCoords).position(0);
-        mIndicesBuffer.put(indices).position(0);
+
+        //mVertexBuffer.put(cube).position(0);
+        //mColorBuffer.put(cubeColors).position(0);
+        //mTextCoordBuffer.put(cubeTextCoords).position(0);
+        //mIndicesBuffer.put(indices).position(0);
 
         //mVertexBuffer.put(quad).position(0);
         //mColorBuffer.put(quadColors).position(0);
         //mTextCoordBuffer.put(quadTextCoords).position(0);
         //mIndicesBuffer.put(indices).position(0);
 
-        //mVertexBuffer.put(vertices).position(0);
-        //mColorBuffer.put(colors).position(0);
-        //mTextCoordBuffer.put(textureCoordinates).position(0);
-        //mIndicesBuffer.put(indices).position(0);
+        mVertexBuffer.put(vertices).position(0);
+        mColorBuffer.put(colors).position(0);
+        mTextCoordBuffer.put(textureCoordinates).position(0);
+        mIndicesBuffer.put(indices).position(0);
     }
 
     public void createQuad(int x, int y, int z, int width, int height){
