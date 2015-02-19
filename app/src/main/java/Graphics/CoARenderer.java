@@ -72,7 +72,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         }
 
         dHelper.setProgHandles(programHandle);
-        tHelper.ImageToTexture(context, R.drawable.texture1, "texture1");
+        tHelper.imageToTexture(context, R.drawable.texture1, "texture1");
         Log.d("Setup", "After texture get");
 
         Log.d("Setup", "Shader successfully initialized.");

@@ -25,7 +25,7 @@ public class TextureHelper {
         context = c;
     }
 
-    public void DataToTexture(ByteBuffer data, String label, int width, int height){
+    public void dataToTexture(ByteBuffer data, String label, int width, int height){
         int[] textureHandle = new int[1];
 
         GLES20.glGenTextures(1, textureHandle, 0);
@@ -49,7 +49,7 @@ public class TextureHelper {
         }
     }
 
-    public int ImageToTexture(final Context context, final int resourceId, final String label){
+    public int imageToTexture(final Context context, final int resourceId, final String label){
         final int[] textureHandle = new int[1];
 
         GLES20.glGenTextures(1, textureHandle, 0);
@@ -88,7 +88,7 @@ public class TextureHelper {
         return textureHandle[0];
     }
 
-    public int DataToTexture(final FloatBuffer data, final String label, final int width, final int height){
+    public int dataToTexture(final FloatBuffer data, final String label, final int width, final int height){
         final int[] textureHandle = new int[1];
 
         GLES20.glGenTextures(1, textureHandle, 0);
