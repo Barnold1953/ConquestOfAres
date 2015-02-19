@@ -11,6 +11,7 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
+import Generation.MapGenerationParams;
 import utkseniordesign.conquestofares.R;
 
 /**
@@ -73,6 +74,13 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         dHelper.setProgHandles(programHandle);
         tHelper.imageToTexture(context, R.drawable.texture1, "texture1");
+
+        // Temporary generation test
+        Generation.MapGenerator generator = new Generation.MapGenerator();
+        MapGenerationParams params = new MapGenerationParams();
+
+        params.mapSize = MapGenerationParams.MapSize.AVERAGE;
+
         Log.d("Setup", "After texture get");
 
         Log.d("Setup", "Shader successfully initialized.");

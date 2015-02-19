@@ -45,15 +45,32 @@ public class MapGenerator {
 
         FloatBuffer pixelBuffer = ByteBuffer.allocateDirect(height * width * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
 
-        // Solid red for now
-        for (int i = 0; i < width * height; i++) {
-            pixelBuffer.put(1.0f);
-            pixelBuffer.put(0.0f);
-            pixelBuffer.put(0.0f);
-            pixelBuffer.put(1.0f);
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (heightMap[y][x] > 0.65) { // Mountains
+                    pixelBuffer.put(127.0f/255.0f);
+                    pixelBuffer.put(127.0f/255.0f);
+                    pixelBuffer.put(127.0f/255.0f);
+                } else if (heightMap[y][x] < 0.0) { // Oceans
+                    pixelBuffer.put(0/255.0f);
+                    pixelBuffer.put(12/255.0f);
+                    pixelBuffer.put(100/255.0f);
+                } else if (heightMap[y][x] < 0.05) { // Beach
+                    pixelBuffer.put(120/255.0f);
+                    pixelBuffer.put(100/255.0f);
+                    pixelBuffer.put(80/255.0f);
+                } else { // Grass
+                    pixelBuffer.put(0);
+                    pixelBuffer.put(80/255.0f);
+                    pixelBuffer.put(0);
+                }
+            }
         }
-        random.setSeed(p.seed);
-        generateTerritories(width, height, heightMap);
+
+        TextureHelper.
+
+       // random.setSeed(p.seed);
+       // generateTerritories(width, height, heightMap);
 
         // TODO(Ben): Render the heightmap
         // TODO(Ben): Segment heightmap into territories
@@ -66,30 +83,6 @@ public class MapGenerator {
             for (int x = 0; x < width; x++) {
                 heightMap[y][x] = octaveNoise2D((double)(seed + y), (double)(x - seed),
                         0.9, 0.001, 8);
-            }
-        }
-
-        // Generate pixel data for texture
-        byte[][][] pixelData = new byte[height][width][3];
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                if (heightMap[y][x] > 0.65) { // Mountains
-                    pixelData[y][x][0] = 127;
-                    pixelData[y][x][1] = 127;
-                    pixelData[y][x][2] = 127;
-                } else if (heightMap[y][x] < 0.0) { // Oceans
-                    pixelData[y][x][0] = 0;
-                    pixelData[y][x][1] = 12;
-                    pixelData[y][x][2] = 100;
-                } else if (heightMap[y][x] < 0.05) { // Beach
-                    pixelData[y][x][0] = 120;
-                    pixelData[y][x][1] = 100;
-                    pixelData[y][x][2] = 80;
-                } else { // Grass
-                    pixelData[y][x][0] = 0;
-                    pixelData[y][x][1] = 80;
-                    pixelData[y][x][2] = 0;
-                }
             }
         }
     }
