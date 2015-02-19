@@ -44,7 +44,7 @@ public class MapGenerator {
         double[][] heightMap = new double[height][width];
         generateHeightmap(width, height, heightMap, p.seed);
 
-        FloatBuffer pixelBuffer = ByteBuffer.allocateDirect(height * width * mBytesPerFloat * 4).order(ByteOrder.nativeOrder()).asFloatBuffer();
+        ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(height * width * 4).order(ByteOrder.nativeOrder());
 
         Log.d("Generator", Integer.toString(width));
         Log.d("Generator", Integer.toString(height));
@@ -53,10 +53,10 @@ public class MapGenerator {
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                pixelBuffer.put(1.0f);
-                pixelBuffer.put(1.0f);
-                pixelBuffer.put(1.0f);
-                pixelBuffer.put(1.0f);
+                pixelBuffer.put((byte)127);
+                pixelBuffer.put((byte)127);
+                pixelBuffer.put((byte)127);
+                pixelBuffer.put((byte)127);
             }
         }
 

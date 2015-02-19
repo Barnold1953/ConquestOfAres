@@ -47,8 +47,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         camera = new Camera();
         sHelper = new ShaderHelper();
         gHelper = new GeometryHelper();
-
-        TextureHelper.context = context;
         dHelper = new DrawHelper(camera, gHelper);
 
         // Set the view matrix
@@ -106,7 +104,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
         //GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
-        dHelper.draw(camera, gHelper.mVertexBuffer, gHelper.mColorBuffer, gHelper.mTextCoordBuffer, gHelper.mIndicesBuffer, "gentest");
+        dHelper.draw(camera, gHelper.mVertexBuffer, gHelper.mColorBuffer, gHelper.mTextCoordBuffer, gHelper.mIndicesBuffer, "texture1");
     }
 
     @Override

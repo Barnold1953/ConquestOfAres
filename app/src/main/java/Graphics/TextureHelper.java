@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * Created by Nathan on 2/5/2015.
@@ -18,8 +19,6 @@ import java.util.Map;
 public class TextureHelper {
     static private Map textureHandles= new HashMap();
     static private HashMap<String, int[]> textures = new HashMap<String, int[]>();
-
-    public static Context context = null;
 
     public static int imageToTexture(final Context context, final int resourceId, final String label){
         final int[] textureHandle = new int[1];
@@ -72,7 +71,7 @@ public class TextureHelper {
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
 
-            GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, 4, width, height, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, data);
+            GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, width, height, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, data);
         }
 
         if (textureHandle[0] == 0)
@@ -99,7 +98,7 @@ public class TextureHelper {
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
 
-            GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, 4, width, height, 0, GLES20.GL_RGBA, GLES20.GL_FLOAT, data);
+            GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, width, height, 0, GLES20.GL_RGBA, GLES20.GL_FLOAT, data);
         }
 
         if (textureHandle[0] == 0)
@@ -112,7 +111,10 @@ public class TextureHelper {
         return textureHandle[0];
     }
 
-    public static int getTexture(String label){
+    public static int getTexture(String label) throws NoSuchElementException{
+        for (String s : textures.keySet()) {
+            Log.d("TEX ", s);
+        }
         return textures.get(label)[0];
     }
 }
