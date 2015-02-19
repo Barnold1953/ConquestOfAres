@@ -2,6 +2,7 @@ package Generation;
 import java.lang.Math.*;
 import java.nio.*;
 import java.util.*;
+import android.util.Log;
 
 /**
  * Created by brb55_000 on 1/21/2015.
@@ -15,7 +16,7 @@ public class MapGenerator {
 
     /// Generates a map and stores the result in p
     // TODO(Ben): Finish this
-    public void generateMap(MapGenerationParams p) {
+    public void generateMap(MapGenerationParams p) throws BufferOverflowException{
         int width = 1;
         int height = 1;
         // TODO: These are arbitrary. Pick better values.
@@ -43,31 +44,46 @@ public class MapGenerator {
         double[][] heightMap = new double[height][width];
         generateHeightmap(width, height, heightMap, p.seed);
 
-        FloatBuffer pixelBuffer = ByteBuffer.allocateDirect(height * width * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
+        FloatBuffer pixelBuffer = ByteBuffer.allocateDirect(height * width * mBytesPerFloat * 4).order(ByteOrder.nativeOrder()).asFloatBuffer();
+
+        Log.d("Generator", Integer.toString(width));
+        Log.d("Generator", Integer.toString(height));
+        Log.d("Generator", Integer.toString(width * height));
+        Log.d("Generator", Integer.toString(pixelBuffer.capacity()));
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
+                pixelBuffer.put(1.0f);
+                pixelBuffer.put(1.0f);
+                pixelBuffer.put(1.0f);
+                pixelBuffer.put(1.0f);
+            }
+        }
+
+
+        /*for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
                 if (heightMap[y][x] > 0.65) { // Mountains
-                    pixelBuffer.put(127.0f/255.0f);
-                    pixelBuffer.put(127.0f/255.0f);
-                    pixelBuffer.put(127.0f/255.0f);
+                    pixelBuffer.put(127.0f / 255.0f);
+                    pixelBuffer.put(127.0f / 255.0f);
+                    pixelBuffer.put(127.0f / 255.0f);
                 } else if (heightMap[y][x] < 0.0) { // Oceans
-                    pixelBuffer.put(0/255.0f);
-                    pixelBuffer.put(12/255.0f);
-                    pixelBuffer.put(100/255.0f);
+                    pixelBuffer.put(0 / 255.0f);
+                    pixelBuffer.put(12 / 255.0f);
+                    pixelBuffer.put(100 / 255.0f);
                 } else if (heightMap[y][x] < 0.05) { // Beach
-                    pixelBuffer.put(120/255.0f);
-                    pixelBuffer.put(100/255.0f);
-                    pixelBuffer.put(80/255.0f);
+                    pixelBuffer.put(120 / 255.0f);
+                    pixelBuffer.put(100 / 255.0f);
+                    pixelBuffer.put(80 / 255.0f);
                 } else { // Grass
                     pixelBuffer.put(0);
-                    pixelBuffer.put(80/255.0f);
+                    pixelBuffer.put(80 / 255.0f);
                     pixelBuffer.put(0);
                 }
                 // Alpha
                 pixelBuffer.put(1.0f);
             }
-        }
+        } */
 
         Graphics.TextureHelper.dataToTexture(pixelBuffer, "gentest", width, height);
 
