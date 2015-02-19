@@ -28,7 +28,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     GeometryHelper gHelper;
     DrawHelper dHelper;
     TextureHelper tHelper;
-    final boolean IS_3D = true; ///< Temporary: determines if we are rendering in 3D or 2D
+    final boolean IS_3D = false; ///< Temporary: determines if we are rendering in 3D or 2D
 
     // Camera lookAt
     final float eyeX = 0.0f;
@@ -74,11 +74,12 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         }
 
         dHelper.setProgHandles(programHandle);
-        tHelper.ImageToTexture(context, R.drawable.texture1);
+        tHelper.ImageToTexture(context, R.drawable.texture1, "texture1");
         Log.d("Setup", "After texture get");
 
         Log.d("Setup", "Shader successfully initialized.");
         gHelper.createBuffers();
+        gHelper.createQuad(0,0,0,1,1);
         gHelper.createQuad(-1, -1, 0, 1, 1);
         gHelper.createQuad(-1, 0, 0, 1, 1);
         gHelper.createQuad(0, -1, 0, 1, 1);

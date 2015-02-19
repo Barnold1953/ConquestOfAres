@@ -8,6 +8,7 @@ import android.opengl.GLUtils;
 import android.util.Log;
 
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,7 +49,7 @@ public class TextureHelper {
         }
     }
 
-    public int ImageToTexture(final Context context, final int resourceId){
+    public int ImageToTexture(final Context context, final int resourceId, final String label){
         final int[] textureHandle = new int[1];
 
         GLES20.glGenTextures(1, textureHandle, 0);
@@ -83,15 +84,38 @@ public class TextureHelper {
 
 
 
-        textures.put("texture1", textureHandle);
+        textures.put(label, textureHandle);
+        return textureHandle[0];
+    }
+
+    public int DataToTexture(final FloatBuffer data, final String label, final int width, final int height){
+        final int[] textureHandle = new int[1];
+
+        GLES20.glGenTextures(1, textureHandle, 0);
+
+        if (textureHandle[0] != 0)
+        {
+            // Bind to the texture in OpenGL
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0]);
+
+            // Set filtering
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
+
+            GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, 4, width, height, 0, GLES20.GL_RGBA, GLES20.GL_FLOAT, data);
+        }
+
+        if (textureHandle[0] == 0)
+        {
+            throw new RuntimeException("Error loading texture.");
+        }
+        GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
+
+        textures.put(label, textureHandle);
         return textureHandle[0];
     }
 
     public int getTexture(String label){
-        GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
-
-
-
         return textures.get(label)[0];
     }
 }
