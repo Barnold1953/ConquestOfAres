@@ -27,7 +27,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     ShaderHelper sHelper;
     GeometryHelper gHelper;
     DrawHelper dHelper;
-    TextureHelper tHelper;
     final boolean IS_3D = false; ///< Temporary: determines if we are rendering in 3D or 2D
 
     // Camera lookAt
@@ -49,8 +48,8 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         sHelper = new ShaderHelper();
         gHelper = new GeometryHelper();
 
-        tHelper = new TextureHelper(context);
-        dHelper = new DrawHelper(camera, gHelper, tHelper);
+        TextureHelper.context = context;
+        dHelper = new DrawHelper(camera, gHelper);
 
         // Set the view matrix
         if (IS_3D) {
@@ -73,7 +72,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         }
 
         dHelper.setProgHandles(programHandle);
-        tHelper.imageToTexture(context, R.drawable.texture1, "texture1");
+        TextureHelper.imageToTexture(context, R.drawable.texture1, "texture1");
 
         // Temporary generation test
         Generation.MapGenerator generator = new Generation.MapGenerator();

@@ -29,7 +29,7 @@ public class DrawHelper {
     }
 
     public void draw(Camera camera, FloatBuffer mVertexBuffer, FloatBuffer mColorBuffer, FloatBuffer mTextCoordBuffer, FloatBuffer mIndicesBuffer, String textureName) {
-        draw(camera, mVertexBuffer, mColorBuffer, mTextCoordBuffer, mIndicesBuffer, tHelper.getTexture(textureName));
+        draw(camera, mVertexBuffer, mColorBuffer, mTextCoordBuffer, mIndicesBuffer, TextureHelper.getTexture(textureName));
     }
 
     public void draw(Camera camera, FloatBuffer mVertexBuffer, FloatBuffer mColorBuffer, FloatBuffer mTextCoordBuffer, FloatBuffer mIndicesBuffer, int textureId){
@@ -57,9 +57,8 @@ public class DrawHelper {
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, gHelper.getVertices().length/3);
     }
 
-    public DrawHelper(Camera mh, GeometryHelper gh, TextureHelper th){
+    public DrawHelper(Camera mh, GeometryHelper gh){
         gHelper = gh;
         mHelper = mh;
-        tHelper = th;
     }
 }

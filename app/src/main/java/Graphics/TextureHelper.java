@@ -16,16 +16,12 @@ import java.util.Map;
  * Created by Nathan on 2/5/2015.
  */
 public class TextureHelper {
-    private Map textureHandles= new HashMap();
-    private HashMap<String, int[]> textures = new HashMap<String, int[]>();
+    static private Map textureHandles= new HashMap();
+    static private HashMap<String, int[]> textures = new HashMap<String, int[]>();
 
-    Context context;
+    public static Context context = null;
 
-    public TextureHelper(Context c){
-        context = c;
-    }
-
-    public void dataToTexture(ByteBuffer data, String label, int width, int height){
+    public static void dataToTexture(ByteBuffer data, String label, int width, int height){
         int[] textureHandle = new int[1];
 
         GLES20.glGenTextures(1, textureHandle, 0);
@@ -49,7 +45,7 @@ public class TextureHelper {
         }
     }
 
-    public int imageToTexture(final Context context, final int resourceId, final String label){
+    public static int imageToTexture(final Context context, final int resourceId, final String label){
         final int[] textureHandle = new int[1];
 
         GLES20.glGenTextures(1, textureHandle, 0);
@@ -82,13 +78,11 @@ public class TextureHelper {
         }
         GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
 
-
-
         textures.put(label, textureHandle);
         return textureHandle[0];
     }
 
-    public int dataToTexture(final FloatBuffer data, final String label, final int width, final int height){
+    public static int dataToTexture(final FloatBuffer data, final String label, final int width, final int height){
         final int[] textureHandle = new int[1];
 
         GLES20.glGenTextures(1, textureHandle, 0);
@@ -115,7 +109,7 @@ public class TextureHelper {
         return textureHandle[0];
     }
 
-    public int getTexture(String label){
+    public static int getTexture(String label){
         return textures.get(label)[0];
     }
 }

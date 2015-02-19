@@ -64,10 +64,12 @@ public class MapGenerator {
                     pixelBuffer.put(80/255.0f);
                     pixelBuffer.put(0);
                 }
+                // Alpha
+                pixelBuffer.put(1.0f);
             }
         }
 
-        TextureHelper.
+        Graphics.TextureHelper.dataToTexture(pixelBuffer, "gentest", width, height);
 
        // random.setSeed(p.seed);
        // generateTerritories(width, height, heightMap);
