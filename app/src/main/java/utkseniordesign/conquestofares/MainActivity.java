@@ -40,15 +40,6 @@ import Graphics.TextureHelper;
 public class MainActivity extends ActionBarActivity {
     private GLSurfaceView mGLSurfaceView;
 
-    private HashMap<String,String> getShaders(){
-        HashMap<String, String> shaders = new HashMap<String, String>();
-
-        shaders.put("simple.vert", getString(R.string.simple_vert));
-        shaders.put("simple.frag", getString(R.string.simple_frag));
-
-        return shaders;
-    }
-
     private HashMap<String, int[]> getTextures(){
         HashMap<String, int[]> textures = new HashMap<String, int[]>();
         int[] texture = new int[1];
@@ -83,14 +74,13 @@ public class MainActivity extends ActionBarActivity {
         final ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
         final boolean supportsEs2 = configurationInfo.reqGlEsVersion >= 0x20000;
 
-        HashMap<String,String> shaders = getShaders();
         Log.d("Main", "Before texture loading");
         HashMap<String, int[]> textures = getTextures();
         Log.d("Main", "After texture loading");
 
         mGLSurfaceView.setEGLContextClientVersion(2);
         mGLSurfaceView.setEGLConfigChooser(8 , 8, 8, 8, 16, 0);
-        mGLSurfaceView.setRenderer(new CoARenderer(this, shaders, textures));
+        mGLSurfaceView.setRenderer(new CoARenderer(this, textures));
 
         setContentView(mGLSurfaceView);
     }

@@ -20,7 +20,6 @@ import utkseniordesign.conquestofares.R;
 public class CoARenderer implements GLSurfaceView.Renderer {
     int programHandle;
     Context context;
-    HashMap<String,String> shaders;
     HashMap<String, int[]> textures;
     Camera camera;
 
@@ -41,13 +40,12 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     final float upY = 1.0f;
     final float upZ = 0.0f;
 
-    public CoARenderer(Context c, HashMap<String,String> s, HashMap<String, int[]> t) {
+    public CoARenderer(Context c, HashMap<String, int[]> t) {
         context = c;
-        shaders = s;
         textures = t;
 
         camera = new Camera();
-        sHelper = new ShaderHelper(shaders);
+        sHelper = new ShaderHelper();
         gHelper = new GeometryHelper();
 
         tHelper = new TextureHelper(context);
@@ -67,7 +65,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         Log.d("Setup", "Surface created.");
         try {
-            programHandle = sHelper.compileShader("simple");
+            programHandle = sHelper.compileShader(context, R.string.simple_vert, R.string.simple_frag, "simple");
         }
         catch (IOException e){
             Log.d("Shader", "Error occurred during compilation");
