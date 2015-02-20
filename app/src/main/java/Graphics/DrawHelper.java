@@ -28,10 +28,6 @@ public class DrawHelper {
         mTextureHandle = GLES20.glGetAttribLocation(ph, "texture");
     }
 
-    public void draw(Camera camera, FloatBuffer mVertexBuffer, FloatBuffer mColorBuffer, FloatBuffer mTextCoordBuffer, FloatBuffer mIndicesBuffer, String textureName) {
-        draw(camera, mVertexBuffer, mColorBuffer, mTextCoordBuffer, mIndicesBuffer, TextureHelper.getTexture(textureName));
-    }
-
     public void draw(Camera camera, FloatBuffer mVertexBuffer, FloatBuffer mColorBuffer, FloatBuffer mTextCoordBuffer, FloatBuffer mIndicesBuffer, int textureId){
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId);

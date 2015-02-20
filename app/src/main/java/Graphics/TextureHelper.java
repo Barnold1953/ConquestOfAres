@@ -17,8 +17,8 @@ import java.util.NoSuchElementException;
  * Created by Nathan on 2/5/2015.
  */
 public class TextureHelper {
-    static private Map textureHandles= new HashMap();
-    static private HashMap<String, int[]> textures = new HashMap<String, int[]>();
+    private static Map textureHandles= new HashMap();
+    private static HashMap<String, int[]> textures = new HashMap<String, int[]>();
 
     public static int imageToTexture(final Context context, final int resourceId, final String label){
         final int[] textureHandle = new int[1];
@@ -61,7 +61,7 @@ public class TextureHelper {
         final int[] textureHandle = new int[1];
 
         GLES20.glGenTextures(1, textureHandle, 0);
-
+        data.position(0);
         if (textureHandle[0] != 0)
         {
             // Bind to the texture in OpenGL
@@ -88,7 +88,7 @@ public class TextureHelper {
         final int[] textureHandle = new int[1];
 
         GLES20.glGenTextures(1, textureHandle, 0);
-
+        data.position(0);
         if (textureHandle[0] != 0)
         {
             // Bind to the texture in OpenGL
@@ -112,9 +112,6 @@ public class TextureHelper {
     }
 
     public static int getTexture(String label) throws NoSuchElementException{
-        for (String s : textures.keySet()) {
-            Log.d("TEX ", s);
-        }
         return textures.get(label)[0];
     }
 }

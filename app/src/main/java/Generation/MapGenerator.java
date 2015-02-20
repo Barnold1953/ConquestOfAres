@@ -44,46 +44,31 @@ public class MapGenerator {
         double[][] heightMap = new double[height][width];
         generateHeightmap(width, height, heightMap, p.seed);
 
-        ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(height * width * 4).order(ByteOrder.nativeOrder());
-
-        Log.d("Generator", Integer.toString(width));
-        Log.d("Generator", Integer.toString(height));
-        Log.d("Generator", Integer.toString(width * height));
-        Log.d("Generator", Integer.toString(pixelBuffer.capacity()));
+        ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(height * width * 4 * mBytesPerFloat).order(ByteOrder.nativeOrder());
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                pixelBuffer.put((byte)127);
-                pixelBuffer.put((byte)127);
-                pixelBuffer.put((byte)127);
-                pixelBuffer.put((byte)127);
-            }
-        }
-
-
-        /*for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
                 if (heightMap[y][x] > 0.65) { // Mountains
-                    pixelBuffer.put(127.0f / 255.0f);
-                    pixelBuffer.put(127.0f / 255.0f);
-                    pixelBuffer.put(127.0f / 255.0f);
+                    pixelBuffer.put((byte)255);
+                    pixelBuffer.put((byte)0);
+                    pixelBuffer.put((byte)0);
                 } else if (heightMap[y][x] < 0.0) { // Oceans
-                    pixelBuffer.put(0 / 255.0f);
-                    pixelBuffer.put(12 / 255.0f);
-                    pixelBuffer.put(100 / 255.0f);
+                    pixelBuffer.put((byte)0);
+                    pixelBuffer.put((byte)0);
+                    pixelBuffer.put((byte)255);
                 } else if (heightMap[y][x] < 0.05) { // Beach
-                    pixelBuffer.put(120 / 255.0f);
-                    pixelBuffer.put(100 / 255.0f);
-                    pixelBuffer.put(80 / 255.0f);
+                    pixelBuffer.put((byte)120);
+                    pixelBuffer.put((byte)100);
+                    pixelBuffer.put((byte)80);
                 } else { // Grass
-                    pixelBuffer.put(0);
-                    pixelBuffer.put(80 / 255.0f);
-                    pixelBuffer.put(0);
+                    pixelBuffer.put((byte)0);
+                    pixelBuffer.put((byte)255);
+                    pixelBuffer.put((byte)0);
                 }
                 // Alpha
-                pixelBuffer.put(1.0f);
+                pixelBuffer.put((byte)255);
             }
-        } */
+        }
 
         Graphics.TextureHelper.dataToTexture(pixelBuffer, "gentest", width, height);
 
@@ -100,7 +85,7 @@ public class MapGenerator {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 heightMap[y][x] = octaveNoise2D((double)(seed + y), (double)(x - seed),
-                        0.9, 0.001, 8);
+                        0.86, 0.01, 8);
             }
         }
     }
