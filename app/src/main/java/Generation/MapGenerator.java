@@ -1,14 +1,22 @@
 package Generation;
 import java.lang.Math.*;
+import java.nio.*;
+import java.util.*;
+import android.util.Log;
 
 /**
  * Created by brb55_000 on 1/21/2015.
  */
 public class MapGenerator {
 
+    private final int mBytesPerFloat = 4;
+    Vertex[] diagram;
+    List<Vertex> vertices = new LinkedList<Vertex>();
+    Random random = new Random();
+
     /// Generates a map and stores the result in p
     // TODO(Ben): Finish this
-    public void generateMap(MapGenerationParams p) {
+    public void generateMap(MapGenerationParams p) throws BufferOverflowException{
         int width = 1;
         int height = 1;
         // TODO: These are arbitrary. Pick better values.
@@ -34,8 +42,38 @@ public class MapGenerator {
         }
 
         double[][] heightMap = new double[height][width];
-
         generateHeightmap(width, height, heightMap, p.seed);
+
+        ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(height * width * 4 * mBytesPerFloat).order(ByteOrder.nativeOrder());
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (heightMap[y][x] > 0.25) { // Mountains
+                    pixelBuffer.put((byte)225);
+                    pixelBuffer.put((byte)225);
+                    pixelBuffer.put((byte)225);
+                } else if (heightMap[y][x] < 0.0) { // Oceans
+                    pixelBuffer.put((byte)0);
+                    pixelBuffer.put((byte)0);
+                    pixelBuffer.put((byte)170);
+                } else if (heightMap[y][x] < 0.05) { // Beach
+                    pixelBuffer.put((byte)130);
+                    pixelBuffer.put((byte)110);
+                    pixelBuffer.put((byte)90);
+                } else { // Grass
+                    pixelBuffer.put((byte)0);
+                    pixelBuffer.put((byte)180);
+                    pixelBuffer.put((byte)0);
+                }
+                // Alpha
+                pixelBuffer.put((byte)255);
+            }
+        }
+
+        Graphics.TextureHelper.dataToTexture(pixelBuffer, "gentest", width, height);
+
+       // random.setSeed(p.seed);
+       // generateTerritories(width, height, heightMap);
 
         // TODO(Ben): Render the heightmap
         // TODO(Ben): Segment heightmap into territories
@@ -47,33 +85,21 @@ public class MapGenerator {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 heightMap[y][x] = octaveNoise2D((double)(seed + y), (double)(x - seed),
-                        0.9, 0.001, 8);
+                        0.86, 0.003, 8);
             }
+        }
+    }
+
+    public void generateTerritories(int width, int height, double[][] heightMap) {
+        int numPoints = 10;
+        Coord[] points = new Coord[numPoints];
+
+        for (int i = 0; i < numPoints; i++) {
+            points[i].x = random.nextDouble() * width;
+            points[i].y = random.nextDouble() * height;
         }
 
-        // Generate pixel data for texture
-        byte[][][] pixelData = new byte[height][width][3];
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                if (heightMap[y][x] > 0.65) { // Mountains
-                    pixelData[y][x][0] = 127;
-                    pixelData[y][x][1] = 127;
-                    pixelData[y][x][2] = 127;
-                } else if (heightMap[y][x] < 0.0) { // Oceans
-                    pixelData[y][x][0] = 0;
-                    pixelData[y][x][1] = 12;
-                    pixelData[y][x][2] = 100;
-                } else if (heightMap[y][x] < 0.05) { // Beach
-                    pixelData[y][x][0] = 120;
-                    pixelData[y][x][1] = 100;
-                    pixelData[y][x][2] = 80;
-                } else { // Grass
-                    pixelData[y][x][0] = 0;
-                    pixelData[y][x][1] = 80;
-                    pixelData[y][x][2] = 0;
-                }
-            }
-        }
+        diagram = Voronoi.generate(points);
     }
 
     private double octaveNoise2D(double x, double y, double persistence, double frequency, int octaves) {
