@@ -48,21 +48,21 @@ public class MapGenerator {
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                if (heightMap[y][x] > 0.65) { // Mountains
-                    pixelBuffer.put((byte)255);
-                    pixelBuffer.put((byte)0);
-                    pixelBuffer.put((byte)0);
+                if (heightMap[y][x] > 0.25) { // Mountains
+                    pixelBuffer.put((byte)225);
+                    pixelBuffer.put((byte)225);
+                    pixelBuffer.put((byte)225);
                 } else if (heightMap[y][x] < 0.0) { // Oceans
                     pixelBuffer.put((byte)0);
                     pixelBuffer.put((byte)0);
-                    pixelBuffer.put((byte)255);
+                    pixelBuffer.put((byte)170);
                 } else if (heightMap[y][x] < 0.05) { // Beach
-                    pixelBuffer.put((byte)120);
-                    pixelBuffer.put((byte)100);
-                    pixelBuffer.put((byte)80);
+                    pixelBuffer.put((byte)130);
+                    pixelBuffer.put((byte)110);
+                    pixelBuffer.put((byte)90);
                 } else { // Grass
                     pixelBuffer.put((byte)0);
-                    pixelBuffer.put((byte)255);
+                    pixelBuffer.put((byte)180);
                     pixelBuffer.put((byte)0);
                 }
                 // Alpha
@@ -85,7 +85,7 @@ public class MapGenerator {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 heightMap[y][x] = octaveNoise2D((double)(seed + y), (double)(x - seed),
-                        0.86, 0.01, 8);
+                        0.86, 0.003, 8);
             }
         }
     }

@@ -84,10 +84,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         Log.d("Setup", "Shader successfully initialized.");
         gHelper.createBuffers();
-        gHelper.createQuad(0,0,0,1,1);
-        gHelper.createQuad(-1, -1, 0, 1, 1);
-        gHelper.createQuad(-1, 0, 0, 1, 1);
-        gHelper.createQuad(0, -1, 0, 1, 1);
+        gHelper.createQuad(-1, -1, 0, 2, 2);
         Log.d("Setup", "Geometry buffers initialized and filled.");
 
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
@@ -104,6 +101,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
         //GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
+        dHelper.draw(camera, gHelper.mVertexBuffer, gHelper.mColorBuffer, gHelper.mTextCoordBuffer, gHelper.mIndicesBuffer, TextureHelper.getTexture("gentest"));
     }
 
     @Override
