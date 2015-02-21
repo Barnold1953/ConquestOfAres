@@ -6,43 +6,55 @@
 package utkseniordesign.conquestofares;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.ArrayRes;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.ToggleButton;
 
+import UI.HintedArrayAdapter;
+
 public class LaunchGameActivity extends Activity {
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_creategame);
-        createSpinner( R.id.mapSizeSpinner, R.array.map_sizes, R.layout.spinner_default );
-        createSpinner( R.id.mapSymmetrySpinner, R.array.map_symmetry, R.layout.spinner_default );
 
-        //set options invisible by default
-        findViewById(R.id.CustomMapOptions).setVisibility(View.INVISIBLE);
-        findViewById(R.id.RandomMapOptions).setVisibility(View.INVISIBLE);
-    }
+        //TODO: Reformat this in a cleaner form.
+        //set up spinners
+        Spinner mapSizeSpinner = ( Spinner ) findViewById( R.id.mapSizeSpinner );
+        ArrayAdapter<CharSequence> mapSizeAdapter =
+                ArrayAdapter.createFromResource( this, R.array.map_sizes, R.layout.spinner_default );
+        mapSizeSpinner.setAdapter( mapSizeAdapter );
 
-    /**
-     * @param spinnerId: The id of the spinner to be created (from xml layout)
-     * @param textResId: The id of the text array to populate the spinner
-     * @param layoutId: The id of the layout you want the spinner to utilize
-     *
-     * This function creates the spinner views utilized on this page. Once we have a better
-     * idea of where we'll be querying user choices from, I'll probably create a more
-     * streamlined interface for this. But, until then, a simple placeholder will do.
-     */
-    protected void createSpinner( int spinnerId, int textResId, int layoutId )
-    {
-        //Set up spinner
-        Spinner spinner = ( Spinner ) findViewById( spinnerId );
-        ArrayAdapter< CharSequence > arrayAdapter = ArrayAdapter.createFromResource( this, textResId, layoutId );
-        spinner.setAdapter( arrayAdapter );
+        Spinner mapSymmetrySpinner = ( Spinner ) findViewById( R.id.mapSymmetrySpinner );
+        ArrayAdapter<CharSequence> mapSymmetryAdapter =
+                ArrayAdapter.createFromResource( this, R.array.map_symmetry, R.layout.spinner_default );
+        mapSymmetrySpinner.setAdapter( mapSymmetryAdapter );
+
+        Spinner horizontalWrapSpinner = ( Spinner ) findViewById( R.id.horizontalWrapSpinner );
+        ArrayAdapter<CharSequence> horizontalWrapAdapter =
+                ArrayAdapter.createFromResource( this, R.array.horizontal_wrap, R.layout.spinner_default );
+        horizontalWrapSpinner.setAdapter( horizontalWrapAdapter );
+
+        Spinner mapNameSpinner = ( Spinner ) findViewById( R.id.mapNameSpinner );
+        ArrayAdapter<CharSequence> mapNameAdapter =
+                ArrayAdapter.createFromResource( this, R.array.map_names, R.layout.spinner_default );
+        mapNameSpinner.setAdapter( mapNameAdapter );
+
+        //set default selections and visibilities
+        mapNameSpinner.setSelection( mapNameAdapter.getPosition( "Map Name" ) );
+        mapSizeSpinner.setSelection( mapSizeAdapter.getPosition( "Map Size" ) );
+        mapSymmetrySpinner.setSelection( mapSymmetryAdapter.getPosition( "Map Symmetry Setting" ) );
+        horizontalWrapSpinner.setSelection( horizontalWrapAdapter.getPosition( "Map Wrap Setting" ) );
+
+        findViewById(R.id.CustomMapOptions).setVisibility( View.GONE );
+        findViewById(R.id.RandomMapOptions).setVisibility( View.GONE );
     }
 
     /**
@@ -77,18 +89,24 @@ public class LaunchGameActivity extends Activity {
         toggleButton.setTextColor( white );
 
         if( v.getId() == R.id.RandomMap ) {
-            findViewById(R.id.RandomMapOptions).setVisibility(View.VISIBLE);
-            findViewById(R.id.CustomMapOptions).setVisibility(View.INVISIBLE);
+            findViewById(R.id.RandomMapOptions).setVisibility( View.VISIBLE );
+            findViewById(R.id.CustomMapOptions).setVisibility(View.GONE);
         }
 
         if( v.getId() == R.id.CustomMap ) {
-            findViewById(R.id.CustomMapOptions).setVisibility(View.VISIBLE);
-            findViewById(R.id.RandomMapOptions).setVisibility(View.INVISIBLE);
+            findViewById(R.id.CustomMapOptions).setVisibility( View.VISIBLE );
+            findViewById(R.id.RandomMapOptions).setVisibility( View.GONE );
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    public void startNewGame( View v )
+    {
+        Intent intent = new Intent( this, GameActivity.class );
+        startActivity( intent );
     }
 }

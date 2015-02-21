@@ -8,7 +8,8 @@
     android:fillViewport="true">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical" android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:weightSum="1">
 
@@ -41,7 +42,7 @@
             <!-- Player Count Dialog -->
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 >
                 <TextView
@@ -73,7 +74,7 @@
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_height="wrap_content"
-                android:layout_width="wrap_content">
+                android:layout_width="match_parent">
                 <!-- Dialog Label -->
                 <TextView
                     android:layout_width="match_parent"
@@ -110,8 +111,8 @@
 
                         <ToggleButton
                             style="@style/MultiToggleButtonTheme"
-                            android:textOn="Custom"
-                            android:textOff="Custom"
+                            android:textOn="Preset"
+                            android:textOff="Preset"
                             android:id="@+id/CustomMap"
                             android:layout_width="0dp"
                             android:layout_weight=".50" />
@@ -120,10 +121,11 @@
                     <!-- Random Options -->
                     <LinearLayout
                         android:orientation="vertical"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/RandomMapOptions">
 
+                        <!-- Symmetry & Size dialogs -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content">
@@ -131,35 +133,35 @@
                             <Spinner
                                 android:id="@+id/mapSizeSpinner"
                                 android:layout_width="0dp"
-                                android:layout_weight=".1975"
+                                android:layout_weight=".30"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="10dp"
                                 android:background="@color/silver" />
 
                             <ImageView
                                 android:layout_width="0dp"
-                                android:layout_weight=".0275"
+                                android:layout_weight=".04"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="bottom"
-                                android:layout_marginRight="4dp"
+                                android:layout_marginRight="2dp"
                                 android:src="@drawable/ic_spinner_arrow" />
 
                             <Spinner
                                 android:id="@+id/mapSymmetrySpinner"
                                 android:layout_width="0dp"
-                                android:layout_weight=".2975"
+                                android:layout_weight=".62"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="10dp"
                                 android:background="@color/silver" />
 
                             <ImageView
                                 android:layout_width="0dp"
-                                android:layout_weight=".0275"
+                                android:layout_weight=".04"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="bottom"
+                                android:layout_marginRight="2dp"
                                 android:src="@drawable/ic_spinner_arrow" />
                         </LinearLayout>
-
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content">
@@ -167,14 +169,14 @@
                             <LinearLayout
                                 style="@style/border"
                                 android:layout_width="0dp"
-                                android:layout_weight=".40"
+                                android:layout_weight=".34"
                                 android:background="@color/lightBlue"
                                 android:layout_margin="4dp" />
 
                             <LinearLayout
                                 style="@style/border"
                                 android:layout_width="0dp"
-                                android:layout_weight=".60"
+                                android:layout_weight=".66"
                                 android:background="@color/lightBlue"
                                 android:layout_margin="4dp" />
                         </LinearLayout>
@@ -183,7 +185,7 @@
                     <!-- Custom Options -->
                     <LinearLayout
                         android:orientation="vertical"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/CustomMapOptions">
 
@@ -205,6 +207,7 @@
                                 android:layout_weight=".0275"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="bottom"
+                                android:layout_marginRight="4dp"
                                 android:src="@drawable/ic_spinner_arrow" />
                         </LinearLayout>
 
@@ -221,9 +224,76 @@
                         </LinearLayout>
                     </LinearLayout>
 
+                    <!-- Horizontal Wrap Settings -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <Spinner
+                            android:id="@+id/horizontalWrapSpinner"
+                            android:layout_width="0dp"
+                            android:layout_weight=".9725"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:background="@color/silver" />
+
+                        <ImageView
+                            android:layout_width="0dp"
+                            android:layout_weight=".0275"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom"
+                            android:layout_marginRight="4dp"
+                            android:src="@drawable/ic_spinner_arrow" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <LinearLayout
+                            style="@style/border"
+                            android:layout_width="0dp"
+                            android:layout_weight="1.0"
+                            android:background="@color/lightBlue"
+                            android:layout_margin="4dp" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
+            <!-- Game Settings Dialog -->
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                >
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Game Settings"
+                    android:textSize="16sp" />
+                <LinearLayout
+                    style="@style/border"
+                    android:background="@color/lightBlue"/>
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:padding="10dp"
+                    android:gravity="center"
+                    android:background="@color/silver">
+
+                    </LinearLayout>
+            </LinearLayout>
+            <Button style="@style/MultiToggleButtonTheme"
+                android:layout_width="fill_parent"
+                android:text="CreateGame"
+                android:onClick="startNewGame"
+                android:background="@color/lightBlue"
+                android:textColor="@color/white"
+                android:layout_marginRight="0dp"
+                android:layout_marginLeft="0dp"
+                />
 
         </LinearLayout>
 

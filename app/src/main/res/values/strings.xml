@@ -11,9 +11,22 @@
         <item>Medium</item>
         <item>Large</item>
         <item>Massive</item>
+        <item>Map Size</item>
     </string-array>
     <string-array name="map_symmetry">
         <item>Symmetrical</item>
         <item>Asymmetrical</item>
+        <item>Map Symmetry Setting</item>
+    </string-array>
+    <string-array name="horizontal_wrap">
+        <item>Horizontal Wrap</item>
+        <item>No Horizontal Wrap</item>
+        <item>Map Wrap Setting</item>
+    </string-array>
+    <string-array name="map_names">
+        <item>Earth</item>
+        <item>Pangea</item>
+        <item>MiddleEarth</item>
+        <item>Map Name</item>
     </string-array>
 </resources>
