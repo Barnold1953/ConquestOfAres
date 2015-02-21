@@ -14,13 +14,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class MainActivity extends ActionBarActivity {
+    private GLSurfaceView mGLSurfaceView;
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
-        super.onCreate( savedInstanceState );
-
         //Sets tabbed layout
-        setContentView( R.layout.activity_main );
+        setContentView(R.layout.activity_main);
 
         //Action bar is unnecessary for our game, and it looks weird. Hide it.
         ActionBar actionBar = getSupportActionBar();
@@ -93,7 +92,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void onCreate( Bundle savedInstanceState )
-        {
+       {
             super.onCreate( savedInstanceState );
 
             //Everytime a page is created, use the arguments passed from create() to get a unique page #
@@ -140,9 +139,22 @@ public class MainActivity extends ActionBarActivity {
     }
 
     @Override
+    protected void onResume()
+    {
+        // The activity must call the GL surface view's onResume() on activity onResume().
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause()
+    {
+        // The activity must call the GL surface view's onPause() on activity onPause().
+        super.onPause();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
-
         //Clean up everything here
     }
 }
