@@ -6,31 +6,51 @@
     <string name="action_settings">Settings</string>
     <string name="announcement">Announcements: this is where developer announcements would go.</string>
     <string name="simple.vert">
-                uniform mat4 uMVPMatrix;\n
-                \n
-                attribute vec4 vPosition;\n
-                attribute vec4 vColor;\n
-                attribute vec2 vTextCoords;\n
-                \n
-                varying vec4 color;\n
-                varying vec2 tCoords;\n
-                \n
-                void main() {\n
-                  color = vColor;\n
-                  tCoords = vTextCoords;\n
-                  gl_Position =  uMVPMatrix * vPosition;\n
+                uniform mat4 uMVPMatrix;
+
+                attribute vec4 vPosition;
+                attribute vec4 vColor;
+                attribute vec2 vTextCoords;
+
+                varying vec4 color;
+                varying vec2 tCoords;
+
+                void main() {
+                  color = vColor;
+                  tCoords = vTextCoords;
+                  gl_Position =  uMVPMatrix * vPosition;
                 }\n
     </string>
     <string name="simple.frag">
-                precision mediump float;\n
-                \n
-                uniform sampler2D texture;\n
-                varying vec4 color;\n
-                varying vec2 tCoords;\n
-                \n
-                void main() {\n
-                  //gl_FragColor = color;\n
+                precision mediump float;
+                uniform sampler2D texture;
+                varying vec4 color;
+                varying vec2 tCoords;
+
+                void main() {
+                  //gl_FragColor = color;
                   gl_FragColor = texture2D(texture, tCoords);
+                }\n
+    </string>
+    <string name="color.vert">
+                uniform mat4 uMVP;
+
+                attribute vec4 vPosition;
+                attribute vec4 vColor;
+
+                varying vec4 color;
+
+                void main() {
+                  color = vColor;
+                  gl_Position =  uMVP * vPosition;
+                }\n
+    </string>
+    <string name="color.frag">
+                precision mediump float;
+                varying vec4 color;
+
+                void main() {
+                  gl_FragColor = color;
                 }\n
     </string>
 </resources>
