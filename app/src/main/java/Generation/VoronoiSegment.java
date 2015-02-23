@@ -13,5 +13,4 @@ public class VoronoiSegment extends Segment {
 
     public final Vertex v1, v2;
     public boolean floating;
-
 }

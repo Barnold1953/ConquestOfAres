@@ -35,15 +35,9 @@ public class ColorMesh {
     public int getCapacity() { return m_capacity; }
     public int getNumIndices() { return m_numIndices; }
 
-    /// Creates and sets the capacity of the mesh in vertices
-    /// Creates and sets the number of indices
-    /// Will clear any existing data
-    public void init(Context context, int capacity, int numIndices) {
-        m_capacity = capacity;
-        m_numIndices = numIndices;
-        m_vertexBuffer = ByteBuffer.allocateDirect(capacity * FLOATS_PER_VERTEX * BYTES_PER_FLOAT).order(ByteOrder.nativeOrder()).asFloatBuffer();
-        m_indexBuffer = new short[numIndices];
-        m_position = 0;
+
+    ColorMesh(Context context, int capacity, int numIndices) {
+        init(capacity, numIndices);
 
         // Init shader
         if (m_programHandle == 0) {
@@ -56,6 +50,16 @@ public class ColorMesh {
                 Log.d("Shader", "Error occurred during compilation");
             }
         }
+    }
+    /// Creates and sets the capacity of the mesh in vertices
+    /// Creates and sets the number of indices
+    /// Will clear any existing data
+    public void init(int capacity, int numIndices) {
+        m_capacity = capacity;
+        m_numIndices = numIndices;
+        m_vertexBuffer = ByteBuffer.allocateDirect(capacity * FLOATS_PER_VERTEX * BYTES_PER_FLOAT).order(ByteOrder.nativeOrder()).asFloatBuffer();
+        m_indexBuffer = new short[numIndices];
+        m_position = 0;
     }
 
     /// Adds a vertex to the mesh. Make sure capacity is set

@@ -2,15 +2,17 @@ package Generation;
 import java.nio.*;
 import java.util.*;
 
+import Graphics.ColorMesh;
+
 /**
  * Created by brb55_000 on 1/21/2015.
  */
 public class MapGenerator {
 
-    private final int mBytesPerFloat = 4;
-    Vertex[] diagram;
-    List<Vertex> vertices = new LinkedList<Vertex>();
-    Random random = new Random();
+    private final int BYTES_PER_FLOAT = 4;
+    private Vertex[] m_diagram;
+    private List<Vertex> m_vertices = new LinkedList<Vertex>();
+    private Random m_random = new Random();
 
     /// Generates a map and returns the map data
     // TODO(Ben): Finish this
@@ -45,7 +47,7 @@ public class MapGenerator {
         double[][] heightMap = new double[height][width];
         generateHeightmap(width, height, heightMap, p.seed);
 
-        ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(height * width * 4 * mBytesPerFloat).order(ByteOrder.nativeOrder());
+        ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(height * width * 4 * BYTES_PER_FLOAT).order(ByteOrder.nativeOrder());
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -74,7 +76,7 @@ public class MapGenerator {
         mapData.texture = Graphics.TextureHelper.dataToTexture(pixelBuffer, "gentest", width, height);
 
        // random.setSeed(p.seed);
-       // generateTerritories(width, height, heightMap);
+        generateTerritories(mapData, width, height, heightMap);
 
         // TODO(Ben): Segment heightmap into territories
         return mapData;
@@ -91,16 +93,29 @@ public class MapGenerator {
         }
     }
 
-    public void generateTerritories(int width, int height, double[][] heightMap) {
+    public void generateTerritories(MapData mapData, int width, int height, double[][] heightMap) {
         int numPoints = 10;
         Coord[] points = new Coord[numPoints];
-
+        // I hate java
         for (int i = 0; i < numPoints; i++) {
-            points[i].x = random.nextDouble() * width;
-            points[i].y = random.nextDouble() * height;
+            points[i] = new Coord();
         }
 
-        diagram = Voronoi.generate(points);
+        for (Coord c : points) {
+            c.x = m_random.nextDouble() * width;
+            c.y = m_random.nextDouble() * height;
+        }
+
+        m_diagram = Voronoi.generate(points);
+
+        mapData.territoryLineMesh = new ColorMesh();
+
+        for (Vertex v : m_diagram) {
+            for (VoronoiSegment s : v.edges) {
+                mapData.territoryLineMesh.addVertex((float)s.v1.x, (float)s.v1.y, 0.0f, 1.0f, 1.0f, 1.0f);
+                mapData.territoryLineMesh.addVertex((float)s.v2.x, (float)s.v2.y, 0.0f, 1.0f, 1.0f, 1.0f);
+            }
+        }
     }
 
     private double octaveNoise2D(double x, double y, double persistence, double frequency, int octaves) {

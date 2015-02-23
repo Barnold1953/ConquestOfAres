@@ -13,6 +13,7 @@ import android.util.Log;
 
 import Generation.MapData;
 import Generation.MapGenerationParams;
+import Generation.MapGenerator;
 import utkseniordesign.conquestofares.R;
 
 /**
@@ -75,7 +76,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         TextureHelper.imageToTexture(context, R.drawable.texture1, "texture1");
 
         // Temporary generation test
-        Generation.MapGenerator generator = new Generation.MapGenerator();
+        MapGenerator generator = new MapGenerator();
         MapGenerationParams params = new MapGenerationParams();
 
         params.mapSize = MapGenerationParams.MapSize.AVERAGE;
