@@ -1,8 +1,6 @@
 package Generation;
-import java.lang.Math.*;
 import java.nio.*;
 import java.util.*;
-import android.util.Log;
 
 /**
  * Created by brb55_000 on 1/21/2015.
@@ -14,9 +12,12 @@ public class MapGenerator {
     List<Vertex> vertices = new LinkedList<Vertex>();
     Random random = new Random();
 
-    /// Generates a map and stores the result in p
+    /// Generates a map and returns the map data
     // TODO(Ben): Finish this
-    public void generateMap(MapGenerationParams p) throws BufferOverflowException{
+    public MapData generateMap(MapGenerationParams p) throws BufferOverflowException{
+        MapData mapData = new MapData();
+        mapData.params = p;
+
         int width = 1;
         int height = 1;
         // TODO: These are arbitrary. Pick better values.
@@ -70,13 +71,13 @@ public class MapGenerator {
             }
         }
 
-        Graphics.TextureHelper.dataToTexture(pixelBuffer, "gentest", width, height);
+        mapData.texture = Graphics.TextureHelper.dataToTexture(pixelBuffer, "gentest", width, height);
 
        // random.setSeed(p.seed);
        // generateTerritories(width, height, heightMap);
 
-        // TODO(Ben): Render the heightmap
         // TODO(Ben): Segment heightmap into territories
+        return mapData;
     }
 
     /// Generates a raw heightmap

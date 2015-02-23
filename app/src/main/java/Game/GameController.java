@@ -16,7 +16,7 @@ public class GameController {
     /// @param gameSettings: Settings for the game
     public void initGame(GameState gameState, GameSettings gameSettings) {
         // Generate the map
-        mapGenerator.generateMap(gameSettings.mapGenParams);
+        gameState.mapData = mapGenerator.generateMap(gameSettings.mapGenParams);
         // Assign territories
         assignTerritories(gameState, gameSettings);
         // Place units
@@ -27,9 +27,6 @@ public class GameController {
     /// @param gameState: The game state
     /// @param gameSettings: The game settings
     private void assignTerritories(GameState gameState, GameSettings gameSettings) {
-        // Set gamestate
-        gameState.territories = gameSettings.mapGenParams.territories;
-
         // Assign territories to players
         switch (gameSettings.territoryDistMode) {
             case RANDOM:
