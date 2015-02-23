@@ -1,5 +1,6 @@
 package utkseniordesign.conquestofares;
 
+import android.content.Intent;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -9,9 +10,7 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
-import android.view.MenuInflater;
 import android.view.ViewGroup;
 
 public class MainActivity extends ActionBarActivity {
@@ -135,15 +134,11 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    /* I don't think this is necessary, since we ditched the action bar
-    @Override
-    public boolean onCreateOptionsMenu( Menu menu ) {
-        // Inflate the menu items for use in the action bar
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate( R.menu.menu_main, menu );
-        return super.onCreateOptionsMenu( menu );
+    public void launchNewGame( View v ) {
+        Intent intent = new Intent( this, LaunchGameActivity.class );
+        startActivity( intent );
     }
-    */
+
 
     @Override
     protected void onDestroy() {
