@@ -20,9 +20,9 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate( savedInstanceState );
 
         //Sets tabbed layout
-        setContentView( R.layout.activity_main );
+        setContentView(R.layout.activity_main);
 
-        //Action bar is uneccessary for our game, and it looks weird. Hide it.
+        //Action bar is unnecessary for our game, and it looks weird. Hide it.
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
 
@@ -35,7 +35,7 @@ public class MainActivity extends ActionBarActivity {
         //Frustratingly, you can't set the indicator color in xml without changing the font color
         //So I was forced to do it programatically
         PagerTabStrip pagerTabStrip = ( PagerTabStrip ) findViewById( R.id.pager_header );
-        pagerTabStrip.setTabIndicatorColor(getResources().getColor(R.color.lightBlue));
+        pagerTabStrip.setTabIndicatorColor( getResources().getColor( R.color.lightBlue ) );
     }
 
     public class SampleFragmentPagerAdapter extends FragmentPagerAdapter {
@@ -93,7 +93,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void onCreate( Bundle savedInstanceState )
-        {
+       {
             super.onCreate( savedInstanceState );
 
             //Everytime a page is created, use the arguments passed from create() to get a unique page #
@@ -107,13 +107,13 @@ public class MainActivity extends ActionBarActivity {
             View view;
             switch( mPage ) {
                 case 1:
-                    view = inflater.inflate(R.layout.main_page, container, false);
+                    view = inflater.inflate(R.layout.activity_main_subtab_main, container, false);
                     break;
                 case 2:
-                    view = inflater.inflate(R.layout.activegames_page, container, false);
+                    view = inflater.inflate(R.layout.activity_main_subtab_activegames, container, false);
                     break;
                 case 3:
-                    view = inflater.inflate(R.layout.leaderboard_page, container, false);
+                    view = inflater.inflate(R.layout.activity_main_subtab_leaderboards, container, false);
                     break;
                 default:
                     view = null;
@@ -139,11 +139,23 @@ public class MainActivity extends ActionBarActivity {
         startActivity( intent );
     }
 
+    @Override
+    protected void onResume()
+    {
+        // The activity must call the GL surface view's onResume() on activity onResume().
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause()
+    {
+        // The activity must call the GL surface view's onPause() on activity onPause().
+        super.onPause();
+    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
         //Clean up everything here
     }
 }
