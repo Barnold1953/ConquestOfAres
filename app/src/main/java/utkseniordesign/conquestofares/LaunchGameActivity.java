@@ -8,63 +8,55 @@ package utkseniordesign.conquestofares;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.ArrayRes;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.ToggleButton;
 
-import UI.HintedArrayAdapter;
+import UI.UserInterfaceHelper;
 
 public class LaunchGameActivity extends Activity {
+
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_creategame);
 
-        //TODO: Reformat this in a cleaner form.
-        //set up spinners
-        Spinner mapSizeSpinner = ( Spinner ) findViewById( R.id.mapSizeSpinner );
-        ArrayAdapter<CharSequence> mapSizeAdapter =
-                ArrayAdapter.createFromResource( this, R.array.map_sizes, R.layout.spinner_default );
-        mapSizeSpinner.setAdapter( mapSizeAdapter );
-
-        Spinner mapSymmetrySpinner = ( Spinner ) findViewById( R.id.mapSymmetrySpinner );
-        ArrayAdapter<CharSequence> mapSymmetryAdapter =
-                ArrayAdapter.createFromResource( this, R.array.map_symmetry, R.layout.spinner_default );
-        mapSymmetrySpinner.setAdapter( mapSymmetryAdapter );
-
-        Spinner horizontalWrapSpinner = ( Spinner ) findViewById( R.id.horizontalWrapSpinner );
-        ArrayAdapter<CharSequence> horizontalWrapAdapter =
-                ArrayAdapter.createFromResource( this, R.array.horizontal_wrap, R.layout.spinner_default );
-        horizontalWrapSpinner.setAdapter( horizontalWrapAdapter );
-
-        Spinner mapNameSpinner = ( Spinner ) findViewById( R.id.mapNameSpinner );
-        ArrayAdapter<CharSequence> mapNameAdapter =
-                ArrayAdapter.createFromResource( this, R.array.map_names, R.layout.spinner_default );
-        mapNameSpinner.setAdapter( mapNameAdapter );
-
-        //set default selections and visibilities
-        mapNameSpinner.setSelection( mapNameAdapter.getPosition( "Map Name" ) );
-        mapSizeSpinner.setSelection( mapSizeAdapter.getPosition( "Map Size" ) );
-        mapSymmetrySpinner.setSelection( mapSymmetryAdapter.getPosition( "Map Symmetry Setting" ) );
-        horizontalWrapSpinner.setSelection( horizontalWrapAdapter.getPosition( "Map Wrap Setting" ) );
+        createSpinners();
 
         findViewById(R.id.CustomMapOptions).setVisibility( View.GONE );
         findViewById(R.id.RandomMapOptions).setVisibility( View.GONE );
     }
 
-    /**
-     *
-     * @param v: The button view
-     *
-     * This method deals with clicks of the toggle buttons. We only want one toggle button
-     * to be active at a time, so any time a button is activated, this one deactivates any other
-     * button in the view.
-     */
+    protected void createSpinners()
+    {
+        //set up spinners
+        Spinner mapSizeSpinner = UserInterfaceHelper.createHintedSpinner(
+                findViewById( R.id.mapSizeSpinner),
+                R.array.map_sizes,
+                R.layout.spinner_default
+        );
+
+        Spinner mapNameSpinner = UserInterfaceHelper.createHintedSpinner(
+                findViewById( R.id.mapNameSpinner),
+                R.array.map_names,
+                R.layout.spinner_default
+        );
+
+        Spinner mapSymmetrySpinner = UserInterfaceHelper.createHintedSpinner(
+                findViewById( R.id.mapSymmetrySpinner),
+                R.array.map_symmetry,
+                R.layout.spinner_default
+        );
+
+        Spinner horizontalWrapSpinner = UserInterfaceHelper.createHintedSpinner(
+                findViewById( R.id.horizontalWrapSpinner),
+                R.array.horizontal_wrap,
+                R.layout.spinner_default
+        );
+    }
+
     public void handleToggleClick( View v )
     {
         //Get Resources
@@ -99,14 +91,16 @@ public class LaunchGameActivity extends Activity {
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
     public void startNewGame( View v )
     {
         Intent intent = new Intent( this, GameActivity.class );
         startActivity( intent );
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+
 }

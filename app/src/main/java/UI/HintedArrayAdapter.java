@@ -16,6 +16,10 @@ public class HintedArrayAdapter extends ArrayAdapter<CharSequence> {
         super( context, resourceId );
     }
 
+    public HintedArrayAdapter( Context context, int resourceId, CharSequence [] strings ) {
+        super( context, resourceId, strings );
+    }
+
     @Override
     public View getView( int position, View convertView, ViewGroup parent )
     {
@@ -24,30 +28,33 @@ public class HintedArrayAdapter extends ArrayAdapter<CharSequence> {
         }
 
         View v = super.getView( position, convertView, parent );
+        return v;
+    }
+
+    @Override
+    public View getDropDownView( int position, View convertView, ViewGroup parent )
+    {
+        View v = null;
+        if( getItem( position ) == getItem( 0 ) ) {
+            TextView tv = new TextView( getContext() );
+            tv.setHeight( 0 );
+            v = tv;
+        }
+        else {
+            v = super.getDropDownView( position, null, parent );
+        }
 
         return v;
     }
 
     public static HintedArrayAdapter createFromResource( Context context, int arrayResourceId, int layoutId )
     {
-        //create new adapter
-        HintedArrayAdapter adapterFromResource = new HintedArrayAdapter( context, arrayResourceId );
-
-        //set the layout
-        adapterFromResource.setDropDownViewResource( layoutId );
-
-        //populate it
-        String [] strings = context.getResources().getStringArray( arrayResourceId );
-        for( String string : strings ) {
-            adapterFromResource.add( string );
-        }
-
-        //return the instance
-        return adapterFromResource;
+        CharSequence[] strings = context.getResources().getTextArray( arrayResourceId );
+        return new HintedArrayAdapter(context, layoutId, strings);
     }
 
     @Override
     public int getCount() {
-        return super.getCount() - 1;
+        return super.getCount();
     }
 }
