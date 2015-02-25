@@ -15,6 +15,6 @@
             android:fadeScrollbars="false"
             android:paddingTop="20dp"
             android:textColor="#555"
-            android:background="@color/darkGrey"
+            android:background="@color/silver"
             />
     </android.support.v4.view.ViewPager>
