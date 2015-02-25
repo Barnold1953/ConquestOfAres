@@ -1,13 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="MainMenuButtonTheme" parent="android:Widget.Button">
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_gravity">bottom</item>
-        <item name="android:layout_margin">11dp</item>
-    </style>
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <!-- UI Button Styles here -->
+        <!-- button styles for the main game menu -->
+        <style name="MainMenuButtonTheme" parent="android:Widget.Button">
+            <item name="android:layout_height">wrap_content</item>
+            <item name="android:layout_width">wrap_content</item>
+            <item name="android:layout_gravity">bottom</item>
+            <item name="android:layout_margin">11dp</item>
+        </style>
 
+        <!-- style for multi state toggle buttons for UI menus -->
+        <style name="MultiToggleButtonTheme" parent="android:Widget.Button.Toggle">
+            <item name="android:layout_height">@dimen/button_multiToggleButton</item>
+            <item name="android:layout_width">@dimen/button_multiToggleButton</item>
+            <item name="android:textSize">20sp</item>
+            <item name="android:textStyle">bold</item>
+            <item name="android:textColor">@color/darkGrey</item>
+            <item name="android:layout_marginLeft">4dp</item>
+            <item name="android:layout_marginRight">4dp</item>
+            <item name="android:background">@color/offWhite</item>
+            <item name="android:onClick">handleToggleClick</item>
+        </style>
+
+    <!--UI Layout styles-->
+        <!-- simple separator border created by a space with a background color -->
+        <style name="border">
+            <item name="android:layout_height">2dp</item>
+            <item name="android:layout_width">fill_parent</item>
+            <item name="android:layout_marginTop">5dp</item>
+        </style>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
     </style>
 
 </resources>
