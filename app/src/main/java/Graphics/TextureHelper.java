@@ -10,14 +10,12 @@ import android.util.Log;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by Nathan on 2/5/2015.
  */
 public class TextureHelper {
-    private Map textureHandles= new HashMap();
-    private HashMap<String, int[]> textures = new HashMap<String, int[]>();
+    private static HashMap<String, int[]> textureMap = new HashMap<String, int[]>();
 
     Context context;
 
@@ -25,7 +23,7 @@ public class TextureHelper {
         context = c;
     }
 
-    public void DataToTexture(ByteBuffer data, String label, int width, int height){
+    public static void DataToTexture(ByteBuffer data, String label, int width, int height){
         int[] textureHandle = new int[1];
 
         GLES20.glGenTextures(1, textureHandle, 0);
@@ -37,11 +35,11 @@ public class TextureHelper {
             GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, width, height, 0, GLES20.GL_RGBA, GLES20.GL_BYTE, data);
 
 
-            if (textureHandles.containsKey(label)) {
+            if (textureMap.containsKey(label)) {
                 Log.d("Texture", "Texture with that label already exists");
                 return;
             } else {
-                textureHandles.put(label, textureHandle);
+                textureMap.put(label, textureHandle);
             }
         }
         else{
@@ -49,7 +47,7 @@ public class TextureHelper {
         }
     }
 
-    public int ImageToTexture(final Context context, final int resourceId, final String label){
+    public static int ImageToTexture(final Context context, final int resourceId, final String label){
         final int[] textureHandle = new int[1];
 
         GLES20.glGenTextures(1, textureHandle, 0);
@@ -84,11 +82,11 @@ public class TextureHelper {
 
 
 
-        textures.put(label, textureHandle);
+        textureMap.put(label, textureHandle);
         return textureHandle[0];
     }
 
-    public int DataToTexture(final FloatBuffer data, final String label, final int width, final int height){
+    public static int DataToTexture(final FloatBuffer data, final String label, final int width, final int height){
         final int[] textureHandle = new int[1];
 
         GLES20.glGenTextures(1, textureHandle, 0);
@@ -111,11 +109,11 @@ public class TextureHelper {
         }
         GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
 
-        textures.put(label, textureHandle);
+        textureMap.put(label, textureHandle);
         return textureHandle[0];
     }
 
-    public int getTexture(String label){
-        return textures.get(label)[0];
+    public static int getTexture(String label){
+        return textureMap.get(label)[0];
     }
 }

@@ -34,8 +34,6 @@ public class DrawHelper {
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, tHelper.getTexture("texture1"));
         GLES20.glUniform1i(mTextureHandle, 0);
 
-
-
         mVertexBuffer.position(0);
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 0, mVertexBuffer);
         GLES20.glEnableVertexAttribArray(mPositionHandle);
@@ -50,9 +48,6 @@ public class DrawHelper {
 
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, camera.getVPMatrix(), 0);
 
-        //GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, ibo[0]);
-        //GLES20.glDrawElements(GLES20.GL_TRIANGLES, 36, GLES20.GL_FLOAT, 0);
-        //GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, gHelper.getVertices().length/3);
     }
 

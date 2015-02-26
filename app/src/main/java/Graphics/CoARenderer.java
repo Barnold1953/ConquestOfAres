@@ -27,6 +27,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     GeometryHelper gHelper;
     DrawHelper dHelper;
     TextureHelper tHelper;
+    TextureRenderer textRendHelper;
     final boolean IS_3D = false; ///< Temporary: determines if we are rendering in 3D or 2D
 
     // Camera lookAt
@@ -50,6 +51,8 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         tHelper = new TextureHelper(context);
         dHelper = new DrawHelper(camera, gHelper, tHelper);
+
+        textRendHelper = new TextureRenderer(c);
 
         // Set the view matrix
         if (IS_3D) {

@@ -12,62 +12,6 @@ import java.util.Arrays;
  * Created by Nathan on 1/20/2015.
  */
 public class GeometryHelper {
-    final float[] cube = {
-            0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f,        // v1-v2-v3-v0 (front)
-
-            1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.000f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,        // v0-v3-v4-v5 (right)
-
-            0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,       // v6-v1-v0-v5 (top)
-
-            0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,               // v6-v7-v2-v1 (left)
-
-            0.0f, 0.0f, 0.0f, 1.000f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,               // v7-v4-v3-v2 (bottom)
-
-            1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f,                  // v5-v4-v7-v6 (back)
-    };
-
-    final float[] cubeNormals = {
-                 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,  // v1-v2-v3-v0 (front)
-
-                1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // v0-v3-v4-v5 (right)
-
-                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,       // v6-v1-v0-v5 (top)
-
-                -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, // v6-v7-v2-v1 (left)
-
-                0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f,  // v7-v4-v3-v2 (bottom)
-
-                0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f,   // v5-v4-v7-v6 (back)
-    };
-
-    final float[] cubeTextCoords = {
-                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-
-                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-
-                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-
-                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-
-                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-
-                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f
-    };
-
-    final float[] cubeColors = {
-                1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-
-                0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-
-                0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-
-                1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-
-                1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-
-                1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f
-    };
-
     final float[] quad = {0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f};
     final float[] quadNormals = {0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f};
     final float[] quadTextCoords = {0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f};
@@ -77,8 +21,6 @@ public class GeometryHelper {
     //final float[] cubeNormals = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
     //final float[] cubeTextCoords = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
     //final float[] cubeColors = {1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f};
-
-    float[] indices;
 
     private final int mBytesPerFloat = 4;
     private final int mStrideBytes = 7 * mBytesPerFloat;
@@ -98,16 +40,6 @@ public class GeometryHelper {
     public float[] colors;
 
     public void createBuffers(){
-        indices = new float[36];
-
-        for(int i = 0, j = 0; i < 36; i+= 6, j += 4) {
-            indices[i] = j;
-            indices[i + 1] = j + 1;
-            indices[i + 2] = j + 2;
-            indices[i + 3] = j + 2;
-            indices[i + 4] = j + 3;
-            indices[i + 5] = j;
-        }
 
         /*
         mVertexBuffer = ByteBuffer.allocateDirect(cube.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
@@ -128,7 +60,7 @@ public class GeometryHelper {
         mVertexBuffer = ByteBuffer.allocateDirect(vertices.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
         mColorBuffer = ByteBuffer.allocateDirect(colors.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
         mTextCoordBuffer = ByteBuffer.allocateDirect(textureCoordinates.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
-        mIndicesBuffer = ByteBuffer.allocateDirect(indices.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
+
 
         //mVertexBuffer.put(cube).position(0);
         //mColorBuffer.put(cubeColors).position(0);
@@ -143,7 +75,6 @@ public class GeometryHelper {
         mVertexBuffer.put(vertices).position(0);
         mColorBuffer.put(colors).position(0);
         mTextCoordBuffer.put(textureCoordinates).position(0);
-        mIndicesBuffer.put(indices).position(0);
     }
 
     public void createQuad(int x, int y, int z, int width, int height){
@@ -186,7 +117,6 @@ public class GeometryHelper {
         mVertexBuffer.put(vertices).position(0);
         mColorBuffer.put(colors).position(0);
         mTextCoordBuffer.put(textureCoordinates).position(0);
-        mIndicesBuffer.put(indices).position(0);
     }
 
     public float[] getVertices(){
@@ -197,8 +127,5 @@ public class GeometryHelper {
     }
     public float[] getTextureCoordinates(){
         return textureCoordinates;
-    }
-    public float[] getIndices(){
-        return indices;
     }
 }
