@@ -25,7 +25,7 @@ public class ShaderHelper {
     public int mMVPMatrixHandle;
     public int mTCoordHandle;
 
-    public ShaderHelper(){
+    public ShaderHelper() {
         shaders = new HashMap<>();
     }
 

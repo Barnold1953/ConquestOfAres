@@ -20,7 +20,7 @@ public class DrawHelper {
     private final int mBytesPerFloat = 4;
     private final int mStrideBytes = 9 * mBytesPerFloat;
 
-    public void setProgHandles(int ph){
+    public void setProgHandles(int ph) {
         mMVPMatrixHandle = GLES20.glGetUniformLocation(ph, "uMVPMatrix");
         mPositionHandle = GLES20.glGetAttribLocation(ph, "vPosition");
         mColorHandle = GLES20.glGetAttribLocation(ph, "vColor");
@@ -28,7 +28,7 @@ public class DrawHelper {
         mTextureHandle = GLES20.glGetAttribLocation(ph, "texture");
     }
 
-    public void draw(Camera camera, FloatBuffer mVertexBuffer, FloatBuffer mColorBuffer, FloatBuffer mTextCoordBuffer, FloatBuffer mIndicesBuffer, int textureId){
+    public void draw(Camera camera, FloatBuffer mVertexBuffer, FloatBuffer mColorBuffer, FloatBuffer mTextCoordBuffer, FloatBuffer mIndicesBuffer, int textureId) {
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId);
         GLES20.glUniform1i(mTextureHandle, 0);
@@ -53,7 +53,7 @@ public class DrawHelper {
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, gHelper.getVertices().length/3);
     }
 
-    public DrawHelper(Camera mh, GeometryHelper gh){
+    public DrawHelper(Camera mh, GeometryHelper gh) {
         gHelper = gh;
         mHelper = mh;
     }

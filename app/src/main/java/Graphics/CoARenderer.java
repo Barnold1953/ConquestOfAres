@@ -65,7 +65,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         try {
             programHandle = sHelper.compileShader(context, R.string.simple_vert, R.string.simple_frag, "simple");
         }
-        catch (IOException e){
+        catch (IOException e) {
             Log.d("Shader", "Error occurred during compilation");
         }
 
@@ -89,8 +89,8 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
         GLES20.glEnable(GLES20.GL_TEXTURE_2D);
-        GLES20.glDepthFunc( GLES20.GL_LEQUAL );
-        GLES20.glDepthMask( true );
+        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
+        GLES20.glDepthMask(true);
     }
 
     @Override

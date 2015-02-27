@@ -59,7 +59,7 @@ public class Camera {
     /// @param height: Height of the viewport
     /// @param zNear: Near clipping planet
     /// @param zFar: Far clipping plane
-    public void setSurface(int width, int height, float zNear, float zFar){
+    public void setSurface(int width, int height, float zNear, float zFar) {
         // Set the viewport
         GLES20.glViewport(0, 0, width, height);
 
@@ -73,11 +73,11 @@ public class Camera {
         Matrix.frustumM(m_projectionMatrix, 0, left, right, bottom, top, zNear, zFar);
     }
     /// Currently does nothing
-    public void update(){
+    public void update() {
         // Empty for now
     }
 
-    public float[] getVPMatrix(){
+    public float[] getVPMatrix() {
         Matrix.multiplyMM(m_vpMatrix, 0, m_projectionMatrix, 0, m_viewMatrix, 0);
         return m_vpMatrix;
     }

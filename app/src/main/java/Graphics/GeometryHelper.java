@@ -97,7 +97,7 @@ public class GeometryHelper {
     public float[] textureCoordinates;
     public float[] colors;
 
-    public void createBuffers(){
+    public void createBuffers() {
         indices = new float[36];
 
         for(int i = 0, j = 0; i < 36; i+= 6, j += 4) {
@@ -146,7 +146,7 @@ public class GeometryHelper {
         mIndicesBuffer.put(indices).position(0);
     }
 
-    public void createQuad(int x, int y, int z, int width, int height){
+    public void createQuad(int x, int y, int z, int width, int height) {
         float[] newV = new float[18];
 
         for(int i = 0; i < quad.length; i+=3) {
@@ -189,16 +189,16 @@ public class GeometryHelper {
         mIndicesBuffer.put(indices).position(0);
     }
 
-    public float[] getVertices(){
+    public float[] getVertices() {
         return vertices;
     }
-    public float[] getNormals(){
+    public float[] getNormals() {
         return normals;
     }
-    public float[] getTextureCoordinates(){
+    public float[] getTextureCoordinates() {
         return textureCoordinates;
     }
-    public float[] getIndices(){
+    public float[] getIndices() {
         return indices;
     }
 }
