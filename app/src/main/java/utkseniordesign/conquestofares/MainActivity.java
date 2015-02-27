@@ -16,7 +16,7 @@ import android.view.ViewGroup;
 public class MainActivity extends ActionBarActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         //Sets tabbed layout
@@ -53,14 +53,14 @@ public class MainActivity extends ActionBarActivity {
 
         //Get item creates a 1-indexed page fragment off a position
         @Override
-        public Fragment getItem(int position){
+        public Fragment getItem(int position) {
             return PageFragment.create(position + 1);
         }
 
         //Returns title
         @Override
-        public CharSequence getPageTitle(int position){
-            switch(position){
+        public CharSequence getPageTitle(int position) {
+            switch(position) {
                 case 0:
                     return "Main Menu";
                 case 1:
@@ -78,7 +78,7 @@ public class MainActivity extends ActionBarActivity {
 
         private int mPage;
 
-        public static PageFragment create(int page){
+        public static PageFragment create(int page) {
             //creates and returns page with appropriate page number
             Bundle args = new Bundle();
             args.putInt(ARG_PAGE, page);
@@ -88,7 +88,7 @@ public class MainActivity extends ActionBarActivity {
         }
 
         @Override
-        public void onCreate(Bundle savedInstanceState){
+        public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
 
             //Everytime a page is created, use the arguments passed from create() to get a unique page #
@@ -96,10 +96,10 @@ public class MainActivity extends ActionBarActivity {
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             //function for creating the view of each individual page fragment (tab)
             View view;
-            switch(mPage){
+            switch(mPage) {
                 case 1:
                     view = inflater.inflate(R.layout.activity_main_subtab_main, container, false);
                     break;
@@ -127,7 +127,7 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    public void launchNewGame(View v){
+    public void launchNewGame(View v) {
         Intent intent = new Intent(this, LaunchGameActivity.class);
         startActivity(intent);
     }

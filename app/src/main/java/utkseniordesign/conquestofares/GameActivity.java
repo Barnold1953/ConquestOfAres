@@ -16,7 +16,7 @@ public class GameActivity extends Activity {
 
     private GLSurfaceView mGLSurfaceView;
 
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gamescreen);
 
@@ -50,7 +50,7 @@ public class GameActivity extends Activity {
         super.onDestroy();
     }
 
-    private HashMap<String, int[]> getTextures(){
+    private HashMap<String, int[]> getTextures() {
         HashMap<String, int[]> textures = new HashMap<String, int[]>();
         int[] texture = new int[1];
 

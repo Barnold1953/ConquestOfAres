@@ -4,11 +4,11 @@ package AI;
  */
 public class AI {
 
-    AI(){
+    AI() {
         //initialize AI class
     }
 
-    public void resetAIClass(){
+    public void resetAIClass() {
         //reset attributes of AI class
         //so that new priorities and attributes
         //can be assigned
@@ -22,17 +22,17 @@ public class AI {
         PrioritySystem(/*GameInterpreter g*/) {
         }
 
-        public void gatherTasks(){
+        public void gatherTasks() {
             //gather basic tasks to be performed
         }
 
-        public void generateAssignments(){
+        public void generateAssignments() {
             //generate list of all possible
             //assignments that could be made
             //in the context of the situation
         }
 
-        public void sortAssignments(){
+        public void sortAssignments() {
             //sort possible actions based on
             //priority system
         }
@@ -42,7 +42,7 @@ public class AI {
         //react to current game state based on
         //priority system
         //change NPCs accordingly
-        public void assignTask(){
+        public void assignTask() {
             //assign task based on which task gets priority
         }
     }

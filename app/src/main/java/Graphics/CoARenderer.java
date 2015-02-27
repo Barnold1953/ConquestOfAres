@@ -65,7 +65,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         try {
             programHandle = sHelper.compileShader(context, R.string.simple_vert, R.string.simple_frag, "simple");
         }
-        catch (IOException e){
+        catch (IOException e) {
             Log.d("Shader", "Error occurred during compilation");
         }
 

@@ -19,7 +19,7 @@ import UI.UserInterfaceHelper;
 public class LaunchGameActivity extends Activity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_creategame);
 
@@ -56,7 +56,7 @@ public class LaunchGameActivity extends Activity {
        );
     }
 
-    public void handleToggleClick(View v){
+    public void handleToggleClick(View v) {
         //Get Resources
         Resources resources = getResources();
         int lightBlue = resources.getColor(R.color.lightBlue);
@@ -67,7 +67,7 @@ public class LaunchGameActivity extends Activity {
         ToggleButton toggleButton = (ToggleButton) v;
         LinearLayout linearLayout = (LinearLayout) toggleButton.getParent();
         int buttonNumber = linearLayout.getChildCount();
-        for(int i = 0; i < buttonNumber; i++){
+        for(int i = 0; i < buttonNumber; i++) {
             ToggleButton tempButton = (ToggleButton)linearLayout.getChildAt(i);
             tempButton.setBackgroundColor(offWhite);
             tempButton.setTextColor(darkGrey);
@@ -77,18 +77,18 @@ public class LaunchGameActivity extends Activity {
         toggleButton.setBackgroundColor(lightBlue);
         toggleButton.setTextColor(white);
 
-        if(v.getId() == R.id.RandomMap){
+        if(v.getId() == R.id.RandomMap) {
             findViewById(R.id.RandomMapOptions).setVisibility(View.VISIBLE);
             findViewById(R.id.CustomMapOptions).setVisibility(View.GONE);
         }
 
-        if(v.getId() == R.id.CustomMap){
+        if(v.getId() == R.id.CustomMap) {
             findViewById(R.id.CustomMapOptions).setVisibility(View.VISIBLE);
             findViewById(R.id.RandomMapOptions).setVisibility(View.GONE);
         }
     }
 
-    public void startNewGame(View v){
+    public void startNewGame(View v) {
         Intent intent = new Intent(this, GameActivity.class);
         startActivity(intent);
     }
