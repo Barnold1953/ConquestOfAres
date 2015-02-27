@@ -734,16 +734,14 @@ public class OpenSimplexNoise {
 
         //First extra vertex
         double attn_ext0 = 2 - dx_ext0 * dx_ext0 - dy_ext0 * dy_ext0 - dz_ext0 * dz_ext0;
-        if (attn_ext0 > 0)
-        {
+        if (attn_ext0 > 0) {
             attn_ext0 *= attn_ext0;
             value += attn_ext0 * attn_ext0 * extrapolate(xsv_ext0, ysv_ext0, zsv_ext0, dx_ext0, dy_ext0, dz_ext0);
         }
 
         //Second extra vertex
         double attn_ext1 = 2 - dx_ext1 * dx_ext1 - dy_ext1 * dy_ext1 - dz_ext1 * dz_ext1;
-        if (attn_ext1 > 0)
-        {
+        if (attn_ext1 > 0) {
             attn_ext1 *= attn_ext1;
             value += attn_ext1 * attn_ext1 * extrapolate(xsv_ext1, ysv_ext1, zsv_ext1, dx_ext1, dy_ext1, dz_ext1);
         }
@@ -1382,8 +1380,7 @@ public class OpenSimplexNoise {
                     if ((c & 0x02) == 0) {
                         ysv_ext0 = ysv_ext1 = ysb;
                         dy_ext0 = dy_ext1 = dy0 - SQUISH_CONSTANT_4D;
-                        if ((c & 0x01) == 0x01)
-                        {
+                        if ((c & 0x01) == 0x01) {
                             ysv_ext0 -= 1;
                             dy_ext0 += 1;
                         } else {
@@ -1398,8 +1395,7 @@ public class OpenSimplexNoise {
                     if ((c & 0x04) == 0) {
                         zsv_ext0 = zsv_ext1 = zsb;
                         dz_ext0 = dz_ext1 = dz0 - SQUISH_CONSTANT_4D;
-                        if ((c & 0x03) == 0x03)
-                        {
+                        if ((c & 0x03) == 0x03) {
                             zsv_ext0 -= 1;
                             dz_ext0 += 1;
                         } else {
@@ -1411,8 +1407,7 @@ public class OpenSimplexNoise {
                         dz_ext0 = dz_ext1 = dz0 - 1 - SQUISH_CONSTANT_4D;
                     }
 
-                    if ((c & 0x08) == 0)
-                    {
+                    if ((c & 0x08) == 0) {
                         wsv_ext0 = wsb;
                         wsv_ext1 = wsb - 1;
                         dw_ext0 = dw0 - SQUISH_CONSTANT_4D;
@@ -1802,8 +1797,7 @@ public class OpenSimplexNoise {
                     if ((c & 0x02) != 0) {
                         ysv_ext0 = ysv_ext1 = ysb + 1;
                         dy_ext0 = dy_ext1 = dy0 - 1 - 3 * SQUISH_CONSTANT_4D;
-                        if ((c & 0x01) == 0)
-                        {
+                        if ((c & 0x01) == 0) {
                             ysv_ext0 += 1;
                             dy_ext0 -= 1;
                         } else {
@@ -1818,8 +1812,7 @@ public class OpenSimplexNoise {
                     if ((c & 0x04) != 0) {
                         zsv_ext0 = zsv_ext1 = zsb + 1;
                         dz_ext0 = dz_ext1 = dz0 - 1 - 3 * SQUISH_CONSTANT_4D;
-                        if ((c & 0x03) == 0)
-                        {
+                        if ((c & 0x03) == 0) {
                             zsv_ext0 += 1;
                             dz_ext0 -= 1;
                         } else {
@@ -1831,8 +1824,7 @@ public class OpenSimplexNoise {
                         dz_ext0 = dz_ext1 = dz0 - 3 * SQUISH_CONSTANT_4D;
                     }
 
-                    if ((c & 0x08) != 0)
-                    {
+                    if ((c & 0x08) != 0) {
                         wsv_ext0 = wsb + 1;
                         wsv_ext1 = wsb + 2;
                         dw_ext0 = dw0 - 1 - 3 * SQUISH_CONSTANT_4D;
@@ -2040,24 +2032,21 @@ public class OpenSimplexNoise {
 
         //First extra vertex
         double attn_ext0 = 2 - dx_ext0 * dx_ext0 - dy_ext0 * dy_ext0 - dz_ext0 * dz_ext0 - dw_ext0 * dw_ext0;
-        if (attn_ext0 > 0)
-        {
+        if (attn_ext0 > 0) {
             attn_ext0 *= attn_ext0;
             value += attn_ext0 * attn_ext0 * extrapolate(xsv_ext0, ysv_ext0, zsv_ext0, wsv_ext0, dx_ext0, dy_ext0, dz_ext0, dw_ext0);
         }
 
         //Second extra vertex
         double attn_ext1 = 2 - dx_ext1 * dx_ext1 - dy_ext1 * dy_ext1 - dz_ext1 * dz_ext1 - dw_ext1 * dw_ext1;
-        if (attn_ext1 > 0)
-        {
+        if (attn_ext1 > 0) {
             attn_ext1 *= attn_ext1;
             value += attn_ext1 * attn_ext1 * extrapolate(xsv_ext1, ysv_ext1, zsv_ext1, wsv_ext1, dx_ext1, dy_ext1, dz_ext1, dw_ext1);
         }
 
         //Third extra vertex
         double attn_ext2 = 2 - dx_ext2 * dx_ext2 - dy_ext2 * dy_ext2 - dz_ext2 * dz_ext2 - dw_ext2 * dw_ext2;
-        if (attn_ext2 > 0)
-        {
+        if (attn_ext2 > 0) {
             attn_ext2 *= attn_ext2;
             value += attn_ext2 * attn_ext2 * extrapolate(xsv_ext2, ysv_ext2, zsv_ext2, wsv_ext2, dx_ext2, dy_ext2, dz_ext2, dw_ext2);
         }
@@ -2065,23 +2054,20 @@ public class OpenSimplexNoise {
         return value / NORM_CONSTANT_4D;
     }
 
-    private double extrapolate(int xsb, int ysb, double dx, double dy)
-    {
+    private double extrapolate(int xsb, int ysb, double dx, double dy) {
         int index = perm[(perm[xsb & 0xFF] + ysb) & 0xFF] & 0x0E;
         return gradients2D[index] * dx
                 + gradients2D[index + 1] * dy;
     }
 
-    private double extrapolate(int xsb, int ysb, int zsb, double dx, double dy, double dz)
-    {
+    private double extrapolate(int xsb, int ysb, int zsb, double dx, double dy, double dz) {
         int index = permGradIndex3D[(perm[(perm[xsb & 0xFF] + ysb) & 0xFF] + zsb) & 0xFF];
         return gradients3D[index] * dx
                 + gradients3D[index + 1] * dy
                 + gradients3D[index + 2] * dz;
     }
 
-    private double extrapolate(int xsb, int ysb, int zsb, int wsb, double dx, double dy, double dz, double dw)
-    {
+    private double extrapolate(int xsb, int ysb, int zsb, int wsb, double dx, double dy, double dz, double dw) {
         int index = perm[(perm[(perm[(perm[xsb & 0xFF] + ysb) & 0xFF] + zsb) & 0xFF] + wsb) & 0xFF] & 0xFC;
         return gradients4D[index] * dx
                 + gradients4D[index + 1] * dy

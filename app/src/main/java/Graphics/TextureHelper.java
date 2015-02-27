@@ -25,8 +25,7 @@ public class TextureHelper {
 
         GLES20.glGenTextures(1, textureHandle, 0);
 
-        if (textureHandle[0] != 0)
-        {
+        if (textureHandle[0] != 0) {
             final BitmapFactory.Options options = new BitmapFactory.Options();
             options.inScaled = false;	// No pre-scaling
 
@@ -47,8 +46,7 @@ public class TextureHelper {
             bitmap.recycle();
         }
 
-        if (textureHandle[0] == 0)
-        {
+        if (textureHandle[0] == 0) {
             throw new RuntimeException("Error loading texture.");
         }
         GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
@@ -62,8 +60,7 @@ public class TextureHelper {
 
         GLES20.glGenTextures(1, textureHandle, 0);
         data.position(0);
-        if (textureHandle[0] != 0)
-        {
+        if (textureHandle[0] != 0) {
             // Bind to the texture in OpenGL
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0]);
 
@@ -74,8 +71,7 @@ public class TextureHelper {
             GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, width, height, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, data);
         }
 
-        if (textureHandle[0] == 0)
-        {
+        if (textureHandle[0] == 0) {
             throw new RuntimeException("Error loading texture.");
         }
         GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
@@ -89,8 +85,7 @@ public class TextureHelper {
 
         GLES20.glGenTextures(1, textureHandle, 0);
         data.position(0);
-        if (textureHandle[0] != 0)
-        {
+        if (textureHandle[0] != 0) {
             // Bind to the texture in OpenGL
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0]);
 
@@ -101,8 +96,7 @@ public class TextureHelper {
             GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, width, height, 0, GLES20.GL_RGBA, GLES20.GL_FLOAT, data);
         }
 
-        if (textureHandle[0] == 0)
-        {
+        if (textureHandle[0] == 0) {
             throw new RuntimeException("Error loading texture.");
         }
         GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);

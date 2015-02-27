@@ -30,20 +30,20 @@ public class UserInterfaceHelper {
      * @return
      *      Returns the spinner instance, for later use.
      */
-    public static Spinner createHintedSpinner ( View spinnerView, int arrayResourceId, int spinnerLayout ) {
+    public static Spinner createHintedSpinner (View spinnerView, int arrayResourceId, int spinnerLayout){
         // set relevant variables
         Context context = spinnerView.getContext();
-        ViewGroup parent = ( ViewGroup ) spinnerView.getParent();
+        ViewGroup parent = (ViewGroup)spinnerView.getParent();
 
-        if( spinnerView == null ) {
-            spinnerView = LayoutInflater.from( spinnerView.getContext() ).inflate( spinnerLayout, parent, false );
+        if(spinnerView == null){
+            spinnerView = LayoutInflater.from(spinnerView.getContext()).inflate(spinnerLayout, parent, false);
         }
 
-        Spinner spinner = ( Spinner ) spinnerView;
+        Spinner spinner = (Spinner)spinnerView;
         HintedArrayAdapter spinnerAdapter =
-                HintedArrayAdapter.createFromResource( context, arrayResourceId, spinnerLayout );
-        spinner.setAdapter( spinnerAdapter );
-        spinner.setSelection( 0 );
+                HintedArrayAdapter.createFromResource(context, arrayResourceId, spinnerLayout);
+        spinner.setAdapter(spinnerAdapter);
+        spinner.setSelection(0);
 
         return spinner;
     }
