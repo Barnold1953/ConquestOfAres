@@ -31,15 +31,16 @@
         android:background="@color/lightGrey">
         <Button
             style="@style/MainMenuButtonTheme"
-            android:background="@drawable/button_find_game"
+            android:background="@drawable/selector_button_find_game"
             />
         <Button
             style="@style/MainMenuButtonTheme"
-            android:background="@drawable/button_new_game"
+            android:background="@drawable/selector_button_new_game"
+            android:onClick="launchNewGame"
             />
         <Button
             style="@style/MainMenuButtonTheme"
-            android:background="@drawable/button_map_editor"
+            android:background="@drawable/selector_button_map_editor"
             />
     </LinearLayout>
 </LinearLayout>
