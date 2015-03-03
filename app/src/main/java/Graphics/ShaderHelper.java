@@ -19,26 +19,13 @@ import utkseniordesign.conquestofares.R;
  * Created by Nathan on 1/17/2015.
  */
 public class ShaderHelper {
-    HashMap<String, Integer> shaders;
+    static HashMap<String, Integer> shaders = new HashMap<>();
     public int mPositionHandle;
     public int mColorHandle;
     public int mMVPMatrixHandle;
     public int mTCoordHandle;
 
-    public ShaderHelper(){
-        shaders = new HashMap<>();
-    }
-
-    public static int loadShader(int type, String shaderCode) throws IOException{
-        int shader = GLES20.glCreateShader(type);
-
-        GLES20.glShaderSource(shader, shaderCode);
-        GLES20.glCompileShader(shader);
-
-        return shader;
-    }
-
-    public int compileShader(Context context, int vertID, int fragID, String shader) throws IOException{
+    public static int compileShader(Context context, int vertID, int fragID, String shader) throws IOException{
 
         String filePath = "@raw/";
         int vertexShaderHandle, fragmentShaderHandle;
@@ -101,10 +88,6 @@ public class ShaderHelper {
                 GLES20.glAttachShader(programHandle, vertexShaderHandle);
                 GLES20.glAttachShader(programHandle, fragmentShaderHandle);
 
-                GLES20.glBindAttribLocation(programHandle, 0, "vPosition");
-                GLES20.glBindAttribLocation(programHandle, 1, "vColor");
-                GLES20.glBindAttribLocation(programHandle, 2, "vTextCoords");
-
                 GLES20.glLinkProgram(programHandle);
 
                 int[] linkStatus = new int[1];
@@ -125,13 +108,6 @@ public class ShaderHelper {
             programHandle = shaders.get(shader);
         }
         Log.d("shader", "Shader successfully compiled");
-
-        mMVPMatrixHandle = GLES20.glGetUniformLocation(programHandle, "uMVPMatrix");
-        mPositionHandle = GLES20.glGetAttribLocation(programHandle, "vPosition");
-        mColorHandle = GLES20.glGetAttribLocation(programHandle, "vColor");
-        mTCoordHandle = GLES20.glGetAttribLocation(programHandle, "vTextCoords");
-
-        GLES20.glUseProgram(programHandle);
 
         return programHandle;
     }

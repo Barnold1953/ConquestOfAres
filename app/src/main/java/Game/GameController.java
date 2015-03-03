@@ -1,5 +1,7 @@
 package Game;
 
+import android.content.Context;
+
 import java.util.*;
 import Generation.MapGenerator;
 import Generation.MapGenerationParams;
@@ -14,9 +16,9 @@ public class GameController {
     /// Initializes a game by setting up game state and map
     /// @param gameState: The game state
     /// @param gameSettings: Settings for the game
-    public void initGame(GameState gameState, GameSettings gameSettings) {
+    public void initGame(Context c, GameState gameState, GameSettings gameSettings) {
         // Generate the map
-        mapGenerator.generateMap(gameSettings.mapGenParams);
+        mapGenerator.generateMap(c, gameSettings.mapGenParams);
         // Assign territories
         assignTerritories(gameState, gameSettings);
         // Place units
@@ -28,7 +30,7 @@ public class GameController {
     /// @param gameSettings: The game settings
     private void assignTerritories(GameState gameState, GameSettings gameSettings) {
         // Set gamestate
-        gameState.territories = gameSettings.mapGenParams.territories;
+        //gameState.territories = gameSettings.mapGenParams.territories;
 
         // Assign territories to players
         switch (gameSettings.territoryDistMode) {

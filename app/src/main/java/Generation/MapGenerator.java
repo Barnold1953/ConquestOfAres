@@ -1,22 +1,27 @@
 package Generation;
-import java.lang.Math.*;
+import android.content.Context;
+
 import java.nio.*;
 import java.util.*;
-import android.util.Log;
+
+import Graphics.ColorMesh;
 
 /**
  * Created by brb55_000 on 1/21/2015.
  */
 public class MapGenerator {
 
-    private final int mBytesPerFloat = 4;
-    Vertex[] diagram;
-    List<Vertex> vertices = new LinkedList<Vertex>();
-    Random random = new Random();
+    private final int BYTES_PER_FLOAT = 4;
+    private Vertex[] m_diagram;
+    private List<Vertex> m_vertices = new LinkedList<Vertex>();
+    private Random m_random = new Random();
 
-    /// Generates a map and stores the result in p
+    /// Generates a map and returns the map data
     // TODO(Ben): Finish this
-    public void generateMap(MapGenerationParams p) throws BufferOverflowException{
+    public MapData generateMap(Context c, MapGenerationParams p) throws BufferOverflowException{
+        MapData mapData = new MapData();
+        mapData.params = p;
+
         int width = 1;
         int height = 1;
         // TODO: These are arbitrary. Pick better values.
@@ -44,7 +49,7 @@ public class MapGenerator {
         double[][] heightMap = new double[height][width];
         generateHeightmap(width, height, heightMap, p.seed);
 
-        ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(height * width * 4 * mBytesPerFloat).order(ByteOrder.nativeOrder());
+        ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(height * width * 4 * BYTES_PER_FLOAT).order(ByteOrder.nativeOrder());
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -70,13 +75,13 @@ public class MapGenerator {
             }
         }
 
-        Graphics.TextureHelper.dataToTexture(pixelBuffer, "gentest", width, height);
+        mapData.texture = Graphics.TextureHelper.dataToTexture(pixelBuffer, "gentest", width, height);
 
-       // random.setSeed(p.seed);
-       // generateTerritories(width, height, heightMap);
+        // random.setSeed(p.seed);
+        generateTerritories(c, mapData, width, height, heightMap);
 
-        // TODO(Ben): Render the heightmap
         // TODO(Ben): Segment heightmap into territories
+        return mapData;
     }
 
     /// Generates a raw heightmap
@@ -90,16 +95,31 @@ public class MapGenerator {
         }
     }
 
-    public void generateTerritories(int width, int height, double[][] heightMap) {
+    public void generateTerritories(Context context, MapData mapData, int width, int height, double[][] heightMap) {
         int numPoints = 10;
         Coord[] points = new Coord[numPoints];
-
+        // I hate java
         for (int i = 0; i < numPoints; i++) {
-            points[i].x = random.nextDouble() * width;
-            points[i].y = random.nextDouble() * height;
+            points[i] = new Coord();
         }
 
-        diagram = Voronoi.generate(points);
+        for (Coord c : points) {
+            c.x = m_random.nextDouble() * width;
+            c.y = m_random.nextDouble() * height;
+        }
+
+        m_diagram = Voronoi.generate(points);
+
+        mapData.territoryLineMesh = new ColorMesh(context);
+
+        for (Vertex v : m_diagram) {
+            for (VoronoiSegment s : v.edges) {
+                mapData.territoryLineMesh.addVertex(((float)s.v1.x / (float)width) * 2.0f - 1.0f, ((float)s.v1.y / (float)height) * 2.0f - 1.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+                mapData.territoryLineMesh.addVertex(((float)s.v2.x / (float)width) * 2.0f - 1.0f, ((float)s.v2.y / (float)height) * 2.0f - 1.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+            }
+            break;
+        }
+        mapData.territoryLineMesh.finish();
     }
 
     private double octaveNoise2D(double x, double y, double persistence, double frequency, int octaves) {
