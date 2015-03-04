@@ -76,7 +76,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         Generation.MapGenerator generator = new Generation.MapGenerator();
         MapGenerationParams params = new MapGenerationParams();
 
-        params.mapSize = MapGenerationParams.MapSize.AVERAGE;
+        params.mapSize = MapGenerationParams.MapSize.MEDIUM;
 
         generator.generateMap(params);
 
