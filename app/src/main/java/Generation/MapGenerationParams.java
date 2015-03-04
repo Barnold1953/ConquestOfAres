@@ -15,14 +15,14 @@ public class MapGenerationParams {
         SMALL,
         MEDIUM,
         LARGE,
-        MASSIVE;
+        MASSIVE
     }
 
     public enum MapSymmetry {
         NONE,
         HORIZONTAL,
         VERTICAL,
-        RADIAL;
+        RADIAL
     }
 
     /// Parameters
