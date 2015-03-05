@@ -4,6 +4,7 @@ import android.content.Context;
 import java.nio.*;
 import java.util.*;
 
+import Game.Territory;
 import Graphics.ColorMesh;
 
 /**
@@ -76,7 +77,7 @@ public class MapGenerator {
         mapData.texture = Graphics.TextureHelper.dataToTexture(pixelBuffer, "gentest", width, height); */
 
         // random.setSeed(p.seed);
-        generateTerritories(c, mapData, width, height, heightMap);
+        generateTerritories(c, mapData, width, height, 100, heightMap);
 
         // TODO(Ben): Segment heightmap into territories
         return mapData;
@@ -87,21 +88,37 @@ public class MapGenerator {
         // Generate the height data
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                heightMap[y][x] = octaveNoise2D((double)(seed + y), (double)(x - seed),
-                        0.86, 0.003, 8);
+                heightMap[y][x] = getHeightValue(x, y, seed);
             }
         }
     }
 
-    public void generateTerritories(Context context, MapData mapData, int width, int height, double[][] heightMap) {
-        int numPoints = 100;
-        ArrayList<Float> points = new ArrayList<Float>();
-        ArrayList<Byte> colors = new ArrayList<Byte>();
-        // I hate java
+    public double getHeightValue(int x, int y, int seed) {
+        return octaveNoise2D((double)(seed + y), (double)(x - seed), 0.86, 0.003, 8);
+    }
 
-        for (int i = 0; i < numPoints; i++) {
-            points.add(m_random.nextFloat() * width);
-            points.add(m_random.nextFloat() * height);
+
+    public void generateTerritories(Context context, MapData mapData, int width, int height, int numTerritories, double[][] heightMap) {
+
+        ArrayList<Byte> colors = new ArrayList<Byte>();
+        // Generate random territories
+        // TODO(Ben): Generate more uniform points
+        mapData.territories = new Vector<Territory>();
+        for (int i = 0; i < numTerritories; i++) {
+            Territory territory = new Territory();
+            territory.x = m_random.nextFloat() * width;
+            territory.y = m_random.nextFloat() * height;
+            territory.height = (float)getHeightValue((int)territory.x, (int)territory.y, 0);
+            // TODO(Ben): More terrain types, humidity / temperature distribution
+            if (territory.height < 0.0f) {
+                territory.terrainType = Territory.TerrainType.Ocean;
+            } else if (territory.height < 0.4f) {
+                territory.terrainType = Territory.TerrainType.Grassland;
+            } else {
+                territory.terrainType = Territory.TerrainType.Mountain;
+            }
+            mapData.territories.add(territory);
+
             colors.add((byte)(m_random.nextFloat() * 255.0f));
             colors.add((byte)(m_random.nextFloat() * 255.0f));
             colors.add((byte)(m_random.nextFloat() * 255.0f));
@@ -109,46 +126,57 @@ public class MapGenerator {
 
         ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(height * width * 4 * BYTES_PER_FLOAT).order(ByteOrder.nativeOrder());
 
+        // Generate texture for showing the territories
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                float closestDist = 9999999999.0f;
-                int closestIndex = 0;
-                for (int i = 0; i < numPoints; i++) {
-                    float dx = (float)x - points.get(i * 2);
-                    float dy = (float)y - points.get(i * 2 + 1);
-                    float dist = (float)Math.sqrt(dx * dx + dy * dy);
-                    if (dist < closestDist) {
-                        closestDist = dist;
-                        closestIndex = i;
-                    }
+                int closestIndex = getClosestTerritoryIndex(x, y, mapData.territories);
+
+                // Check if we are on an edge
+                boolean isEdge = false;
+
+                if (getClosestTerritoryIndex((float)x + 1, (float)y, mapData.territories) != closestIndex) {
+                    isEdge = true;
                 }
-                int cIndex = closestIndex * 3;
-                pixelBuffer.put(colors.get(cIndex));
-                pixelBuffer.put(colors.get(cIndex + 1));
-                pixelBuffer.put(colors.get(cIndex + 2));
+                if (getClosestTerritoryIndex((float)x - 1, (float)y, mapData.territories) != closestIndex) {
+                    isEdge = true;
+                }
+                if (getClosestTerritoryIndex((float)x, (float)y + 1, mapData.territories) != closestIndex) {
+                    isEdge = true;
+                }
+                if (getClosestTerritoryIndex((float)x, (float)y - 1, mapData.territories) != closestIndex) {
+                    isEdge = true;
+                }
+                if (isEdge) {
+                    pixelBuffer.put((byte)0);
+                    pixelBuffer.put((byte)0);
+                    pixelBuffer.put((byte)0);
+                } else {
+                    int cIndex = closestIndex * 3;
+                    pixelBuffer.put(colors.get(cIndex));
+                    pixelBuffer.put(colors.get(cIndex + 1));
+                    pixelBuffer.put(colors.get(cIndex + 2));
+                }
                 // Alpha
                 pixelBuffer.put((byte)255);
             }
         }
 
         mapData.texture = Graphics.TextureHelper.dataToTexture(pixelBuffer, "vortest", width, height);
+    }
 
-       /* DelaunayTriangulator triangulator = new DelaunayTriangulator();
-        ArrayList<Integer> indices = triangulator.computeTriangles(points, false);
-
-        mapData.territoryLineMesh = new ColorMesh(context);
-
-        for (int i = 0; i < indices.size(); i+=3) {
-            float r = m_random.nextFloat();
-            float g = m_random.nextFloat();
-            float b = m_random.nextFloat();
-            for (int j = 0; j < 3; j++) {
-                int index = indices.get(i + j);
-                mapData.territoryLineMesh.addVertex(points.get(index) * 2.0f - 1.0f, points.get(index + 1) * 2.0f - 1.0f, 0.0f, r, g, b);
+    private int getClosestTerritoryIndex(float x, float y, Vector<Territory> territories) {
+        int closestIndex = 0;
+        float closestDist = 999999999.9f;
+        for (int i = 0; i < territories.size(); i++) {
+            float dx = (float)x - territories.get(i).x;
+            float dy = (float)y - territories.get(i).y;
+            float dist = (float)Math.sqrt(dx * dx + dy * dy);
+            if (dist < closestDist) {
+                closestDist = dist;
+                closestIndex = i;
             }
         }
-
-        mapData.territoryLineMesh.finish(); */
+        return closestIndex;
     }
 
     private double octaveNoise2D(double x, double y, double persistence, double frequency, int octaves) {
