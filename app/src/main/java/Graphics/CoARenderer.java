@@ -102,8 +102,8 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         //GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
         GLES20.glUseProgram(programHandle);
-        //dHelper.draw(camera, gHelper.mVertexBuffer, gHelper.mColorBuffer, gHelper.mTextCoordBuffer, gHelper.mIndicesBuffer, TextureHelper.getTexture("gentest"));
-        mapData.territoryLineMesh.renderLines(camera.getVPMatrix(), gHelper.mVertexBuffer, gHelper.mColorBuffer);
+        dHelper.draw(camera, gHelper.mVertexBuffer, gHelper.mColorBuffer, gHelper.mTextCoordBuffer, gHelper.mIndicesBuffer, TextureHelper.getTexture("vortest"));
+        //mapData.territoryLineMesh.renderTriangles(camera.getVPMatrix());
     }
 
     @Override

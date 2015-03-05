@@ -12,8 +12,6 @@ import Graphics.ColorMesh;
 public class MapGenerator {
 
     private final int BYTES_PER_FLOAT = 4;
-    private Vertex[] m_diagram;
-    private List<Vertex> m_vertices = new LinkedList<Vertex>();
     private Random m_random = new Random();
 
     /// Generates a map and returns the map data
@@ -49,7 +47,7 @@ public class MapGenerator {
         double[][] heightMap = new double[height][width];
         generateHeightmap(width, height, heightMap, p.seed);
 
-        ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(height * width * 4 * BYTES_PER_FLOAT).order(ByteOrder.nativeOrder());
+        /*ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(height * width * 4 * BYTES_PER_FLOAT).order(ByteOrder.nativeOrder());
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -75,7 +73,7 @@ public class MapGenerator {
             }
         }
 
-        mapData.texture = Graphics.TextureHelper.dataToTexture(pixelBuffer, "gentest", width, height);
+        mapData.texture = Graphics.TextureHelper.dataToTexture(pixelBuffer, "gentest", width, height); */
 
         // random.setSeed(p.seed);
         generateTerritories(c, mapData, width, height, heightMap);
@@ -96,30 +94,61 @@ public class MapGenerator {
     }
 
     public void generateTerritories(Context context, MapData mapData, int width, int height, double[][] heightMap) {
-        int numPoints = 10;
-        Coord[] points = new Coord[numPoints];
+        int numPoints = 100;
+        ArrayList<Float> points = new ArrayList<Float>();
+        ArrayList<Byte> colors = new ArrayList<Byte>();
         // I hate java
+
         for (int i = 0; i < numPoints; i++) {
-            points[i] = new Coord();
+            points.add(m_random.nextFloat() * width);
+            points.add(m_random.nextFloat() * height);
+            colors.add((byte)(m_random.nextFloat() * 255.0f));
+            colors.add((byte)(m_random.nextFloat() * 255.0f));
+            colors.add((byte)(m_random.nextFloat() * 255.0f));
         }
 
-        for (Coord c : points) {
-            c.x = m_random.nextDouble() * width;
-            c.y = m_random.nextDouble() * height;
+        ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(height * width * 4 * BYTES_PER_FLOAT).order(ByteOrder.nativeOrder());
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                float closestDist = 9999999999.0f;
+                int closestIndex = 0;
+                for (int i = 0; i < numPoints; i++) {
+                    float dx = (float)x - points.get(i * 2);
+                    float dy = (float)y - points.get(i * 2 + 1);
+                    float dist = (float)Math.sqrt(dx * dx + dy * dy);
+                    if (dist < closestDist) {
+                        closestDist = dist;
+                        closestIndex = i;
+                    }
+                }
+                int cIndex = closestIndex * 3;
+                pixelBuffer.put(colors.get(cIndex));
+                pixelBuffer.put(colors.get(cIndex + 1));
+                pixelBuffer.put(colors.get(cIndex + 2));
+                // Alpha
+                pixelBuffer.put((byte)255);
+            }
         }
 
-        m_diagram = Voronoi.generate(points);
+        mapData.texture = Graphics.TextureHelper.dataToTexture(pixelBuffer, "vortest", width, height);
+
+       /* DelaunayTriangulator triangulator = new DelaunayTriangulator();
+        ArrayList<Integer> indices = triangulator.computeTriangles(points, false);
 
         mapData.territoryLineMesh = new ColorMesh(context);
 
-        for (Vertex v : m_diagram) {
-            for (VoronoiSegment s : v.edges) {
-                mapData.territoryLineMesh.addVertex(((float)s.v1.x / (float)width) * 2.0f - 1.0f, ((float)s.v1.y / (float)height) * 2.0f - 1.0f, 0.0f, 1.0f, 1.0f, 1.0f);
-                mapData.territoryLineMesh.addVertex(((float)s.v2.x / (float)width) * 2.0f - 1.0f, ((float)s.v2.y / (float)height) * 2.0f - 1.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+        for (int i = 0; i < indices.size(); i+=3) {
+            float r = m_random.nextFloat();
+            float g = m_random.nextFloat();
+            float b = m_random.nextFloat();
+            for (int j = 0; j < 3; j++) {
+                int index = indices.get(i + j);
+                mapData.territoryLineMesh.addVertex(points.get(index) * 2.0f - 1.0f, points.get(index + 1) * 2.0f - 1.0f, 0.0f, r, g, b);
             }
-            break;
         }
-        mapData.territoryLineMesh.finish();
+
+        mapData.territoryLineMesh.finish(); */
     }
 
     private double octaveNoise2D(double x, double y, double persistence, double frequency, int octaves) {
