@@ -8,12 +8,12 @@ import Generation.MapData;
  */
 public class GameState {
 
-    enum State {
+    public enum State {
         PLACING_UNITS,
         PLAYING
     }
 
-    public int currentPlayerIndex = 0; ///< Index of the current player into players TODO: Use this
+    public int currentPlayerIndex = -1; ///< Index of the current player into players TODO: Use this
     State currentState;
     public Vector<Player> players = new Vector<Player>(); ///< List of all players TODO: Use this
     public Vector<Territory> territories = new Vector<Territory>(); ///< List of all territories

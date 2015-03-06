@@ -16,47 +16,35 @@ import Generation.MapGenerationParams;
 /// Contains the game logic core
 public class GameController {
 
-    private MapGenerator mapGenerator = new MapGenerator(); ///< Generates the map
     private GameState m_gameState = null; ///< Handle to game
     private GameSettings m_gameSettings = null; ///< Settings TODO(Aaron): pass in good settings in initGame
-    private GameEngine m_gameEngine = new GameEngine; ///< For separating init logic
+    private GameEngine m_gameEngine = new GameEngine(); ///< Initializes the game
+    private Player m_currentPlayer = null;
 
     /// Initializes a game by setting up game state and map
     public void initGame(GameState gameState, GameSettings gameSettings) {
         // Set handles so we don't have to pass shit around everywhere
         m_gameState = gameState;
         m_gameSettings = gameSettings;
-        // Generate the map
-        MapData mapData = mapGenerator.generateMap(gameSettings.mapGenParams);
-        m_gameState.territories = mapData.territories;
-        m_gameState.mapData = mapData;
-        // Initialize players
-        initPlayers(m_gameSettings.numPlayers, m_gameSettings.numAI);
-        // Assign territories
-        assignTerritories();
-        // Place units
-        initUnits();
-        Log.d("Init: ", "initGame finished.");
+       // Initialize the game
+        m_gameEngine.initGame(m_gameState, m_gameSettings);
+        m_gameState.currentPlayerIndex = -1; // Start at -1 so nextTurn goes to 0
     }
 
-    private void initPlayers(int numPlayers, int numAI) {
-        // TODO: Set up all the players and assign random colors
-    }
-
-    /// Assignes territories to players based on the TerritoryDistMode
-    private void assignTerritories() {
-        // Set gamestate
-        //gameState.territories = gameSettings.mapGenParams.territories;
-
-        // Assign territories to players
-        switch (m_gameSettings.territoryDistMode) {
-            case RANDOM:
-                // TODO: Implement. Randomly loop through each territories and assign to players
-                break;
-            case ROUND_ROBIN:
-                // TODO: This needs MP stuff or AI probably.
-                break;
+    /// Call this to transition to the next turn
+    void nextTurn() {
+        // Go to next player (starts at -1)
+        m_gameState.currentPlayerIndex++;
+        if (m_gameState.currentPlayerIndex >= m_gameState.players.size()) m_gameState.currentPlayerIndex = 0;
+        m_currentPlayer = m_gameState.players.get(m_gameState.currentPlayerIndex);
+        // Check if we should do AI
+        if (m_currentPlayer.isAI) {
+            // TODO: Do AI stuff
+            nextTurn(); // Recursively go to next turn
+            return;
         }
+        // Current player is human, he is now placing units
+        m_gameState.currentState = GameState.State.PLACING_UNITS;
     }
 
     /// Call this method when the world is clicked on
@@ -64,15 +52,18 @@ public class GameController {
         // TODO: Implement
         // TODO: Get territory that was clicked
         // TODO: Handle unit transfer
+        switch (m_gameState.currentState) {
+            case PLACING_UNITS:
+                // TODO: Implement
+                break;
+            case PLAYING:
+                // TODO: Implement
+                break;
+        }
     }
 
     /// Returns the territory at a specific point
     Territory getTerritoryAtPoint(float x, float y) {
         return MapGenerator.getClosestTerritory(x, y, m_gameState.territories);
-    }
-
-    /// Sets up all the initial armies
-    private void initUnits() {
-        // TODO: Implement
     }
 }
