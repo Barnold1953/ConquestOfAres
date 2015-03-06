@@ -1,6 +1,7 @@
 package utkseniordesign.conquestofares;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
@@ -10,7 +11,9 @@ import android.os.Bundle;
 
 import java.util.HashMap;
 
+import Game.GameSettings;
 import Graphics.CoARenderer;
+import UI.UserInterfaceHelper;
 
 public class GameActivity extends Activity {
 
@@ -19,6 +22,16 @@ public class GameActivity extends Activity {
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_gamescreen );
+
+        // Get Game Settings, everything except MapGenParams
+        Intent intent = getIntent();
+        GameSettings settings = (GameSettings) intent.getParcelableExtra("Settings");
+        UserInterfaceHelper.createDialog( this, String.valueOf(settings.getNumPlayers()), "Player Count");
+        UserInterfaceHelper.createDialog( this, settings.getMapGenParams().mapSymmetry.toString(), "Map Symmetry");
+        UserInterfaceHelper.createDialog( this, settings.getMapGenParams().mapSize.toString(), "Map Size");
+        UserInterfaceHelper.createDialog( this, String.valueOf(settings.getTurnLength()), "Turn Length");
+        UserInterfaceHelper.createDialog( this, String.valueOf(settings.getTerritoriesForVictory()), "Victory Condition");
+        UserInterfaceHelper.createDialog( this, String.valueOf(settings.isHorizontalWrap()), "Horizontal Wrap");
 
         // Get GL Resources
         HashMap<String, int[]> textures = getTextures();
