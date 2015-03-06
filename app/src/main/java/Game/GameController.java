@@ -13,66 +13,66 @@ import Generation.MapGenerationParams;
  * Created by brb55_000 on 2/6/2015.
  */
 
+/// Contains the game logic core
 public class GameController {
+
     private MapGenerator mapGenerator = new MapGenerator(); ///< Generates the map
-    private GameState m_gameState;
+    private GameState m_gameState = null; ///< Handle to game
+    private GameSettings m_gameSettings = null; ///< Settings TODO(Aaron): pass in good settings in initGame
+    private GameEngine m_gameEngine = new GameEngine; ///< For separating init logic
 
     /// Initializes a game by setting up game state and map
-    /// @param gameState: The game state
-    /// @param gameSettings: Settings for the game
     public void initGame(GameState gameState, GameSettings gameSettings) {
+        // Set handles so we don't have to pass shit around everywhere
         m_gameState = gameState;
+        m_gameSettings = gameSettings;
         // Generate the map
         MapData mapData = mapGenerator.generateMap(gameSettings.mapGenParams);
-        gameState.territories = mapData.territories;
-        gameState.mapData = mapData;
+        m_gameState.territories = mapData.territories;
+        m_gameState.mapData = mapData;
+        // Initialize players
+        initPlayers(m_gameSettings.numPlayers, m_gameSettings.numAI);
         // Assign territories
-        assignTerritories(gameState, gameSettings);
+        assignTerritories();
         // Place units
-        initUnits(gameState);
-        Log.d("Init: ", "INITIALIZING****************************");
+        initUnits();
+        Log.d("Init: ", "initGame finished.");
+    }
+
+    private void initPlayers(int numPlayers, int numAI) {
+        // TODO: Set up all the players and assign random colors
     }
 
     /// Assignes territories to players based on the TerritoryDistMode
-    /// @param gameState: The game state
-    /// @param gameSettings: The game settings
-    private void assignTerritories(GameState gameState, GameSettings gameSettings) {
+    private void assignTerritories() {
         // Set gamestate
         //gameState.territories = gameSettings.mapGenParams.territories;
 
         // Assign territories to players
-        switch (gameSettings.territoryDistMode) {
+        switch (m_gameSettings.territoryDistMode) {
             case RANDOM:
-                // TODO: Implement
+                // TODO: Implement. Randomly loop through each territories and assign to players
                 break;
             case ROUND_ROBIN:
-                // TODO: This needs MP stuff or AI
+                // TODO: This needs MP stuff or AI probably.
                 break;
         }
     }
 
+    /// Call this method when the world is clicked on
     void onClick(float x, float y) {
+        // TODO: Implement
         // TODO: Get territory that was clicked
+        // TODO: Handle unit transfer
     }
 
+    /// Returns the territory at a specific point
     Territory getTerritoryAtPoint(float x, float y) {
-        float closestDistance = 999999999999999.0f;
-        Territory closestTerritory = null;
-        for (Territory t : m_gameState.territories) {
-            float dx = t.x - x;
-            float dy = t.y - y;
-            float distance = dx * dx + dy * dy;
-            if (distance < closestDistance) {
-                closestDistance = distance;
-                closestTerritory = t;
-            }
-        }
-        return closestTerritory;
+        return MapGenerator.getClosestTerritory(x, y, m_gameState.territories);
     }
 
     /// Sets up all the initial armies
-    /// @param gameState: The game state
-    private void initUnits(GameState gameState) {
+    private void initUnits() {
         // TODO: Implement
     }
 }

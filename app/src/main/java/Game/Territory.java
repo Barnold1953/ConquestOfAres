@@ -20,6 +20,6 @@ public class Territory {
     public int power = 0; ///< Power of the territory
     public float x; ///< x coordinate of center
     public float y; ///< y coordinate of center
-    public float height; ///< Terrain height value
-    public TerrainType terrainType;
+    public float height; ///< Terrain height value TODO: Use this for something maybe? Or remove it?
+    public TerrainType terrainType; //< Type of terrain TODO: Use this for something
 }

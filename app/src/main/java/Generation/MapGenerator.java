@@ -12,14 +12,15 @@ import Graphics.ColorMesh;
  */
 public class MapGenerator {
 
-    private final int BYTES_PER_FLOAT = 4;
-    private Random m_random = new Random();
+    private static final int BYTES_PER_FLOAT = 4;
+    private static Random m_random = new Random();
 
     // Change these to affect the border modulation
-    final float MODULATE_SCALE = 32.0f; ///< Size of variation
-    final double MODULATE_PERSISTENCE = 0.8; ///< How much weight is passed down to each consecutive octave
-    final double MODULATE_FREQUENCY = 0.01; ///< Frequency of the modulation
-    final int MODULATE_OCTAVES = 5; ///< Number of fractal iterations
+    final static float MODULATE_SCALE = 32.0f; ///< Size of variation
+    final static double MODULATE_PERSISTENCE = 0.8; ///< How much weight is passed down to each consecutive octave
+    final static double MODULATE_FREQUENCY = 0.01; ///< Frequency of the modulation
+    final static int MODULATE_OCTAVES = 5; ///< Number of fractal iterations
+    private static OpenSimplexNoise osNoise = new OpenSimplexNoise();
 
     /// Generates a map and returns the map data
     // TODO(Ben): Finish this
@@ -233,7 +234,7 @@ public class MapGenerator {
         mapData.pixelBuffer = pixelBuffer;
     }
 
-    public Territory getClosestTerritory(float x, float y, Vector<Territory> territories) {
+    public static Territory getClosestTerritory(float x, float y, Vector<Territory> territories) {
         return territories.get(getClosestTerritoryIndex(x, y, territories));
     }
 
