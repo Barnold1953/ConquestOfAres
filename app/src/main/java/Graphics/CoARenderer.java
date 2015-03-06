@@ -11,6 +11,7 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
+import Game.GameState;
 import Generation.MapData;
 import Generation.MapGenerationParams;
 import utkseniordesign.conquestofares.R;
@@ -25,6 +26,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     HashMap<String, int[]> textures;
     Camera camera;
     MapData mapData;
+    GameState gameState = null;
 
     GeometryHelper gHelper;
     DrawHelper dHelper;
@@ -40,6 +42,10 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     final float upX = 0.0f;
     final float upY = 1.0f;
     final float upZ = 0.0f;
+
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
+    }
 
     public CoARenderer(Context c, HashMap<String, int[]> t) {
         context = c;
@@ -72,14 +78,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         dHelper.setProgHandles(programHandle);
         TextureHelper.imageToTexture(context, R.drawable.texture1, "texture1");
 
-        // Temporary generation test
-        Generation.MapGenerator generator = new Generation.MapGenerator();
-        MapGenerationParams params = new MapGenerationParams();
-
-        params.mapSize = MapGenerationParams.MapSize.AVERAGE;
-
-        mapData = generator.generateMap(context, params);
-
         Log.d("Setup", "After texture get");
 
         Log.d("Setup", "Shader successfully initialized.");
@@ -95,6 +93,13 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 unused) {
+       if (gameState != null && gameState.mapData.texture == 0) {
+           gameState.mapData.texture = TextureHelper.dataToTexture(gameState.mapData.pixelBuffer,
+                    "vortest",
+                    gameState.mapData.width,
+                    gameState.mapData.height);
+            Log.d("Init: ", "TeTURING****************************");
+        }
         // Redraw background color
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         //GLES20.glClearDepthf(1.0f);

@@ -17,7 +17,7 @@ public class MapGenerator {
 
     /// Generates a map and returns the map data
     // TODO(Ben): Finish this
-    public MapData generateMap(Context c, MapGenerationParams p) throws BufferOverflowException{
+    public MapData generateMap(MapGenerationParams p) throws BufferOverflowException{
         MapData mapData = new MapData();
         mapData.params = p;
 
@@ -44,6 +44,9 @@ public class MapGenerator {
             default:
                 break;
         }
+
+        mapData.width = width;
+        mapData.height = height;
 
         double[][] heightMap = new double[height][width];
         generateHeightmap(width, height, heightMap, p.seed);
@@ -77,7 +80,7 @@ public class MapGenerator {
         mapData.texture = Graphics.TextureHelper.dataToTexture(pixelBuffer, "gentest", width, height); */
 
         // random.setSeed(p.seed);
-        generateTerritories(c, mapData, width, height, 100, heightMap);
+        generateTerritories(mapData, width, height, 100);
 
         // TODO(Ben): Segment heightmap into territories
         return mapData;
@@ -98,7 +101,7 @@ public class MapGenerator {
     }
 
 
-    public void generateTerritories(Context context, MapData mapData, int width, int height, int numTerritories, double[][] heightMap) {
+    public void generateTerritories(MapData mapData, int width, int height, int numTerritories) {
 
         ArrayList<Byte> colors = new ArrayList<Byte>();
         // Generate random territories
@@ -130,11 +133,14 @@ public class MapGenerator {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 int closestIndex = getClosestTerritoryIndex(x, y, mapData.territories);
+                Territory territory = mapData.territories.get(closestIndex);
 
                 // Check if we are on an edge
                 boolean isEdge = false;
-
-                if (getClosestTerritoryIndex((float)x + 1, (float)y, mapData.territories) != closestIndex) {
+                int newIndex;
+                newIndex =
+                if (new != closestIndex) {
+                    if (mapData.territories)
                     isEdge = true;
                 }
                 if (getClosestTerritoryIndex((float)x - 1, (float)y, mapData.territories) != closestIndex) {
@@ -160,8 +166,7 @@ public class MapGenerator {
                 pixelBuffer.put((byte)255);
             }
         }
-
-        mapData.texture = Graphics.TextureHelper.dataToTexture(pixelBuffer, "vortest", width, height);
+        mapData.pixelBuffer = pixelBuffer;
     }
 
     private int getClosestTerritoryIndex(float x, float y, Vector<Territory> territories) {

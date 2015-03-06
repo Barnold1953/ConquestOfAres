@@ -22,5 +22,4 @@ public class Territory {
     public float y; ///< y coordinate of center
     public float height; ///< Terrain height value
     public TerrainType terrainType;
-
 }
