@@ -15,11 +15,13 @@ import Generation.MapGenerationParams;
 
 public class GameController {
     private MapGenerator mapGenerator = new MapGenerator(); ///< Generates the map
+    private GameState m_gameState;
 
     /// Initializes a game by setting up game state and map
     /// @param gameState: The game state
     /// @param gameSettings: Settings for the game
     public void initGame(GameState gameState, GameSettings gameSettings) {
+        m_gameState = gameState;
         // Generate the map
         MapData mapData = mapGenerator.generateMap(gameSettings.mapGenParams);
         gameState.territories = mapData.territories;
@@ -47,6 +49,25 @@ public class GameController {
                 // TODO: This needs MP stuff or AI
                 break;
         }
+    }
+
+    void onClick(float x, float y) {
+        // TODO: Get territory that was clicked
+    }
+
+    Territory getTerritoryAtPoint(float x, float y) {
+        float closestDistance = 999999999999999.0f;
+        Territory closestTerritory = null;
+        for (Territory t : m_gameState.territories) {
+            float dx = t.x - x;
+            float dy = t.y - y;
+            float distance = dx * dx + dy * dy;
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestTerritory = t;
+            }
+        }
+        return closestTerritory;
     }
 
     /// Sets up all the initial armies

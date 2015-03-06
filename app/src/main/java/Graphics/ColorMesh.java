@@ -32,20 +32,6 @@ public class ColorMesh {
     private static int m_mvpHandle;
     private static int m_programHandle = 0;
 
-    public ColorMesh(Context context) {
-        // Init shader
-        if (m_programHandle == 0) {
-            try {
-                m_programHandle = ShaderHelper.compileShader(context, R.string.color_vert, R.string.color_frag, "color");
-                m_positionHandle = GLES20.glGetAttribLocation(m_programHandle, "vPosition");
-                m_colorHandle = GLES20.glGetAttribLocation(m_programHandle, "vColor");
-                m_mvpHandle = GLES20.glGetUniformLocation(m_programHandle, "uMVPMatrix");
-            } catch (IOException e) {
-                Log.d("Shader", "Error occurred during compilation");
-            }
-        }
-    }
-
     /// Adds a vertex to the mesh. Make sure capacity is set
     public void addVertex(float x, float y, float z, float r, float g, float b) {
         vertexVec.add(x);
@@ -61,7 +47,19 @@ public class ColorMesh {
         indexVec.add(index);
     }
 
-    public void finish() {
+    public void finish(Context context) {
+
+        if (m_programHandle == 0) {
+            try {
+                m_programHandle = ShaderHelper.compileShader(context, R.string.color_vert, R.string.color_frag, "color");
+                m_positionHandle = GLES20.glGetAttribLocation(m_programHandle, "vPosition");
+                m_colorHandle = GLES20.glGetAttribLocation(m_programHandle, "vColor");
+                m_mvpHandle = GLES20.glGetUniformLocation(m_programHandle, "uMVPMatrix");
+            } catch (IOException e) {
+                Log.d("Shader", "Error occurred during compilation");
+            }
+        }
+
         m_vertexBuffer = ByteBuffer.allocateDirect(vertexVec.size() * FLOATS_PER_VERTEX * BYTES_PER_FLOAT).order(ByteOrder.nativeOrder()).asFloatBuffer();
 
         for (int i = 0; i < vertexVec.size(); i++) {

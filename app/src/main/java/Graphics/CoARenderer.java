@@ -98,7 +98,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
                     "vortest",
                     gameState.mapData.width,
                     gameState.mapData.height);
-            Log.d("Init: ", "TeTURING****************************");
+           gameState.mapData.territoryGraphMesh.finish(context);
         }
         // Redraw background color
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
@@ -108,7 +108,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         GLES20.glUseProgram(programHandle);
         dHelper.draw(camera, gHelper.mVertexBuffer, gHelper.mColorBuffer, gHelper.mTextCoordBuffer, gHelper.mIndicesBuffer, TextureHelper.getTexture("vortest"));
-        //mapData.territoryLineMesh.renderTriangles(camera.getVPMatrix());
+        gameState.mapData.territoryGraphMesh.renderLines(camera.getVPMatrix());
     }
 
     @Override

@@ -15,6 +15,7 @@ public class MapData {
     public int texture = 0; ///< ID for the openGL texture that is generated. Gets set by generator
     public Vector<Territory> territories = null; ///< Generated territories. Gets set by generator
 
+    public ColorMesh territoryGraphMesh;
     public MapGenerationParams params;
     public int width;
     public int height;
