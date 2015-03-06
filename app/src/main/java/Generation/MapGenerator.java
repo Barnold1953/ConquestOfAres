@@ -40,7 +40,7 @@ public class MapGenerator {
                 width = 512;
                 height = 512;
                 break;
-            case AVERAGE:
+            case MEDIUM:
                 width = 768;
                 height = 768;
                 break;

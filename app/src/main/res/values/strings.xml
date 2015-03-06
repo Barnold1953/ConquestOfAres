@@ -15,13 +15,32 @@
     </string-array>
     <string-array name="map_symmetry">
         <item>Map Symmetry Setting</item>
-        <item>Symmetrical</item>
-        <item>Asymmetrical</item>
+        <item>None</item>
+        <item>Horizontal</item>
+        <item>Vertical</item>
+        <item>Radial</item>
     </string-array>
     <string-array name="horizontal_wrap">
         <item>Map Wrap Setting</item>
         <item>Horizontal Wrap</item>
         <item>No Horizontal Wrap</item>
+    </string-array>
+    <string-array name="victory_conditions">
+        <item>Victory Condition</item>
+        <item>50% Control</item>
+        <item>66% Control</item>
+        <item>75% Control</item>
+        <item>100% Control</item>
+    </string-array>
+    <string-array name="turn_length">
+        <item>Max Turn Length</item>
+        <item>Half Hour</item>
+        <item>One Hour</item>
+        <item>Two Hours</item>
+        <item>Six Hours</item>
+        <item>Twelve Hours</item>
+        <item>One day</item>
+        <item>Two Days</item>
     </string-array>
     <string-array name="map_names">
         <item>Map Name</item>

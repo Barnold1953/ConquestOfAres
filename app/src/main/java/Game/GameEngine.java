@@ -21,11 +21,11 @@ public class GameEngine {
         m_gameState = gameState;
         m_gameSettings = gameSettings;
         // Generate the map
-        MapData mapData = mapGenerator.generateMap(gameSettings.mapGenParams);
+        MapData mapData = mapGenerator.generateMap(gameSettings.getMapGenParams());
         m_gameState.territories = mapData.territories;
         m_gameState.mapData = mapData;
         // Initialize players
-        initPlayers(m_gameSettings.numPlayers, m_gameSettings.numAI);
+        initPlayers(m_gameSettings.getNumPlayers(), m_gameSettings.getNumAI());
         // Assign territories
         assignTerritories();
         // Place units
@@ -43,7 +43,7 @@ public class GameEngine {
         //gameState.territories = gameSettings.mapGenParams.territories;
 
         // Assign territories to players
-        switch (m_gameSettings.territoryDistMode) {
+        switch (m_gameSettings.getTerritoryDistMode()) {
             case RANDOM:
                 // TODO: Implement. Randomly loop through each territories and assign to players
                 break;

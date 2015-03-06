@@ -11,9 +11,13 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.ToggleButton;
 
+import Game.GameSettings;
+import UI.DiscreteSeekBar;
+import UI.DiscreteSeekBarListener;
 import UI.UserInterfaceHelper;
 
 public class LaunchGameActivity extends Activity {
@@ -55,6 +59,18 @@ public class LaunchGameActivity extends Activity {
                 R.array.horizontal_wrap,
                 R.layout.spinner_default
         );
+
+        Spinner turnLengthSpinner = UserInterfaceHelper.createHintedSpinner(
+                findViewById( R.id.turnLengthSpinner),
+                R.array.turn_length,
+                R.layout.spinner_default
+        );
+
+        Spinner victoryConditionSpinner = UserInterfaceHelper.createHintedSpinner(
+                findViewById( R.id.victoryConditionSpinner),
+                R.array.victory_conditions,
+                R.layout.spinner_default
+        );
     }
 
     public void handleToggleClick( View v )
@@ -66,19 +82,7 @@ public class LaunchGameActivity extends Activity {
         int darkGrey = resources.getColor( R.color.darkGrey );
         int white = resources.getColor( R.color.white );
 
-        ToggleButton toggleButton = (ToggleButton) v;
-        LinearLayout linearLayout = (LinearLayout) toggleButton.getParent();
-        int buttonNumber = linearLayout.getChildCount();
-        for( int i = 0; i < buttonNumber; i++ )
-        {
-            ToggleButton tempButton = ( ToggleButton ) linearLayout.getChildAt( i );
-            tempButton.setBackgroundColor( offWhite );
-            tempButton.setTextColor( darkGrey );
-            tempButton.setChecked( false );
-        }
-
-        toggleButton.setBackgroundColor( lightBlue );
-        toggleButton.setTextColor( white );
+        UserInterfaceHelper.handleToggleButton( v, lightBlue, offWhite, white, darkGrey );
 
         if( v.getId() == R.id.RandomMap ) {
             findViewById(R.id.RandomMapOptions).setVisibility( View.VISIBLE );
@@ -91,10 +95,57 @@ public class LaunchGameActivity extends Activity {
         }
     }
 
+    private GameSettings getSettings()
+    {
+        GameSettings gameSettings = new GameSettings();
+        String numPlayers = UserInterfaceHelper.getSelectedToggleButton(findViewById(R.id.PlayerCountToggle));
+        String horizontalWrap = ((Spinner)findViewById(R.id.horizontalWrapSpinner)).getSelectedItem().toString();
+        String territoriesForVictory = ((Spinner)findViewById(R.id.victoryConditionSpinner)).getSelectedItem().toString();
+        String turnLength = ((Spinner)findViewById(R.id.turnLengthSpinner)).getSelectedItem().toString();
+        String mapSize = ((Spinner)findViewById(R.id.mapSizeSpinner)).getSelectedItem().toString();
+        String mapSymmetry = ((Spinner)findViewById(R.id.mapSymmetrySpinner)).getSelectedItem().toString();
+
+        int returnCode = gameSettings.parseSettings(
+                numPlayers,
+                horizontalWrap,
+                territoriesForVictory,
+                turnLength,
+                mapSize,
+                mapSymmetry
+        );
+
+        switch(returnCode) {
+            case 1:
+                UserInterfaceHelper.createDialog( this, "Please Specify Number of Players!", "Missing Information");
+                return null;
+            case 2:
+                UserInterfaceHelper.createDialog( this, "Please Specify Map Wrap Settings!", "Missing Information");
+                return null;
+            case 3:
+                UserInterfaceHelper.createDialog( this, "Please Specify a Victory Condition!", "Missing Information");
+                return null;
+            case 4:
+                UserInterfaceHelper.createDialog( this, "Please Specify a Map Size!", "Missing Information");
+                return null;
+            case 5:
+                UserInterfaceHelper.createDialog( this, "Please Specify a Map Symmetry Settings!", "Missing Information");
+                return null;
+            case 6:
+                UserInterfaceHelper.createDialog( this, "Please Specify a Turn Length!", "Missing Information");
+                return null;
+            default:
+                return gameSettings;
+        }
+    }
+
     public void startNewGame( View v )
     {
-        Intent intent = new Intent( this, GameActivity.class );
-        startActivity( intent );
+        GameSettings settings = getSettings();
+        if(settings != null) {
+            Intent intent = new Intent(this, GameActivity.class);
+            intent.putExtra("Settings", settings);
+            startActivity(intent);
+        }
     }
 
     @Override

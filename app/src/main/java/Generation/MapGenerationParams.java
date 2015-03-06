@@ -13,11 +13,12 @@ public class MapGenerationParams {
     public enum MapSize {
         CRAMPED,
         SMALL,
-        AVERAGE,
-        LARGE
+        MEDIUM,
+        LARGE,
+        MASSIVE
     }
 
-    enum MapSymmetry {
+    public enum MapSymmetry {
         NONE,
         HORIZONTAL,
         VERTICAL,
@@ -26,6 +27,6 @@ public class MapGenerationParams {
 
     /// Parameters
     public int seed = 0; ///< Generation seed. Set by caller
-    public MapSize mapSize = MapSize.SMALL; ///< Size of map
+    public MapSize mapSize = MapSize.MEDIUM; ///< Size of map
     public MapSymmetry mapSymmetry = MapSymmetry.NONE; ///< Symmetry of generated map
 }

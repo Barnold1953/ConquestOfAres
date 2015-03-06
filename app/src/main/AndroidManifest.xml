@@ -20,5 +20,6 @@
         <activity android:name=".GameActivity" />
     </application>
     <uses-feature android:glEsVersion="0x00020000" android:required="true" />
+    <uses-sdk android:minSdkVersion="11"/>
 
 </manifest>
