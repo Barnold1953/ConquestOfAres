@@ -11,6 +11,8 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
+import Game.GameState;
+import Generation.MapData;
 import Generation.MapGenerationParams;
 import utkseniordesign.conquestofares.R;
 
@@ -23,8 +25,9 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     Context context;
     HashMap<String, int[]> textures;
     Camera camera;
+    MapData mapData;
+    GameState gameState = null;
 
-    ShaderHelper sHelper;
     GeometryHelper gHelper;
     DrawHelper dHelper;
     final boolean IS_3D = false; ///< Temporary: determines if we are rendering in 3D or 2D
@@ -40,12 +43,15 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     final float upY = 1.0f;
     final float upZ = 0.0f;
 
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
+    }
+
     public CoARenderer(Context c, HashMap<String, int[]> t) {
         context = c;
         textures = t;
 
         camera = new Camera();
-        sHelper = new ShaderHelper();
         gHelper = new GeometryHelper();
         dHelper = new DrawHelper(camera, gHelper);
 
@@ -63,7 +69,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         Log.d("Setup", "Surface created.");
         try {
-            programHandle = sHelper.compileShader(context, R.string.simple_vert, R.string.simple_frag, "simple");
+            programHandle = ShaderHelper.compileShader(context, R.string.simple_vert, R.string.simple_frag, "simple");
         }
         catch (IOException e){
             Log.d("Shader", "Error occurred during compilation");
@@ -71,14 +77,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         dHelper.setProgHandles(programHandle);
         TextureHelper.imageToTexture(context, R.drawable.texture1, "texture1");
-
-        // Temporary generation test
-        Generation.MapGenerator generator = new Generation.MapGenerator();
-        MapGenerationParams params = new MapGenerationParams();
-
-        params.mapSize = MapGenerationParams.MapSize.MEDIUM;
-
-        generator.generateMap(params);
 
         Log.d("Setup", "After texture get");
 
@@ -95,13 +93,22 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 unused) {
+       if (gameState != null && gameState.mapData.texture == 0) {
+           gameState.mapData.texture = TextureHelper.dataToTexture(gameState.mapData.pixelBuffer,
+                    "vortest",
+                    gameState.mapData.width,
+                    gameState.mapData.height);
+           gameState.mapData.territoryGraphMesh.finish(context);
+        }
         // Redraw background color
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         //GLES20.glClearDepthf(1.0f);
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
         //GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
-        dHelper.draw(camera, gHelper.mVertexBuffer, gHelper.mColorBuffer, gHelper.mTextCoordBuffer, gHelper.mIndicesBuffer, TextureHelper.getTexture("gentest"));
+        GLES20.glUseProgram(programHandle);
+        dHelper.draw(camera, gHelper.mVertexBuffer, gHelper.mColorBuffer, gHelper.mTextCoordBuffer, gHelper.mIndicesBuffer, TextureHelper.getTexture("vortest"));
+        gameState.mapData.territoryGraphMesh.renderLines(camera.getVPMatrix());
     }
 
     @Override

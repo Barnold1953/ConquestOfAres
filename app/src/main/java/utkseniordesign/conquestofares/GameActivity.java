@@ -11,6 +11,9 @@ import android.os.Bundle;
 
 import java.util.HashMap;
 
+import Game.GameController;
+import Game.GameState;
+import Generation.MapGenerationParams;
 import Game.GameSettings;
 import Graphics.CoARenderer;
 import UI.UserInterfaceHelper;
@@ -18,6 +21,10 @@ import UI.UserInterfaceHelper;
 public class GameActivity extends Activity {
 
     private GLSurfaceView mGLSurfaceView;
+    private GameState gameState;
+    private GameController gameController;
+    private CoARenderer coaRenderer;
+    private GameSettings gameSettings;
 
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
@@ -39,9 +46,17 @@ public class GameActivity extends Activity {
         // Initialize the glSurfaceView
         mGLSurfaceView = ( GLSurfaceView ) findViewById( R.id.glRenderArea );
         mGLSurfaceView.setEGLContextClientVersion(2);
-        mGLSurfaceView.setEGLConfigChooser(8 , 8, 8, 8, 16, 0);
-        mGLSurfaceView.setRenderer( new CoARenderer( this, textures ) );
+        mGLSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
+        coaRenderer = new CoARenderer(this, textures);
+        gameController = new GameController();
+        // TODO:Set these with the settings menu parameters
+        gameSettings = new GameSettings();
+        mGLSurfaceView.setRenderer(coaRenderer);
 
+        // Init the game
+        GameState gameState = new GameState();
+        gameController.initGame(gameState, gameSettings);
+        coaRenderer.setGameState(gameState);
     }
 
     @Override

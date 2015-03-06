@@ -16,10 +16,11 @@ public class GameSettings implements Parcelable {
     boolean m_isMultiplayer = false; ///< True when multiplayer mode is active
     boolean m_isHorizontalWrap = false; ///< True when the map wraps horizontally
     int m_numPlayers = 0; ///< Number of players in the game
+    int m_numAI = 1; ///< Number of AI players in the game
     double m_territoriesForVictory = -1; ///< Percent of territories needed for victory. -1 means all
     int m_maxTurnLength = -1; ///< Max turn length in minutes. -1 means no limit
     TerritoryDistributionMode m_territoryDistMode = TerritoryDistributionMode.RANDOM; ///< How to distribute territory
-    MapGenerationParams m_mapGenParams; ///< Map generation specific data
+    MapGenerationParams m_mapGenParams = new MapGenerationParams(); ///< Map generation specific data
     // TODO: Other settings
 
     public GameSettings() {
@@ -31,6 +32,10 @@ public class GameSettings implements Parcelable {
 
     public int getNumPlayers() {
         return m_numPlayers;
+    }
+
+    public int getNumAI() {
+        return m_numAI;
     }
 
     public double getTerritoriesForVictory() {

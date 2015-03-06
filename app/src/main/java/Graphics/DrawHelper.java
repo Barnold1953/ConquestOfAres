@@ -1,6 +1,7 @@
 package Graphics;
 
 import android.opengl.GLES20;
+import android.util.Log;
 
 import java.nio.FloatBuffer;
 
@@ -51,6 +52,10 @@ public class DrawHelper {
         //GLES20.glDrawElements(GLES20.GL_TRIANGLES, 36, GLES20.GL_FLOAT, 0);
         //GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, gHelper.getVertices().length/3);
+
+     //   GLES20.glDisableVertexAttribArray(mPositionHandle);
+     //   GLES20.glDisableVertexAttribArray(mColorHandle);
+     //   GLES20.glDisableVertexAttribArray(mTCoordHandle);
     }
 
     public DrawHelper(Camera mh, GeometryHelper gh){

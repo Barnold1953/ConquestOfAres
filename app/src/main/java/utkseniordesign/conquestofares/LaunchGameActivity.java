@@ -16,8 +16,6 @@ import android.widget.Spinner;
 import android.widget.ToggleButton;
 
 import Game.GameSettings;
-import UI.DiscreteSeekBar;
-import UI.DiscreteSeekBarListener;
 import UI.UserInterfaceHelper;
 
 public class LaunchGameActivity extends Activity {
