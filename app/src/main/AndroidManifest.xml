@@ -16,7 +16,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".LaunchGameActivity"/>
+        <activity android:name=".GameActivity" />
     </application>
     <uses-feature android:glEsVersion="0x00020000" android:required="true" />
+    <uses-sdk android:minSdkVersion="11"/>
 
 </manifest>
