@@ -10,10 +10,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.SeekBar;
 import android.widget.Spinner;
-import android.widget.ToggleButton;
 
 import Game.GameSettings;
 import UI.UserInterfaceHelper;
@@ -103,7 +100,7 @@ public class LaunchGameActivity extends Activity {
         String mapSize = ((Spinner)findViewById(R.id.mapSizeSpinner)).getSelectedItem().toString();
         String mapSymmetry = ((Spinner)findViewById(R.id.mapSymmetrySpinner)).getSelectedItem().toString();
 
-        int returnCode = gameSettings.parseSettings(
+        GameSettings.GameSettingErrors returnCode = gameSettings.parseSettings(
                 numPlayers,
                 horizontalWrap,
                 territoriesForVictory,
@@ -113,22 +110,22 @@ public class LaunchGameActivity extends Activity {
         );
 
         switch(returnCode) {
-            case 1:
+            case NUM_PLAYERS_UNSET:
                 UserInterfaceHelper.createDialog( this, "Please Specify Number of Players!", "Missing Information");
                 return null;
-            case 2:
+            case MAP_WRAP_UNSET:
                 UserInterfaceHelper.createDialog( this, "Please Specify Map Wrap Settings!", "Missing Information");
                 return null;
-            case 3:
+            case VICTORY_CONDITION_UNSET:
                 UserInterfaceHelper.createDialog( this, "Please Specify a Victory Condition!", "Missing Information");
                 return null;
-            case 4:
+            case MAP_SIZE_UNSET:
                 UserInterfaceHelper.createDialog( this, "Please Specify a Map Size!", "Missing Information");
                 return null;
-            case 5:
+            case MAP_SYMMETRY_UNSET:
                 UserInterfaceHelper.createDialog( this, "Please Specify a Map Symmetry Settings!", "Missing Information");
                 return null;
-            case 6:
+            case TURN_LENGTH_UNSET:
                 UserInterfaceHelper.createDialog( this, "Please Specify a Turn Length!", "Missing Information");
                 return null;
             default:

@@ -31,23 +31,18 @@ public class GameActivity extends Activity {
         setContentView( R.layout.activity_gamescreen );
 
         // Get Game Settings, everything except MapGenParams
-        Intent intent = getIntent();
-        GameSettings settings = (GameSettings) intent.getParcelableExtra("Settings");
-        UserInterfaceHelper.createDialog( this, String.valueOf(settings.getNumPlayers()), "Player Count");
-        UserInterfaceHelper.createDialog( this, settings.getMapGenParams().mapSymmetry.toString(), "Map Symmetry");
-        UserInterfaceHelper.createDialog( this, settings.getMapGenParams().mapSize.toString(), "Map Size");
-        UserInterfaceHelper.createDialog( this, String.valueOf(settings.getTurnLength()), "Turn Length");
-        UserInterfaceHelper.createDialog( this, String.valueOf(settings.getTerritoriesForVictory()), "Victory Condition");
-        UserInterfaceHelper.createDialog( this, String.valueOf(settings.isHorizontalWrap()), "Horizontal Wrap");
 
-        // Get GL Resources
-        HashMap<String, int[]> textures = getTextures();
+        /* COMMENT THIS OUT IF GAME ACTIVITY IS YOUR STARTUP ACTIVITY */
+        Intent intent = getIntent();
+        if( intent != null ) {
+            GameSettings settings = (GameSettings) intent.getParcelableExtra("Settings");
+        }
 
         // Initialize the glSurfaceView
         mGLSurfaceView = ( GLSurfaceView ) findViewById( R.id.glRenderArea );
         mGLSurfaceView.setEGLContextClientVersion(2);
         mGLSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
-        coaRenderer = new CoARenderer(this, textures);
+        coaRenderer = new CoARenderer(this);
         gameController = new GameController();
         // TODO:Set these with the settings menu parameters
         gameSettings = new GameSettings();
@@ -78,26 +73,5 @@ public class GameActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-    }
-
-    private HashMap<String, int[]> getTextures(){
-        HashMap<String, int[]> textures = new HashMap<String, int[]>();
-        int[] texture = new int[1];
-
-        Bitmap bitmap = BitmapFactory.decodeResource( getResources(), R.drawable.texture1 );
-
-        GLES20.glGenTextures( 1, texture, 0 );
-        GLES20.glBindTexture( GLES20.GL_TEXTURE_2D, texture[0] );
-
-        GLES20.glTexParameterf( GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST );
-        GLES20.glTexParameterf( GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR );
-
-        GLUtils.texImage2D( GLES20.GL_TEXTURE_2D, 0, bitmap, 0 );
-
-        bitmap.recycle();
-
-        textures.put( "texture1", texture );
-
-        return textures;
     }
 }

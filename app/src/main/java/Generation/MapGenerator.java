@@ -1,5 +1,6 @@
 package Generation;
 import android.content.Context;
+import android.util.Log;
 
 import java.nio.*;
 import java.util.*;
@@ -58,7 +59,7 @@ public class MapGenerator {
         double[][] heightMap = new double[height][width];
         generateHeightmap(width, height, heightMap, p.seed);
 
-        /*ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(height * width * 4 * BYTES_PER_FLOAT).order(ByteOrder.nativeOrder());
+        ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(height * width * 4).order(ByteOrder.nativeOrder());
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -67,7 +68,7 @@ public class MapGenerator {
                     pixelBuffer.put((byte)225);
                     pixelBuffer.put((byte)225);
                 } else if (heightMap[y][x] < 0.0) { // Oceans
-                    pixelBuffer.put((byte)0);
+                    pixelBuffer.put((byte)255);
                     pixelBuffer.put((byte)0);
                     pixelBuffer.put((byte)170);
                 } else if (heightMap[y][x] < 0.05) { // Beach
@@ -75,7 +76,7 @@ public class MapGenerator {
                     pixelBuffer.put((byte)110);
                     pixelBuffer.put((byte)90);
                 } else { // Grass
-                    pixelBuffer.put((byte)0);
+                    pixelBuffer.put((byte)255);
                     pixelBuffer.put((byte)180);
                     pixelBuffer.put((byte)0);
                 }
@@ -84,10 +85,8 @@ public class MapGenerator {
             }
         }
 
-        mapData.texture = Graphics.TextureHelper.dataToTexture(pixelBuffer, "gentest", width, height); */
-
         // random.setSeed(p.seed);
-        generateTerritories(mapData, width, height, 100);
+        generateTerritories(mapData, width, height, 100, pixelBuffer);
 
         // TODO(Ben): Segment heightmap into territories
         return mapData;
@@ -107,7 +106,7 @@ public class MapGenerator {
         return octaveNoise2D((double)(seed + y), (double)(x - seed), 0.86, 0.003, 8);
     }
 
-    public void generateTerritories(MapData mapData, int width, int height, int numTerritories) {
+    public void generateTerritories(MapData mapData, int width, int height, int numTerritories, ByteBuffer pixelBuffer) {
 
         ArrayList<Byte> colors = new ArrayList<Byte>();
         // Generate random territories
@@ -117,6 +116,7 @@ public class MapGenerator {
         float yStep = 64.0f;
         float minDist = 64.0f;
         int maxIteration = 1000;
+        int pindex = 0;
 
         mapData.territories = new Vector<Territory>();
         for (float i = yStep / 2; i < height; i += yStep) {
@@ -150,21 +150,24 @@ public class MapGenerator {
                 // TODO(Ben): More terrain types, humidity / temperature distribution
                 if (territory.height < 0.0f) {
                     territory.terrainType = Territory.TerrainType.Ocean;
+                    colors.add((byte)0);
+                    colors.add((byte)0);
+                    colors.add((byte)170);
                 } else if (territory.height < 0.4f) {
                     territory.terrainType = Territory.TerrainType.Grassland;
+                    colors.add((byte) (m_random.nextFloat() * 255.0f));
+                    colors.add((byte) (m_random.nextFloat() * 255.0f));
+                    colors.add((byte) (m_random.nextFloat() * 255.0f));
                 } else {
                     territory.terrainType = Territory.TerrainType.Mountain;
+                    colors.add((byte) (m_random.nextFloat() * 255.0f));
+                    colors.add((byte) (m_random.nextFloat() * 255.0f));
+                    colors.add((byte) (m_random.nextFloat() * 255.0f));
                 }
                 mapData.territories.add(territory);
-
-                colors.add((byte) (m_random.nextFloat() * 255.0f));
-                colors.add((byte) (m_random.nextFloat() * 255.0f));
-                colors.add((byte) (m_random.nextFloat() * 255.0f));
             }
         }
-
-        ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(height * width * 4 * BYTES_PER_FLOAT).order(ByteOrder.nativeOrder());
-
+        float c;
         // Generate texture for showing the territories
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -209,17 +212,26 @@ public class MapGenerator {
                     isEdge = true;
                 }
                 if (isEdge) {
+                    pixelBuffer.position(pindex);
                     pixelBuffer.put((byte)0);
                     pixelBuffer.put((byte)0);
                     pixelBuffer.put((byte)0);
+                    pindex += 3;
                 } else {
                     int cIndex = closestIndex * 3;
-                    pixelBuffer.put(colors.get(cIndex));
-                    pixelBuffer.put(colors.get(cIndex + 1));
-                    pixelBuffer.put(colors.get(cIndex + 2));
+                    pixelBuffer.position(pindex++);
+                    c = (float)pixelBuffer.get(pindex) / 255.0f;
+                    pixelBuffer.put((byte)(c * colors.get(cIndex)));
+                    pixelBuffer.position(pindex++);
+                    c = (float)pixelBuffer.get(pindex) / 255.0f;
+                    pixelBuffer.put((byte)(c * colors.get(cIndex + 1)));
+                    pixelBuffer.position(pindex++);
+                    c = (float)pixelBuffer.get(pindex) / 255.0f;
+                    pixelBuffer.put((byte)(c * colors.get(cIndex + 2)));
                 }
                 // Alpha
                 pixelBuffer.put((byte)255);
+                pindex++;
             }
         }
 
