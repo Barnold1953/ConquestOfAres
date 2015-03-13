@@ -68,7 +68,7 @@ public class MapGenerator {
                     pixelBuffer.put((byte)225);
                     pixelBuffer.put((byte)225);
                 } else if (heightMap[y][x] < 0.0) { // Oceans
-                    pixelBuffer.put((byte)255);
+                    pixelBuffer.put((byte)0);
                     pixelBuffer.put((byte)0);
                     pixelBuffer.put((byte)170);
                 } else if (heightMap[y][x] < 0.05) { // Beach
@@ -76,7 +76,7 @@ public class MapGenerator {
                     pixelBuffer.put((byte)110);
                     pixelBuffer.put((byte)90);
                 } else { // Grass
-                    pixelBuffer.put((byte)255);
+                    pixelBuffer.put((byte)0);
                     pixelBuffer.put((byte)180);
                     pixelBuffer.put((byte)0);
                 }
@@ -85,8 +85,9 @@ public class MapGenerator {
             }
         }
 
+        mapData.terrainPixelBuffer = pixelBuffer;
         // random.setSeed(p.seed);
-        generateTerritories(mapData, width, height, 100, pixelBuffer);
+        generateTerritories(mapData, width, height, 100);
 
         // TODO(Ben): Segment heightmap into territories
         return mapData;
@@ -103,12 +104,13 @@ public class MapGenerator {
     }
 
     public double getHeightValue(int x, int y, int seed) {
-        return octaveNoise2D((double)(seed + y), (double)(x - seed), 0.86, 0.003, 8);
+        return octaveNoise2D((double)(seed + y), (double)(x - seed), 0.86, 0.0015, 7);
     }
 
-    public void generateTerritories(MapData mapData, int width, int height, int numTerritories, ByteBuffer pixelBuffer) {
-
+    public void generateTerritories(MapData mapData, int width, int height, int numTerritories) {
+        ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(height * width * 4).order(ByteOrder.nativeOrder());
         ArrayList<Byte> colors = new ArrayList<Byte>();
+        pixelBuffer.position(0);
         // Generate random territories
         // TODO(Ben): Generate more uniform points
 
@@ -146,7 +148,7 @@ public class MapGenerator {
                     break;
                 }
 
-                territory.height = (float) getHeightValue((int) territory.x, (int) territory.y, 0);
+                territory.height = (float) getHeightValue((int) territory.x, (int) territory.y, mapData.params.seed);
                 // TODO(Ben): More terrain types, humidity / temperature distribution
                 if (territory.height < 0.0f) {
                     territory.terrainType = Territory.TerrainType.Ocean;
@@ -212,35 +214,36 @@ public class MapGenerator {
                     isEdge = true;
                 }
                 if (isEdge) {
-                    pixelBuffer.position(pindex);
                     pixelBuffer.put((byte)0);
                     pixelBuffer.put((byte)0);
                     pixelBuffer.put((byte)0);
-                    pindex += 3;
                 } else {
                     int cIndex = closestIndex * 3;
-                    pixelBuffer.position(pindex++);
-                    c = (float)pixelBuffer.get(pindex) / 255.0f;
-                    pixelBuffer.put((byte)(c * colors.get(cIndex)));
-                    pixelBuffer.position(pindex++);
-                    c = (float)pixelBuffer.get(pindex) / 255.0f;
-                    pixelBuffer.put((byte)(c * colors.get(cIndex + 1)));
-                    pixelBuffer.position(pindex++);
-                    c = (float)pixelBuffer.get(pindex) / 255.0f;
-                    pixelBuffer.put((byte)(c * colors.get(cIndex + 2)));
+                    pixelBuffer.put((byte)(colors.get(cIndex)));
+                    pixelBuffer.put((byte)(colors.get(cIndex + 1)));
+                    pixelBuffer.put((byte)(colors.get(cIndex + 2)));
                 }
                 // Alpha
                 pixelBuffer.put((byte)255);
-                pindex++;
             }
         }
 
         // Add graph lines
+        float r, g, b;
         mapData.territoryGraphMesh = new ColorMesh();
         for (Territory t1 : mapData.territories) {
             for (Territory t2 : t1.neighbors) {
-                mapData.territoryGraphMesh.addVertex((t1.x / width) * 2.0f - 1.0f, (t1.y / height) * 2.0f - 1.0f, 0.0f, 1.0f, 0.0f, 0.0f);
-                mapData.territoryGraphMesh.addVertex((t2.x / width) * 2.0f - 1.0f, (t2.y / height) * 2.0f - 1.0f, 0.0f, 1.0f, 0.0f, 0.0f);
+                if (t1.terrainType == Territory.TerrainType.Ocean || t2.terrainType == Territory.TerrainType.Ocean) {
+                    r = 0;
+                    g = 1.0f;
+                    b = 1.0f;
+                } else {
+                    r = 1.0f;
+                    g = 0.0f;
+                    b = 0.0f;
+                }
+                mapData.territoryGraphMesh.addVertex((t1.x / width) * 2.0f - 1.0f, (t1.y / height) * 2.0f - 1.0f, 0.0f, r, g, b);
+                mapData.territoryGraphMesh.addVertex((t2.x / width) * 2.0f - 1.0f, (t2.y / height) * 2.0f - 1.0f, 0.0f, r, g, b);
             }
         }
         mapData.pixelBuffer = pixelBuffer;
