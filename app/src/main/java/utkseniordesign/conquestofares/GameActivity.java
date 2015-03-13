@@ -31,14 +31,12 @@ public class GameActivity extends Activity {
         setContentView( R.layout.activity_gamescreen );
 
         // Get Game Settings, everything except MapGenParams
+
+        /* COMMENT THIS OUT IF GAME ACTIVITY IS YOUR STARTUP ACTIVITY */
         Intent intent = getIntent();
-        GameSettings settings = (GameSettings) intent.getParcelableExtra("Settings");
-        UserInterfaceHelper.createDialog( this, String.valueOf(settings.getNumPlayers()), "Player Count");
-        UserInterfaceHelper.createDialog( this, settings.getMapGenParams().mapSymmetry.toString(), "Map Symmetry");
-        UserInterfaceHelper.createDialog( this, settings.getMapGenParams().mapSize.toString(), "Map Size");
-        UserInterfaceHelper.createDialog( this, String.valueOf(settings.getTurnLength()), "Turn Length");
-        UserInterfaceHelper.createDialog( this, String.valueOf(settings.getTerritoriesForVictory()), "Victory Condition");
-        UserInterfaceHelper.createDialog( this, String.valueOf(settings.isHorizontalWrap()), "Horizontal Wrap");
+        if( intent != null ) {
+            GameSettings settings = (GameSettings) intent.getParcelableExtra("Settings");
+        }
 
         // Get GL Resources
         HashMap<String, int[]> textures = getTextures();
