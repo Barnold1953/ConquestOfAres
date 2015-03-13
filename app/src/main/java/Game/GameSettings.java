@@ -13,6 +13,16 @@ enum TerritoryDistributionMode {
 }
 
 public class GameSettings implements Parcelable {
+    public enum GameSettingErrors {
+        NUM_PLAYERS_UNSET,
+        MAP_WRAP_UNSET,
+        MAP_SYMMETRY_UNSET,
+        MAP_SIZE_UNSET,
+        TURN_LENGTH_UNSET,
+        VICTORY_CONDITION_UNSET,
+        NO_ERROR
+    }
+
     boolean m_isMultiplayer = false; ///< True when multiplayer mode is active
     boolean m_isHorizontalWrap = false; ///< True when the map wraps horizontally
     int m_numPlayers = 0; ///< Number of players in the game
@@ -104,7 +114,7 @@ public class GameSettings implements Parcelable {
         m_mapGenParams.mapSymmetry = MapGenerationParams.MapSymmetry.valueOf(source.readString());
     }
 
-    public int parseSettings (
+    public GameSettingErrors parseSettings (
             String numPlayers,
             String horizontalWrap,
             String territoriesForVictory,
@@ -116,18 +126,18 @@ public class GameSettings implements Parcelable {
         if(numPlayers != null) {
             m_numPlayers = Integer.parseInt(numPlayers);
         }
-        else return 1;
+        else return GameSettingErrors.NUM_PLAYERS_UNSET;
 
         // parse horizontalWrap unless it hasn't been chosen, in which case return 2
         if(!horizontalWrap.equals("Map Wrap Settings")) {
             m_isHorizontalWrap = horizontalWrap.equals("Horizontal Wrap");
         }
-        else return 2;
+        else return GameSettingErrors.MAP_WRAP_UNSET;
 
         if(!territoriesForVictory.equals("Victory Condition")) {
             m_territoriesForVictory = Integer.parseInt(territoriesForVictory.substring(0,2))/100.0;
         }
-        else return 3;
+        else return GameSettingErrors.VICTORY_CONDITION_UNSET;
 
         if(m_mapGenParams == null) {
             m_mapGenParams = new MapGenerationParams();
@@ -136,12 +146,12 @@ public class GameSettings implements Parcelable {
         if(!mapSize.equals("Map Size")) {
             m_mapGenParams.mapSize = MapGenerationParams.MapSize.valueOf(mapSize.toUpperCase());
         }
-        else return 4;
+        else return GameSettingErrors.MAP_SIZE_UNSET;
 
-        if(!mapSize.equals("Map Symmetry")) {
+        if(!mapSize.equals("Map Symmetry Settings")) {
             m_mapGenParams.mapSymmetry = MapGenerationParams.MapSymmetry.valueOf(mapSymmetry.toUpperCase());
         }
-        else return 5;
+        else return GameSettingErrors.MAP_SYMMETRY_UNSET;
 
         switch(turnLength) {
             case "Half Hour":
@@ -166,9 +176,8 @@ public class GameSettings implements Parcelable {
                 m_maxTurnLength = 48*60;
                 break;
             default:
-                return 5;
+                return GameSettingErrors.TURN_LENGTH_UNSET;
         }
-
-        return 0;
+        return GameSettingErrors.NO_ERROR;
     }
 }
