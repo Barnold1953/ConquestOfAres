@@ -1,5 +1,6 @@
 package Generation;
 import android.content.Context;
+import android.util.Log;
 
 import java.nio.*;
 import java.util.*;
@@ -67,7 +68,7 @@ public class MapGenerator {
                     pixelBuffer.put((byte)225);
                     pixelBuffer.put((byte)225);
                 } else if (heightMap[y][x] < 0.0) { // Oceans
-                    pixelBuffer.put((byte)0);
+                    pixelBuffer.put((byte)255);
                     pixelBuffer.put((byte)0);
                     pixelBuffer.put((byte)170);
                 } else if (heightMap[y][x] < 0.05) { // Beach
@@ -75,7 +76,7 @@ public class MapGenerator {
                     pixelBuffer.put((byte)110);
                     pixelBuffer.put((byte)90);
                 } else { // Grass
-                    pixelBuffer.put((byte)0);
+                    pixelBuffer.put((byte)255);
                     pixelBuffer.put((byte)180);
                     pixelBuffer.put((byte)0);
                 }
@@ -219,13 +220,13 @@ public class MapGenerator {
                 } else {
                     int cIndex = closestIndex * 3;
                     pixelBuffer.position(pindex++);
-                    c = (float)pixelBuffer.get(cIndex) / 255.0f;
+                    c = (float)pixelBuffer.get(pindex) / 255.0f;
                     pixelBuffer.put((byte)(c * colors.get(cIndex)));
                     pixelBuffer.position(pindex++);
-                    c = (float)pixelBuffer.get(cIndex) / 255.0f;
+                    c = (float)pixelBuffer.get(pindex) / 255.0f;
                     pixelBuffer.put((byte)(c * colors.get(cIndex + 1)));
                     pixelBuffer.position(pindex++);
-                    c = (float)pixelBuffer.get(cIndex) / 255.0f;
+                    c = (float)pixelBuffer.get(pindex) / 255.0f;
                     pixelBuffer.put((byte)(c * colors.get(cIndex + 2)));
                 }
                 // Alpha
