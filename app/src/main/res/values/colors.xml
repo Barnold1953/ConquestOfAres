@@ -6,4 +6,6 @@
     <color name="silver">#e1e1e1</color>
     <color name="darkGrey">#9c9c9c</color>
     <color name="white">#ffffff</color>
+    <color name="transparentBlack">#5000</color>
+    <color name="transparent">#0000</color>
 </resources>

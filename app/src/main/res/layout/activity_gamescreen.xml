@@ -10,12 +10,16 @@
         android:layout_height="fill_parent"/>
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="50dp">
+        android:layout_height="50dp"
+        android:animateLayoutChanges="true"
+        android:background="@color/transparent">
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_gravity="left"
-            android:src="@drawable/button_game_screen_menu"/>
+            android:layout_margin="5dp"
+            android:onClick="toggleDevPanel"
+            android:src="@drawable/ic_pickaxe"/>
     </LinearLayout>
 
 </FrameLayout>
