@@ -49,15 +49,16 @@ public class GameController {
 
     /// Call this method when the world is clicked on
     void onClick(float x, float y) {
-        // TODO: Implement
-        // TODO: Get territory that was clicked
-        // TODO: Handle unit transfer
+
+        //get territory
+        m_gameState.selectedTerritory = getTerritoryAtPoint(x, y);
+
         switch (m_gameState.currentState) {
             case PLACING_UNITS:
-                // TODO: Implement
+                m_gameState.currentState = GameState.State.PLACING_UNITS;
                 break;
             case PLAYING:
-                // TODO: Implement
+                m_gameState.currentState = GameState.State.PLAYING;
                 break;
         }
     }

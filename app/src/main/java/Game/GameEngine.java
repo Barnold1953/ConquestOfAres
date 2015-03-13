@@ -2,6 +2,8 @@ package Game;
 
 import android.util.Log;
 
+import java.util.Random;
+
 import Generation.MapData;
 import Generation.MapGenerator;
 
@@ -33,8 +35,20 @@ public class GameEngine {
         Log.d("Init: ", "initGame finished.");
     }
 
+    private int generateByteColor(int num)
+    {
+        int color = num*10; //unique color to each player
+        return color;
+    }
+
     private void initPlayers(int numPlayers, int numAI) {
-        // TODO: Set up all the players and assign random colors
+        for (int i=1; i <= numPlayers; i++) {
+            Player p = new Player();
+            m_gameState.players.add(new Player());
+            p.color[0] = (byte)(generateByteColor(i)); //R
+            p.color[1] = (byte) (generateByteColor(i*2)); // G
+            p.color[2] = (byte) (generateByteColor(i*3)); //B
+       }
     }
 
     /// Assignes territories to players based on the TerritoryDistMode
@@ -55,6 +69,13 @@ public class GameEngine {
 
     /// Sets up all the initial armies
     private void initUnits() {
+        for (int i=0; i < m_gameState.territories.size(); i++) {
+            for (int j=0; j <3; j++) {
+                m_gameState.territories.get(i).army.units.add(new Unit());
+                //double for loop necessary?
+            }
+        }
+        //3 or 4 units per unit per territory
         // TODO: Implement
     }
 }
