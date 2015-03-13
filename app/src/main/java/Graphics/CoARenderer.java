@@ -42,9 +42,19 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     final float upX = 0.0f;
     final float upY = 1.0f;
     final float upZ = 0.0f;
+    boolean showTerrain = true;
+    boolean showLines = false;
 
     public void setGameState(GameState gameState) {
         this.gameState = gameState;
+    }
+
+    public void toggleLines() {
+        showLines = !showLines;
+    }
+
+    public void toggleTerrain() {
+        showTerrain = !showTerrain;
     }
 
     public CoARenderer(Context c) {
@@ -97,6 +107,10 @@ public class CoARenderer implements GLSurfaceView.Renderer {
                     "vortest",
                     gameState.mapData.width,
                     gameState.mapData.height);
+           gameState.mapData.terrainTexture = TextureHelper.dataToTexture(gameState.mapData.terrainPixelBuffer,
+                   "tertest",
+                   gameState.mapData.width,
+                   gameState.mapData.height);
            gameState.mapData.territoryGraphMesh.finish(context);
         }
         // Redraw background color
@@ -106,8 +120,12 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         //GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
         GLES20.glUseProgram(programHandle);
-        dHelper.draw(camera, gHelper.mVertexBuffer, gHelper.mColorBuffer, gHelper.mTextCoordBuffer, gHelper.mIndicesBuffer, TextureHelper.getTexture("vortest"));
-        gameState.mapData.territoryGraphMesh.renderLines(camera.getVPMatrix());
+        if (showTerrain) {
+            dHelper.draw(camera, gHelper.mVertexBuffer, gHelper.mColorBuffer, gHelper.mTextCoordBuffer, gHelper.mIndicesBuffer, TextureHelper.getTexture("tertest"));
+        } else {
+            dHelper.draw(camera, gHelper.mVertexBuffer, gHelper.mColorBuffer, gHelper.mTextCoordBuffer, gHelper.mIndicesBuffer, TextureHelper.getTexture("vortest"));
+        }
+        if (showLines) gameState.mapData.territoryGraphMesh.renderLines(camera.getVPMatrix());
     }
 
     @Override
