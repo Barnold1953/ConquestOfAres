@@ -107,14 +107,14 @@ public class GameActivity extends Activity {
         toggleButtons[0].setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                coaRenderer.toggleLines();
             }
         });
         toggleButtons[1].setText("Terrain");
         toggleButtons[1].setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                coaRenderer.toggleTerrain();
             }
         });
         toggleButtons[2].setText("Owners");
