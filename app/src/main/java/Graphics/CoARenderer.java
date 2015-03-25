@@ -54,7 +54,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     }
 
     public void toggleTerrain() {
-        showTerrain = !showTerrain;
+
     }
 
     public CoARenderer(Context c) {
@@ -116,11 +116,9 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         //GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
         GLES20.glUseProgram(programHandle);
-        if (showTerrain) {
-            dHelper.draw(camera, gHelper.mVertexBuffer, gHelper.mColorBuffer, gHelper.mTextCoordBuffer, gHelper.mIndicesBuffer, TextureHelper.getTexture("tertest"));
-        } else {
-            dHelper.draw(camera, gHelper.mVertexBuffer, gHelper.mColorBuffer, gHelper.mTextCoordBuffer, gHelper.mIndicesBuffer, TextureHelper.getTexture("vortest"));
-        }
+
+        dHelper.draw(camera, gHelper.mVertexBuffer, gHelper.mColorBuffer, gHelper.mTextCoordBuffer, gHelper.mIndicesBuffer, TextureHelper.getTexture("vortest"));
+
         if (showLines) gameState.mapData.territoryGraphMesh.renderLines(camera.getVPMatrix());
     }
 
@@ -132,7 +130,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         if (IS_3D) {
             camera.setSurface(width, height, 0.1f, 10000.0f);
         } else {
-            camera.ortho(width, height);
+            camera.ortho(1, 1);
         }
     }
 }

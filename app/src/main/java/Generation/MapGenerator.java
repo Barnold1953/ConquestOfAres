@@ -87,61 +87,56 @@ public class MapGenerator {
 
         float xStep = 64.0f;
         float yStep = 64.0f;
-        float minDist = 64.0f;
-        int maxIteration = 1000;
+        float minDist = 96.0f*96.0f;
+        int maxIteration = 100;
         int pindex = 0;
 
         mapData.territoryIndices = new int[height][width];
 
         // Generate territories
         mapData.territories = new Vector<Territory>();
-        for (float i = yStep / 2; i < height; i += yStep) {
-            for (float j = xStep / 2; j < width; j += xStep) {
-
-                Territory territory = new Territory();
-                boolean stop = false;
-                int iter = 0;
-                do {
-                    territory.x = m_random.nextFloat() * width;
-                    territory.y = m_random.nextFloat() * height;
-                    stop = true;
-                    for (Territory t : mapData.territories) {
-                        float dx = t.x - territory.x;
-                        float dy = t.y - territory.y;
-                        float dist = (float)Math.sqrt(dx * dx + dy * dy);
-                        if (dist < minDist) {
-                            stop = false;
-                            break;
-                        }
+        while (true) {
+            Territory territory = new Territory();
+            boolean stop = false;
+            int iter = 0;
+            do {
+                territory.x = m_random.nextFloat() * width;
+                territory.y = m_random.nextFloat() * height;
+                stop = true;
+                for (Territory t : mapData.territories) {
+                    float dx = t.x - territory.x;
+                    float dy = t.y - territory.y;
+                    if (dx * dx + dy * dy < minDist) {
+                        stop = false;
+                        break;
                     }
-                    iter++;
-                } while (stop == false && iter != maxIteration);
-
-                if (iter == maxIteration) {
-                    i = height;
-                    break;
                 }
+                iter++;
+            } while (stop == false && iter != maxIteration);
 
-                territory.height = (float) getHeightValue((int) territory.x, (int) territory.y, mapData.params.seed);
-                // TODO(Ben): More terrain types, humidity / temperature distribution
-                if (territory.height < 0.0f) {
-                    territory.terrainType = Territory.TerrainType.Ocean;
-                    colors.add((byte)0);
-                    colors.add((byte)0);
-                    colors.add((byte)170);
-                } else if (territory.height < 0.4f) {
-                    territory.terrainType = Territory.TerrainType.Grassland;
-                    colors.add((byte) (m_random.nextFloat() * 255.0f));
-                    colors.add((byte) (m_random.nextFloat() * 255.0f));
-                    colors.add((byte) (m_random.nextFloat() * 255.0f));
-                } else {
-                    territory.terrainType = Territory.TerrainType.Mountain;
-                    colors.add((byte) (m_random.nextFloat() * 255.0f));
-                    colors.add((byte) (m_random.nextFloat() * 255.0f));
-                    colors.add((byte) (m_random.nextFloat() * 255.0f));
-                }
-                mapData.territories.add(territory);
+            if (iter == maxIteration) {
+                break;
             }
+
+            territory.height = (float) getHeightValue((int) territory.x, (int) territory.y, mapData.params.seed);
+            // TODO(Ben): More terrain types, humidity / temperature distribution
+            if (territory.height < 0.0f) {
+                territory.terrainType = Territory.TerrainType.Ocean;
+                colors.add((byte)0);
+                colors.add((byte)0);
+                colors.add((byte)170);
+            } else if (territory.height < 0.4f) {
+                territory.terrainType = Territory.TerrainType.Grassland;
+                colors.add((byte) (m_random.nextFloat() * 255.0f));
+                colors.add((byte) (m_random.nextFloat() * 255.0f));
+                colors.add((byte) (m_random.nextFloat() * 255.0f));
+            } else {
+                territory.terrainType = Territory.TerrainType.Mountain;
+                colors.add((byte) (m_random.nextFloat() * 255.0f));
+                colors.add((byte) (m_random.nextFloat() * 255.0f));
+                colors.add((byte) (m_random.nextFloat() * 255.0f));
+            }
+            mapData.territories.add(territory);
         }
         float c;
         for (int y = 0; y < height; y++) {
