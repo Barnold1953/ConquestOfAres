@@ -54,7 +54,9 @@ public class GameActivity extends Activity {
         /* COMMENT THIS OUT IF GAME ACTIVITY IS YOUR STARTUP ACTIVITY */
         Intent intent = getIntent();
         if( intent != null ) {
-            GameSettings settings = (GameSettings) intent.getParcelableExtra("Settings");
+            gameSettings = (GameSettings) intent.getParcelableExtra("Settings");
+        } else {
+            gameSettings = new GameSettings();
         }
 
         // Initialize the glSurfaceView
@@ -63,8 +65,7 @@ public class GameActivity extends Activity {
         mGLSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
         coaRenderer = new CoARenderer(this);
         gameController = new GameController();
-        // TODO:Set these with the settings menu parameters
-        gameSettings = new GameSettings();
+
         mGLSurfaceView.setRenderer(coaRenderer);
 
         // Init the game
