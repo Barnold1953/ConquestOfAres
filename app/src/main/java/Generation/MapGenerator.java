@@ -1,5 +1,6 @@
 package Generation;
 import android.content.Context;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import java.nio.*;
@@ -34,20 +35,20 @@ public class MapGenerator {
         // TODO: These are arbitrary. Pick better values.
         switch (p.mapSize) {
             case CRAMPED:
-                width = 256;
-                height = 256;
+                width = 540;
+                height = 960;
                 break;
             case SMALL:
-                width = 512;
-                height = 512;
+                width = 720;
+                height = 1280;
                 break;
             case MEDIUM:
-                width = 768;
-                height = 768;
+                width = 900;
+                height = 1600;
                 break;
             case LARGE:
-                width = 1024;
-                height = 1024;
+                width = 1080;
+                height = 1920;
                 break;
             default:
                 break;
@@ -56,36 +57,6 @@ public class MapGenerator {
         mapData.width = width;
         mapData.height = height;
 
-        double[][] heightMap = new double[height][width];
-        generateHeightmap(width, height, heightMap, p.seed);
-
-        ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(height * width * 4).order(ByteOrder.nativeOrder());
-
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                if (heightMap[y][x] > 0.25) { // Mountains
-                    pixelBuffer.put((byte)225);
-                    pixelBuffer.put((byte)225);
-                    pixelBuffer.put((byte)225);
-                } else if (heightMap[y][x] < 0.0) { // Oceans
-                    pixelBuffer.put((byte)0);
-                    pixelBuffer.put((byte)0);
-                    pixelBuffer.put((byte)170);
-                } else if (heightMap[y][x] < 0.05) { // Beach
-                    pixelBuffer.put((byte)130);
-                    pixelBuffer.put((byte)110);
-                    pixelBuffer.put((byte)90);
-                } else { // Grass
-                    pixelBuffer.put((byte)0);
-                    pixelBuffer.put((byte)180);
-                    pixelBuffer.put((byte)0);
-                }
-                // Alpha
-                pixelBuffer.put((byte)255);
-            }
-        }
-
-        mapData.terrainPixelBuffer = pixelBuffer;
         // random.setSeed(p.seed);
         generateTerritories(mapData, width, height, 100);
 
@@ -120,6 +91,9 @@ public class MapGenerator {
         int maxIteration = 1000;
         int pindex = 0;
 
+        mapData.territoryIndices = new int[height][width];
+
+        // Generate territories
         mapData.territories = new Vector<Territory>();
         for (float i = yStep / 2; i < height; i += yStep) {
             for (float j = xStep / 2; j < width; j += xStep) {
@@ -170,48 +144,62 @@ public class MapGenerator {
             }
         }
         float c;
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                mapData.territoryIndices[y][x] = getClosestTerritoryIndex((float)x, (float)y, mapData.territories);
+            }
+        }
+
         // Generate texture for showing the territories
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int closestIndex = getClosestTerritoryIndex(x, y, mapData.territories);
+                int closestIndex = mapData.territoryIndices[y][x];
                 Territory territory = mapData.territories.get(closestIndex);
                 Territory nextTerritory;
 
                 // Check if we are on an edge
                 boolean isEdge = false;
                 int newIndex;
-                newIndex = getClosestTerritoryIndex((float)x + 1, (float)y, mapData.territories);
-                if (newIndex != closestIndex) {
-                    // Add neighbor territory if needed
-                    nextTerritory = mapData.territories.get(newIndex);
-                    if (!territory.neighbors.contains(nextTerritory)) {
-                        territory.neighbors.add(nextTerritory);
+                if (x < width - 1) {
+                    newIndex = mapData.territoryIndices[y][x + 1];
+                    if (newIndex != closestIndex) {
+                        // Add neighbor territory if needed
+                        nextTerritory = mapData.territories.get(newIndex);
+                        if (!territory.neighbors.contains(nextTerritory)) {
+                            territory.neighbors.add(nextTerritory);
+                        }
+                        isEdge = true;
                     }
-                    isEdge = true;
                 }
-                newIndex = getClosestTerritoryIndex((float)x - 1, (float)y, mapData.territories);
-                if (newIndex != closestIndex) {
-                    nextTerritory = mapData.territories.get(newIndex);
-                    if (!territory.neighbors.contains(nextTerritory)) {
-                        territory.neighbors.add(nextTerritory);
+                if (x > 0) {
+                    newIndex = mapData.territoryIndices[y][x - 1];
+                    if (newIndex != closestIndex) {
+                        nextTerritory = mapData.territories.get(newIndex);
+                        if (!territory.neighbors.contains(nextTerritory)) {
+                            territory.neighbors.add(nextTerritory);
+                        }
+                        isEdge = true;
                     }
-                    isEdge = true;
                 }
-                newIndex = getClosestTerritoryIndex((float)x, (float)y + 1, mapData.territories);
-                if (newIndex != closestIndex) {
-                    nextTerritory = mapData.territories.get(newIndex);
-                    if (!territory.neighbors.contains(nextTerritory)) {
-                        territory.neighbors.add(nextTerritory);
+                if (y < height - 1) {
+                    newIndex = mapData.territoryIndices[y + 1][x];
+                    if (newIndex != closestIndex) {
+                        nextTerritory = mapData.territories.get(newIndex);
+                        if (!territory.neighbors.contains(nextTerritory)) {
+                            territory.neighbors.add(nextTerritory);
+                        }
+                        isEdge = true;
                     }
-                    isEdge = true;
                 }
-                newIndex = getClosestTerritoryIndex((float)x, (float)y - 1, mapData.territories);
-                if (newIndex != closestIndex) {
-                    nextTerritory = mapData.territories.get(newIndex);
-                    if (!territory.neighbors.contains(nextTerritory)) {
-                        territory.neighbors.add(nextTerritory);
+                if (y > 0) {
+                    newIndex = mapData.territoryIndices[y - 1][x];
+                    if (newIndex != closestIndex) {
+                        nextTerritory = mapData.territories.get(newIndex);
+                        if (!territory.neighbors.contains(nextTerritory)) {
+                            territory.neighbors.add(nextTerritory);
+                        }
+                        isEdge = true;
                     }
-                    isEdge = true;
                 }
                 if (isEdge) {
                     pixelBuffer.put((byte)0);

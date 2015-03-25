@@ -42,7 +42,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     final float upX = 0.0f;
     final float upY = 1.0f;
     final float upZ = 0.0f;
-    boolean showTerrain = true;
+    boolean showTerrain = false;
     boolean showLines = false;
 
     public void setGameState(GameState gameState) {
@@ -107,10 +107,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
                     "vortest",
                     gameState.mapData.width,
                     gameState.mapData.height);
-           gameState.mapData.terrainTexture = TextureHelper.dataToTexture(gameState.mapData.terrainPixelBuffer,
-                   "tertest",
-                   gameState.mapData.width,
-                   gameState.mapData.height);
            gameState.mapData.territoryGraphMesh.finish(context);
         }
         // Redraw background color

@@ -8,6 +8,8 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.util.Log;
 
 import java.util.HashMap;
 
@@ -31,6 +33,12 @@ public class GameActivity extends Activity {
         setContentView( R.layout.activity_gamescreen );
 
         // Get Game Settings, everything except MapGenParams
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+        Log.d("Display width: ", Integer.toString(metrics.widthPixels));
+        Log.d("Display height: ", Integer.toString(metrics.heightPixels));
 
         /* COMMENT THIS OUT IF GAME ACTIVITY IS YOUR STARTUP ACTIVITY */
         Intent intent = getIntent();
