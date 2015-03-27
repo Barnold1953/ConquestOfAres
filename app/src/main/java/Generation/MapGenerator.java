@@ -89,12 +89,32 @@ public class MapGenerator {
 
         float xStep = 64.0f;
         float yStep = 64.0f;
-        float minDist = 96.0f*96.0f;
+        final float minDist = 96.0f;
+        final float minDist2 = minDist * minDist;
         int maxIteration = 100;
         int pindex = 0;
         float dx, dy;
 
         mapData.territoryIndices = new int[height][width];
+
+        // Determine bounds for placing territories based on wrap mode
+        float startX = 0.0f, startY = 0.0f, genWidth = width, genHeight = height;
+        switch(mapData.params.mapSymmetry) {
+            case HORIZONTAL:
+                startX = minDist / 2.0f;
+                genWidth = width / 2.0f - startX * 2.0f;
+                break;
+            case VERTICAL:
+                startY = minDist / 2.0f;
+                genHeight = height / 2.0f - startY * 2.0f;
+                break;
+            case RADIAL:
+                startX = minDist / 2.0f;
+                genWidth = width / 2.0f - startX * 2.0f;
+                startY = minDist / 2.0f;
+                genHeight = height / 2.0f - startY * 2.0f;
+                break;
+        }
 
         // Generate territories
         mapData.territories = new Vector<Territory>();
@@ -103,8 +123,8 @@ public class MapGenerator {
             boolean stop = false;
             int iter = 0;
             do {
-                territory.x = m_random.nextFloat() * width;
-                territory.y = m_random.nextFloat() * height;
+                territory.x = m_random.nextFloat() * genWidth + startX;
+                territory.y = m_random.nextFloat() * genHeight + startY;
                 stop = true;
                 for (Territory t : mapData.territories) {
                     if (mapData.params.horizontalWrap) {
@@ -116,7 +136,7 @@ public class MapGenerator {
                         dx = t.x - territory.x;
                         dy = t.y - territory.y;
                     }
-                    if (dx * dx + dy * dy < minDist) {
+                    if (dx * dx + dy * dy < minDist2) {
                         stop = false;
                         break;
                     }
@@ -130,24 +150,56 @@ public class MapGenerator {
 
             territory.height = (float) getHeightValue((int) territory.x, (int) territory.y, mapData.params.seed);
             // TODO(Ben): More terrain types, humidity / temperature distribution
-            if (territory.height < 0.0f) {
-                territory.terrainType = Territory.TerrainType.Ocean;
+            mapData.territories.add(territory);
+        }
+
+        // Clone territories for symmetry
+        int size = mapData.territories.size();
+        switch(mapData.params.mapSymmetry) {
+            case HORIZONTAL:
+                for (int i = 0; i < size; i++) {
+                    Territory newTerritory = new Territory(mapData.territories.get(i));
+                    newTerritory.x = width - newTerritory.x;
+                    mapData.territories.add(newTerritory);
+                }
+                break;
+            case RADIAL:
+                for (int i = 0; i < size; i++) {
+                    Territory newTerritory = new Territory(mapData.territories.get(i));
+                    newTerritory.x = width - newTerritory.x;
+                    mapData.territories.add(newTerritory);
+                }
+                size = mapData.territories.size();
+                // Purposely omitting break!
+            case VERTICAL:
+                for (int i = 0; i < size; i++) {
+                    Territory newTerritory = new Territory(mapData.territories.get(i));
+                    newTerritory.y = height - newTerritory.y;
+                    mapData.territories.add(newTerritory);
+                }
+                break;
+        }
+
+        // Set color values
+        for (Territory t : mapData.territories) {
+            if (t.height < 0.0f) {
+                t.terrainType = Territory.TerrainType.Ocean;
                 colors.add((byte)0);
                 colors.add((byte)0);
                 colors.add((byte)170);
-            } else if (territory.height < 0.4f) {
-                territory.terrainType = Territory.TerrainType.Grassland;
+            } else if (t.height < 0.4f) {
+                t.terrainType = Territory.TerrainType.Grassland;
                 colors.add((byte) (m_random.nextFloat() * 255.0f));
                 colors.add((byte) (m_random.nextFloat() * 255.0f));
                 colors.add((byte) (m_random.nextFloat() * 255.0f));
             } else {
-                territory.terrainType = Territory.TerrainType.Mountain;
+                t.terrainType = Territory.TerrainType.Mountain;
                 colors.add((byte) (m_random.nextFloat() * 255.0f));
                 colors.add((byte) (m_random.nextFloat() * 255.0f));
                 colors.add((byte) (m_random.nextFloat() * 255.0f));
             }
-            mapData.territories.add(territory);
         }
+
         float c;
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
