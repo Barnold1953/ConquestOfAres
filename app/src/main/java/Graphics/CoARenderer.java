@@ -23,7 +23,6 @@ import utkseniordesign.conquestofares.R;
 public class CoARenderer implements GLSurfaceView.Renderer {
     int programHandle;
     Context context;
-    HashMap<String, int[]> textures = new HashMap<String, int[]>();
     Camera camera;
     MapData mapData;
     GameState gameState = null;

@@ -7,6 +7,8 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.Vector;
 
+import Game.Unit;
+
 /**
  * Created by Nathan on 1/12/2015.
  */
@@ -78,5 +80,9 @@ public class SpriteBatchSystem {
         }
 
         GeometryHelper.removeFromBatch(name, quadrilateral);
+    }
+
+    public static void addUnit(Unit.Type type, float x, float y){
+
     }
 }
