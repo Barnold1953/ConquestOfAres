@@ -8,10 +8,15 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.os.Bundle;
+
+import android.util.DisplayMetrics;
+import android.util.Log;
+
 import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 
 import java.util.HashMap;
 
@@ -40,10 +45,18 @@ public class GameActivity extends Activity {
 
         // Get Game Settings, everything except MapGenParams
 
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+        Log.d("Display width: ", Integer.toString(metrics.widthPixels));
+        Log.d("Display height: ", Integer.toString(metrics.heightPixels));
+
         /* COMMENT THIS OUT IF GAME ACTIVITY IS YOUR STARTUP ACTIVITY */
         Intent intent = getIntent();
         if( intent != null ) {
-            GameSettings settings = (GameSettings) intent.getParcelableExtra("Settings");
+            gameSettings = (GameSettings) intent.getParcelableExtra("Settings");
+        } else {
+            gameSettings = new GameSettings();
         }
 
         // Initialize the glSurfaceView
@@ -52,8 +65,7 @@ public class GameActivity extends Activity {
         mGLSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
         coaRenderer = new CoARenderer(this);
         gameController = new GameController();
-        // TODO:Set these with the settings menu parameters
-        gameSettings = new GameSettings();
+
         mGLSurfaceView.setRenderer(coaRenderer);
 
         // Init the game

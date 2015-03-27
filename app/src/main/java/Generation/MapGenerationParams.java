@@ -29,4 +29,5 @@ public class MapGenerationParams {
     public int seed = 150000; ///< Generation seed. Set by caller
     public MapSize mapSize = MapSize.MEDIUM; ///< Size of map
     public MapSymmetry mapSymmetry = MapSymmetry.NONE; ///< Symmetry of generated map
+    public boolean horizontalWrap = false;
 }

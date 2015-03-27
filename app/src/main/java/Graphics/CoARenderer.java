@@ -42,7 +42,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     final float upX = 0.0f;
     final float upY = 1.0f;
     final float upZ = 0.0f;
-    boolean showTerrain = true;
+    boolean showTerrain = false;
     boolean showLines = false;
 
     public void setGameState(GameState gameState) {
@@ -54,7 +54,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     }
 
     public void toggleTerrain() {
-        showTerrain = !showTerrain;
+
     }
 
     public CoARenderer(Context c) {
@@ -112,10 +112,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
                     "vortest",
                     gameState.mapData.width,
                     gameState.mapData.height);
-           gameState.mapData.terrainTexture = TextureHelper.dataToTexture(gameState.mapData.terrainPixelBuffer,
-                   "tertest",
-                   gameState.mapData.width,
-                   gameState.mapData.height);
            gameState.mapData.territoryGraphMesh.finish(context);
         }
         // Redraw background color
@@ -125,11 +121,9 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         //GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
         GLES20.glUseProgram(programHandle);
-        if (showTerrain) {
-            dHelper.draw(camera, GeometryHelper.getVertBuff("master"), GeometryHelper.getColorBuff("master"), GeometryHelper.getTextBuff("master"), TextureHelper.getTexture("tertest"));
-        } else {
-            dHelper.draw(camera, GeometryHelper.getVertBuff("master"), GeometryHelper.getColorBuff("master"), GeometryHelper.getTextBuff("master"), TextureHelper.getTexture("vortest"));
-        }
+
+        dHelper.draw(camera, GeometryHelper.getVertBuff("master"), GeometryHelper.getColorBuff("master"), GeometryHelper.getTextBuff("master"), TextureHelper.getTexture("vortest"));
+
         if (showLines) gameState.mapData.territoryGraphMesh.renderLines(camera.getVPMatrix());
 
         Enumeration vEnum = SpriteBatchSystem.sprites.elements();
@@ -148,7 +142,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         if (IS_3D) {
             camera.setSurface(width, height, 0.1f, 10000.0f);
         } else {
-            camera.ortho(width, height);
+            camera.ortho(1, 1);
         }
     }
 }
