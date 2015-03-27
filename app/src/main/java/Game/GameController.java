@@ -17,7 +17,6 @@ import Graphics.SpriteBatchSystem;
 
 /// Contains the game logic core
 public class GameController {
-
     private GameState m_gameState = null; ///< Handle to game
     private GameSettings m_gameSettings = null; ///< Settings TODO(Aaron): pass in good settings in initGame
     private GameEngine m_gameEngine = new GameEngine(); ///< Initializes the game
@@ -82,13 +81,7 @@ public class GameController {
 
     boolean addUnit(Territory territory, float x, float y, Unit.Type type){
         if(territory.owner.extraUnits > 0){
-            Unit unit = new Unit();
-            unit.hasMoved = true;
-            unit.location[0] = x;
-            unit.location[1] = y;
-            unit.destination[0] = 0;
-            unit.destination[0] = 0;
-            unit.type = type;
+            Unit unit = new Unit(x,y, Unit.Type.soldier);
 
             SpriteBatchSystem.addUnit(unit.type, x, y);
 
@@ -101,6 +94,9 @@ public class GameController {
 
     boolean attack(Territory attacker, Territory defender){
         while(attacker.army.units.size() > 0 && defender.army.units.size() > 0){
+            // I figure we can change the chance of winning based on the type of unit it is, like tanks are weak to airplanes, airplanes are weak to soldiers, and soldiers are weak to tanks
+            // kind of like a rock-paper-scissors dynamic
+
             if(m_gameState.random.nextInt() % 2 == 0){
                 attacker.army.units.remove(attacker.army.units.size()-1);
             }
@@ -108,7 +104,7 @@ public class GameController {
                 defender.army.units.remove(defender.army.units.size()-1);
             }
         }
-        return attacker.army.units.size() > 0 ? true : false;
+        return !attacker.army.units.isEmpty();
     }
 
     void moveUnit(Territory source, Territory destination){

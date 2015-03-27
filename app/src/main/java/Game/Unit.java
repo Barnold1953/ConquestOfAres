@@ -11,10 +11,22 @@ public class Unit {
         soldier, tank, airplane
     }
 
+    public Unit(float x, float y, Type t){
+        hasMoved = true;
+        location[0] = x;
+        location[1] = y;
+        destination[0] = 0;
+        destination[0] = 0;
+        type = t;
+    }
+
     Type type;
     float[] location = new float[2];
     float[] destination = new float[2];
-    // TODO: Different stats?
-    // TODO: Health?
-    // TODO: Upgrades?
+    // when health reaches 0, soldier is removed from army.units
+    float health = 100.0f;
+    // armor will divide the attacker's damage and then subtract that # from health
+    float armor;
+    // damage will increase or decrease based on the type of units fighting
+    float damage;
 }
