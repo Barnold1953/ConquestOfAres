@@ -10,20 +10,15 @@ import android.util.Log;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.HashMap;
-<<<<<<< HEAD
-=======
 import java.util.Map;
 import java.util.NoSuchElementException;
->>>>>>> 39284de09d212bfa2a6a4073a3e1acb0d907da16
 
 /**
  * Created by Nathan on 2/5/2015.
  */
 public class TextureHelper {
-    private static HashMap<String, int[]> textureMap = new HashMap<String, int[]>();
+    private static HashMap<String, int[]> textures = new HashMap<String, int[]>();
 
-    private static Map textureHandles= new HashMap();
- 
     public static int imageToTexture(final Context context, final int resourceId, final String label){
         final int[] textureHandle = new int[1];
 
@@ -81,7 +76,7 @@ public class TextureHelper {
         }
         GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
 
-        textureMap.put(label, textureHandle);
+        textures.put(label, textureHandle);
         return textureHandle[0];
     }
 
@@ -108,7 +103,7 @@ public class TextureHelper {
         }
         GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
 
-        textureMap.put(label, textureHandle);
+        textures.put(label, textureHandle);
         return textureHandle[0];
     }
 

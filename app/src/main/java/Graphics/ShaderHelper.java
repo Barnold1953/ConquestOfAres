@@ -19,13 +19,11 @@ import utkseniordesign.conquestofares.R;
  * Created by Nathan on 1/17/2015.
  */
 public class ShaderHelper {
-
-
-    
     static HashMap<String, Integer> shaders = new HashMap<>();
 
-
     public static int compileShader(Context context, int vertID, int fragID, String shader) throws IOException{
+
+        String filePath = "@raw/";
         int vertexShaderHandle, fragmentShaderHandle;
 
         Log.d("1", "Before loading shader");
@@ -106,8 +104,6 @@ public class ShaderHelper {
             programHandle = shaders.get(shader);
         }
         Log.d("shader", "Shader successfully compiled");
-
-        GLES20.glUseProgram(programHandle);
 
         return programHandle;
     }
