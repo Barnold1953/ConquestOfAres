@@ -8,6 +8,8 @@ import java.util.*;
 import Generation.MapData;
 import Generation.MapGenerator;
 import Generation.MapGenerationParams;
+import Graphics.Quadrilateral;
+import Graphics.SpriteBatchSystem;
 
 /**
  * Created by brb55_000 on 2/6/2015.
@@ -49,15 +51,26 @@ public class GameController {
 
     /// Call this method when the world is clicked on
     void onClick(float x, float y) {
-        // TODO: Implement
-        // TODO: Get territory that was clicked
-        // TODO: Handle unit transfer
+        Territory territory = getTerritoryAtPoint(x, y);
+        if(territory == m_gameState.selectedTerritory){
+            m_gameState.selectedTerritory = null;
+            return;
+        }
+        if(m_gameState.selectedTerritory == null){
+            m_gameState.selectedTerritory = territory;
+            return;
+        }
         switch (m_gameState.currentState) {
             case PLACING_UNITS:
-                // TODO: Implement
+                addUnit(territory, x, y, Unit.Type.soldier);
                 break;
             case PLAYING:
-                // TODO: Implement
+                if(m_gameState.selectedTerritory.owner != territory.owner){
+                    attack(m_gameState.selectedTerritory, territory);
+                }
+                else{
+                    moveUnit(m_gameState.selectedTerritory, territory);
+                }
                 break;
         }
     }
@@ -65,5 +78,43 @@ public class GameController {
     /// Returns the territory at a specific point
     Territory getTerritoryAtPoint(float x, float y) {
         return MapGenerator.getClosestTerritory(x, y, m_gameState.territories);
+    }
+
+    boolean addUnit(Territory territory, float x, float y, Unit.Type type){
+        if(territory.owner.extraUnits > 0){
+            Unit unit = new Unit();
+            unit.hasMoved = true;
+            unit.location[0] = x;
+            unit.location[1] = y;
+            unit.destination[0] = 0;
+            unit.destination[0] = 0;
+            unit.type = type;
+
+            SpriteBatchSystem.addUnit(unit.type, x, y);
+
+            territory.army.units.add(unit);
+            territory.owner.extraUnits--;
+            return true;
+        }
+        return false;
+    }
+
+    boolean attack(Territory attacker, Territory defender){
+        while(attacker.army.units.size() > 0 && defender.army.units.size() > 0){
+            if(m_gameState.random.nextInt() % 2 == 0){
+                attacker.army.units.remove(attacker.army.units.size()-1);
+            }
+            else{
+                defender.army.units.remove(defender.army.units.size()-1);
+            }
+        }
+        return attacker.army.units.size() > 0 ? true : false;
+    }
+
+    void moveUnit(Territory source, Territory destination){
+        Unit unit = source.army.units.get(source.army.units.size()-1);
+        destination.owner.extraUnits++;
+        addUnit(destination, destination.x, destination.y, unit.type);
+        source.army.units.remove(source.army.units.size()-1);
     }
 }

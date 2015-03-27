@@ -20,10 +20,6 @@ import utkseniordesign.conquestofares.R;
  */
 public class ShaderHelper {
     static HashMap<String, Integer> shaders = new HashMap<>();
-    public int mPositionHandle;
-    public int mColorHandle;
-    public int mMVPMatrixHandle;
-    public int mTCoordHandle;
 
     public static int compileShader(Context context, int vertID, int fragID, String shader) throws IOException{
 

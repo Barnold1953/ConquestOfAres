@@ -17,7 +17,6 @@ import java.util.NoSuchElementException;
  * Created by Nathan on 2/5/2015.
  */
 public class TextureHelper {
-    private static Map textureHandles= new HashMap();
     private static HashMap<String, int[]> textures = new HashMap<String, int[]>();
 
     public static int imageToTexture(final Context context, final int resourceId, final String label){
