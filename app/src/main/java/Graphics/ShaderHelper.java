@@ -19,11 +19,11 @@ import utkseniordesign.conquestofares.R;
  * Created by Nathan on 1/17/2015.
  */
 public class ShaderHelper {
-    private static HashMap<String, Integer> shaders;
 
-    public ShaderHelper(){
-        shaders = new HashMap<>();
-    }
+
+    
+    static HashMap<String, Integer> shaders = new HashMap<>();
+
 
     public static int compileShader(Context context, int vertID, int fragID, String shader) throws IOException{
         int vertexShaderHandle, fragmentShaderHandle;

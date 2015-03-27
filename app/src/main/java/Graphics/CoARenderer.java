@@ -11,6 +11,9 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
+import Game.GameState;
+import Generation.MapData;
+import Generation.MapGenerationParams;
 import utkseniordesign.conquestofares.R;
 
 /**
@@ -20,14 +23,13 @@ import utkseniordesign.conquestofares.R;
 public class CoARenderer implements GLSurfaceView.Renderer {
     int programHandle;
     Context context;
-    HashMap<String, int[]> textures;
+    HashMap<String, int[]> textures = new HashMap<String, int[]>();
     Camera camera;
+    MapData mapData;
+    GameState gameState = null;
 
-    ShaderHelper sHelper;
-    GeometryHelper gHelper;
     DrawHelper dHelper;
-    TextureHelper tHelper;
-    TextureRenderer textRendHelper;
+
     final boolean IS_3D = false; ///< Temporary: determines if we are rendering in 3D or 2D
 
     // Camera lookAt
@@ -40,17 +42,27 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     final float upX = 0.0f;
     final float upY = 1.0f;
     final float upZ = 0.0f;
+    boolean showTerrain = true;
+    boolean showLines = false;
 
-    public CoARenderer(Context c, HashMap<String, int[]> t) {
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
+    }
+
+    public void toggleLines() {
+        showLines = !showLines;
+    }
+
+    public void toggleTerrain() {
+        showTerrain = !showTerrain;
+    }
+
+    public CoARenderer(Context c) {
         context = c;
-        textures = t;
 
         camera = new Camera();
-        sHelper = new ShaderHelper();
         gHelper = new GeometryHelper();
-
-        tHelper = new TextureHelper(context);
-        dHelper = new DrawHelper(camera, gHelper, tHelper);
+        dHelper = new DrawHelper(camera, gHelper);
 
         textRendHelper = new TextureRenderer(c);
 
@@ -68,22 +80,20 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         Log.d("Setup", "Surface created.");
         try {
-            programHandle = sHelper.compileShader(context, R.string.simple_vert, R.string.simple_frag, "simple");
+            programHandle = ShaderHelper.compileShader(context, R.string.simple_vert, R.string.simple_frag, "simple");
         }
         catch (IOException e){
             Log.d("Shader", "Error occurred during compilation");
         }
 
         dHelper.setProgHandles(programHandle);
-        tHelper.ImageToTexture(context, R.drawable.texture1, "texture1");
+        TextureHelper.imageToTexture(context, R.drawable.texture1, "texture1");
+
         Log.d("Setup", "After texture get");
 
         Log.d("Setup", "Shader successfully initialized.");
         gHelper.createBuffers();
-        gHelper.createQuad(0,0,0,1,1);
-        gHelper.createQuad(-1, -1, 0, 1, 1);
-        gHelper.createQuad(-1, 0, 0, 1, 1);
-        gHelper.createQuad(0, -1, 0, 1, 1);
+        gHelper.createQuad(-1, -1, 0, 2, 2);
         Log.d("Setup", "Geometry buffers initialized and filled.");
 
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
@@ -94,13 +104,30 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 unused) {
+       if (gameState != null && gameState.mapData.texture == 0) {
+           gameState.mapData.texture = TextureHelper.dataToTexture(gameState.mapData.pixelBuffer,
+                    "vortest",
+                    gameState.mapData.width,
+                    gameState.mapData.height);
+           gameState.mapData.terrainTexture = TextureHelper.dataToTexture(gameState.mapData.terrainPixelBuffer,
+                   "tertest",
+                   gameState.mapData.width,
+                   gameState.mapData.height);
+           gameState.mapData.territoryGraphMesh.finish(context);
+        }
         // Redraw background color
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         //GLES20.glClearDepthf(1.0f);
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
         //GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
-        dHelper.Draw(camera, gHelper.mVertexBuffer, gHelper.mColorBuffer, gHelper.mTextCoordBuffer, gHelper.mIndicesBuffer);
+        GLES20.glUseProgram(programHandle);
+        if (showTerrain) {
+            dHelper.draw(camera, gHelper.mVertexBuffer, gHelper.mColorBuffer, gHelper.mTextCoordBuffer, gHelper.mIndicesBuffer, TextureHelper.getTexture("tertest"));
+        } else {
+            dHelper.draw(camera, gHelper.mVertexBuffer, gHelper.mColorBuffer, gHelper.mTextCoordBuffer, gHelper.mIndicesBuffer, TextureHelper.getTexture("vortest"));
+        }
+        if (showLines) gameState.mapData.territoryGraphMesh.renderLines(camera.getVPMatrix());
     }
 
     @Override

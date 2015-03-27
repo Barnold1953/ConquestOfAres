@@ -81,8 +81,8 @@ public class GeometryHelper {
         float[] newV = new float[18];
 
         for(int i = 0; i < quad.length; i+=3) {
-            newV[i] = quad[i] + x;
-            newV[i+1] = quad[i+1] + y;
+            newV[i] = quad[i] * width + x;
+            newV[i+1] = quad[i+1] * height + y;
             newV[i+2] = quad[i+2] + z;
         }
 
