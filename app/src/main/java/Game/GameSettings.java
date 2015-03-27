@@ -24,7 +24,6 @@ public class GameSettings implements Parcelable {
     }
 
     boolean m_isMultiplayer = false; ///< True when multiplayer mode is active
-    boolean m_isHorizontalWrap = false; ///< True when the map wraps horizontally
     int m_numPlayers = 0; ///< Number of players in the game
     int m_numAI = 1; ///< Number of AI players in the game
     double m_territoriesForVictory = -1; ///< Percent of territories needed for victory. -1 means all
@@ -81,7 +80,7 @@ public class GameSettings implements Parcelable {
 
     public void writeToParcel(Parcel out, int flags) {
         out.writeByte((byte) (m_isMultiplayer ? 1 : 0));
-        out.writeByte((byte) (m_isHorizontalWrap ? 1 : 0));
+        out.writeByte((byte) (m_mapGenParams.horizontalWrap ? 1 : 0));
         out.writeInt(m_numPlayers);
         out.writeDouble(m_territoriesForVictory);
         out.writeInt(m_maxTurnLength);
@@ -109,7 +108,7 @@ public class GameSettings implements Parcelable {
         }
 
         m_isMultiplayer = source.readByte() != 0;
-        m_isHorizontalWrap = source.readByte() != 0;
+        m_mapGenParams.horizontalWrap = source.readByte() != 0;
         m_numPlayers = source.readInt();
         m_territoriesForVictory = source.readDouble();
         m_maxTurnLength = source.readInt();
@@ -135,7 +134,7 @@ public class GameSettings implements Parcelable {
 
         // parse horizontalWrap unless it hasn't been chosen, in which case return 2
         if(!horizontalWrap.equals("Map Wrap Settings")) {
-            m_isHorizontalWrap = horizontalWrap.equals("Horizontal Wrap");
+            m_mapGenParams.horizontalWrap = horizontalWrap.equals("Horizontal Wrap");
         }
         else return GameSettingErrors.MAP_WRAP_UNSET;
 

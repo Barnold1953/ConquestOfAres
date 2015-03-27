@@ -6,6 +6,21 @@ import java.util.*;
  */
 public class Territory {
 
+    public Territory() {
+        // Empty
+    }
+    // Copy constructor
+    public Territory(Territory b) {
+        this.neighbors = b.neighbors;
+        this.army = b.army;
+        this.owner = b.owner;
+        this.power = b.power;
+        this.x = b.x;
+        this.y = b.y;
+        this.height = b.height;
+        this.terrainType = b.terrainType;
+    }
+
     public enum TerrainType {
         Ocean,
         Grassland,
