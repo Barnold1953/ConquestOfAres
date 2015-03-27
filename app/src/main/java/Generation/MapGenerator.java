@@ -24,10 +24,12 @@ public class MapGenerator {
     final static int MODULATE_OCTAVES = 5; ///< Number of fractal iterations
     private static OpenSimplexNoise osNoise = new OpenSimplexNoise();
 
+    public static MapData mapData;
+
     /// Generates a map and returns the map data
     // TODO(Ben): Finish this
     public MapData generateMap(MapGenerationParams p) throws BufferOverflowException{
-        MapData mapData = new MapData();
+        mapData = new MapData();
         mapData.params = p;
 
         int width = 1;
@@ -58,7 +60,7 @@ public class MapGenerator {
         mapData.height = height;
 
         // random.setSeed(p.seed);
-        generateTerritories(mapData, width, height, 100);
+        generateTerritories(width, height, 100);
 
         // TODO(Ben): Segment heightmap into territories
         return mapData;
@@ -78,7 +80,7 @@ public class MapGenerator {
         return octaveNoise2D((double)(seed + y), (double)(x - seed), 0.86, 0.0015, 7);
     }
 
-    public void generateTerritories(MapData mapData, int width, int height, int numTerritories) {
+    public void generateTerritories(int width, int height, int numTerritories) {
         ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(height * width * 4).order(ByteOrder.nativeOrder());
         ArrayList<Byte> colors = new ArrayList<Byte>();
         pixelBuffer.position(0);
@@ -90,6 +92,7 @@ public class MapGenerator {
         float minDist = 96.0f*96.0f;
         int maxIteration = 100;
         int pindex = 0;
+        float dx, dy;
 
         mapData.territoryIndices = new int[height][width];
 
@@ -104,8 +107,15 @@ public class MapGenerator {
                 territory.y = m_random.nextFloat() * height;
                 stop = true;
                 for (Territory t : mapData.territories) {
-                    float dx = t.x - territory.x;
-                    float dy = t.y - territory.y;
+                    if (mapData.params.horizontalWrap) {
+                        dx = Math.abs(t.x - territory.x);
+                        dy = Math.abs(t.y - territory.y);
+                        dx = Math.min(dx, width - dx);
+                        dy = Math.min(dy, height - dy);
+                    } else {
+                        dx = t.x - territory.x;
+                        dy = t.y - territory.y;
+                    }
                     if (dx * dx + dy * dy < minDist) {
                         stop = false;
                         break;
@@ -239,12 +249,20 @@ public class MapGenerator {
     private static int getClosestTerritoryIndex(float x, float y, Vector<Territory> territories) {
         int closestIndex = 0;
         float closestDist = 99999999999.9f;
+        float dx, dy;
 
         x += (float)octaveNoise2D(x, y, MODULATE_PERSISTENCE, MODULATE_FREQUENCY, MODULATE_OCTAVES) * MODULATE_SCALE;
         y += (float)octaveNoise2D(x + 2048.0, y + 2048.0, MODULATE_PERSISTENCE, MODULATE_FREQUENCY, MODULATE_OCTAVES) * MODULATE_SCALE;
         for (int i = 0; i < territories.size(); i++) {
-            float dx = (float)x - territories.get(i).x;
-            float dy = (float)y - territories.get(i).y;
+            if (mapData.params.horizontalWrap) {
+                dx = Math.abs(x - territories.get(i).x);
+                dy = Math.abs(y - territories.get(i).y);
+                dx = Math.min(dx, mapData.width - dx);
+                dy = Math.min(dy, mapData.height - dy);
+            } else {
+                dx = x - territories.get(i).x;
+                dy = y - territories.get(i).y;
+            }
             float dist = dx * dx + dy * dy;
             if (dist < closestDist) {
                 closestDist = dist;
