@@ -9,7 +9,9 @@ import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -17,15 +19,20 @@ import java.util.HashMap;
 
 import Game.GameController;
 import Game.GameState;
+import Game.Territory;
 import Generation.MapGenerationParams;
 import Game.GameSettings;
 import Graphics.CoARenderer;
+import UI.TerritoryPanel;
 import UI.UserInterfaceHelper;
 
 public class GameActivity extends Activity {
 
     TextView [] toggleButtons;
+    TerritoryPanel territoryPanel = null;
+    View.OnTouchListener touchListener = null;
     Boolean devPanelShown = false;
+    Boolean territoryPanelShown = false;
 
     private GLSurfaceView mGLSurfaceView;
     private GameState gameState;
@@ -60,6 +67,15 @@ public class GameActivity extends Activity {
         GameState gameState = new GameState();
         gameController.initGame(gameState, gameSettings);
         coaRenderer.setGameState(gameState);
+
+        // Get game screen touch listener
+        findViewById(R.id.glRenderArea).setOnTouchListener( new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                Territory t = gameController.onClick(event.getX(),event.getY());
+                getTerritoryMenu(v, t);
+                return true;
+            }
+        } );
     }
 
     @Override
@@ -76,6 +92,17 @@ public class GameActivity extends Activity {
         // The activity must call the GL surface view's onPause() on activity onPause().
         super.onPause();
         mGLSurfaceView.onPause();
+    }
+
+    public void getTerritoryMenu(View v, Territory territory) {
+        FrameLayout parent = (FrameLayout)v.getParent();
+        if(parent != null) {
+            if(!territoryPanelShown) {
+                territoryPanelShown = true;
+                if(territoryPanel == null) territoryPanel = new TerritoryPanel(getBaseContext(), territory);
+                parent.addView(territoryPanel);
+            }
+        } else territoryPanel.update(territory);
     }
 
     public void toggleDevPanel(View v) {
@@ -110,6 +137,7 @@ public class GameActivity extends Activity {
                 coaRenderer.toggleLines();
             }
         });
+
         toggleButtons[1].setText("Terrain");
         toggleButtons[1].setOnClickListener( new View.OnClickListener() {
             @Override
@@ -117,6 +145,7 @@ public class GameActivity extends Activity {
                 coaRenderer.toggleTerrain();
             }
         });
+
         toggleButtons[2].setText("Owners");
         toggleButtons[2].setOnClickListener( new View.OnClickListener() {
             @Override
