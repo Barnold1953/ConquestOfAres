@@ -8,6 +8,8 @@ import java.util.*;
 import Generation.MapData;
 import Generation.MapGenerator;
 import Generation.MapGenerationParams;
+import Graphics.Quadrilateral;
+import Graphics.SpriteBatchSystem;
 
 /**
  * Created by brb55_000 on 2/6/2015.
@@ -15,7 +17,6 @@ import Generation.MapGenerationParams;
 
 /// Contains the game logic core
 public class GameController {
-
     private GameState m_gameState = null; ///< Handle to game
     private GameSettings m_gameSettings = null; ///< Settings TODO(Aaron): pass in good settings in initGame
     private GameEngine m_gameEngine = new GameEngine(); ///< Initializes the game
@@ -48,19 +49,20 @@ public class GameController {
     }
 
     /// Call this method when the world is clicked on
-    public Territory onClick(float x, float y) {
-        // TODO: Implement
-        Territory t = getTerritoryAtPoint(x,y);
-        // TODO: Handle unit transfer
-        /*switch (m_gameState.currentState) {
+    public void onClick(float x, float y) {
+        Territory territory = getTerritoryAtPoint(x, y);
+        if(territory == m_gameState.selectedTerritory){
+            m_gameState.selectedTerritory = null;
+        }
+        else {
+            m_gameState.selectedTerritory = territory;
+        }
+        switch (m_gameState.currentState) {
             case PLACING_UNITS:
-                // TODO: Implement
                 break;
             case PLAYING:
-                // TODO: Implement
                 break;
-        }*/
-        return t;
+        }
     }
 
     /// Returns the territory at a specific point

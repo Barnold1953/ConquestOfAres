@@ -1,4 +1,5 @@
 package Game;
+import java.sql.Time;
 import java.util.*;
 
 import Generation.MapData;
@@ -19,6 +20,7 @@ public class GameState {
     public Vector<Territory> territories = new Vector<Territory>(); ///< List of all territories
     public MapData mapData; ///< Map specific data
     public Territory selectedTerritory = null; //< Currently selected territory TODO: Use this
+    public Random random = new Random(System.currentTimeMillis());
     // TODO: Statistics? Scores?
-    // TODO: Previous Moves?
+    public List<Action> actions;
 }

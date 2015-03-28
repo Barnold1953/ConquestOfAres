@@ -6,6 +6,21 @@ import java.util.*;
  */
 public class Territory {
 
+    public Territory() {
+        // Empty
+    }
+    // Copy constructor
+    public Territory(Territory b) {
+        this.neighbors = b.neighbors;
+        this.armies = b.armies;
+        this.owner = b.owner;
+        this.power = b.power;
+        this.x = b.x;
+        this.y = b.y;
+        this.height = b.height;
+        this.terrainType = b.terrainType;
+    }
+
     public enum TerrainType {
         Ocean,
         Grassland,
@@ -22,10 +37,7 @@ public class Territory {
     public float y; ///< y coordinate of center
     public float height; ///< Terrain height value TODO: Use this for something maybe? Or remove it?
     public TerrainType terrainType; //< Type of terrain TODO: Use this for something
-
-    public void addUnits( int numberOfUnits ) {
-        armies.get(0).units.add(new Unit());
-    }
+    public Player owner;
 
     public void resolveControl() {
         Random randomNumberGenerator = new Random();

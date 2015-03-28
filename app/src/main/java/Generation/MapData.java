@@ -12,11 +12,10 @@ package Generation;
 public class MapData {
     /// Returns
     public ByteBuffer pixelBuffer; ///< Pixels for the texture
-    public ByteBuffer terrainPixelBuffer;
     public int texture = 0; ///< ID for the openGL texture that is generated. Gets set by generator
-    public int terrainTexture = 0;
     public Vector<Territory> territories = null; ///< Generated territories. Gets set by generator
 
+    public int[][] territoryIndices = null;
     public ColorMesh territoryGraphMesh;
     public MapGenerationParams params;
     public int width;

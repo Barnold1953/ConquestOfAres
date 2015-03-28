@@ -10,16 +10,11 @@ import java.nio.FloatBuffer;
  */
 public class DrawHelper {
     private Camera mHelper;
-    private GeometryHelper gHelper;
-    private TextureHelper tHelper;
     private int mPositionHandle;
     private int mColorHandle;
     private int mMVPMatrixHandle;
     private int mTCoordHandle;
     private int mTextureHandle;
-
-    private final int mBytesPerFloat = 4;
-    private final int mStrideBytes = 9 * mBytesPerFloat;
 
     public void setProgHandles(int ph){
         mMVPMatrixHandle = GLES20.glGetUniformLocation(ph, "uMVPMatrix");
@@ -29,7 +24,7 @@ public class DrawHelper {
         mTextureHandle = GLES20.glGetAttribLocation(ph, "texture");
     }
 
-    public void draw(Camera camera, FloatBuffer mVertexBuffer, FloatBuffer mColorBuffer, FloatBuffer mTextCoordBuffer, FloatBuffer mIndicesBuffer, int textureId){
+    public void draw(Camera camera, FloatBuffer mVertexBuffer, FloatBuffer mColorBuffer, FloatBuffer mTextCoordBuffer, int textureId){
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId);
         GLES20.glUniform1i(mTextureHandle, 0);
@@ -51,15 +46,14 @@ public class DrawHelper {
         //GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, ibo[0]);
         //GLES20.glDrawElements(GLES20.GL_TRIANGLES, 36, GLES20.GL_FLOAT, 0);
         //GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, gHelper.getVertices().length/3);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, GeometryHelper.getVerticesCount("master")/3);
 
      //   GLES20.glDisableVertexAttribArray(mPositionHandle);
      //   GLES20.glDisableVertexAttribArray(mColorHandle);
      //   GLES20.glDisableVertexAttribArray(mTCoordHandle);
     }
 
-    public DrawHelper(Camera mh, GeometryHelper gh){
-        gHelper = gh;
+    public DrawHelper(Camera mh){
         mHelper = mh;
     }
 }

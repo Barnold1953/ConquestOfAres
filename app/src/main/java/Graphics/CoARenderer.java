@@ -1,6 +1,7 @@
 package Graphics;
 
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.HashMap;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -13,7 +14,6 @@ import android.util.Log;
 
 import Game.GameState;
 import Generation.MapData;
-import Generation.MapGenerationParams;
 import utkseniordesign.conquestofares.R;
 
 /**
@@ -23,13 +23,13 @@ import utkseniordesign.conquestofares.R;
 public class CoARenderer implements GLSurfaceView.Renderer {
     int programHandle;
     Context context;
-    HashMap<String, int[]> textures = new HashMap<String, int[]>();
     Camera camera;
     MapData mapData;
     GameState gameState = null;
 
-    GeometryHelper gHelper;
     DrawHelper dHelper;
+    SpriteBatchSystem sbsHelper;
+
     final boolean IS_3D = false; ///< Temporary: determines if we are rendering in 3D or 2D
 
     // Camera lookAt
@@ -42,7 +42,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     final float upX = 0.0f;
     final float upY = 1.0f;
     final float upZ = 0.0f;
-    boolean showTerrain = true;
+    boolean showTerrain = false;
     boolean showLines = false;
 
     public void setGameState(GameState gameState) {
@@ -54,15 +54,15 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     }
 
     public void toggleTerrain() {
-        showTerrain = !showTerrain;
+
     }
 
     public CoARenderer(Context c) {
         context = c;
 
         camera = new Camera();
-        gHelper = new GeometryHelper();
-        dHelper = new DrawHelper(camera, gHelper);
+        dHelper = new DrawHelper(camera);
+        sbsHelper = new SpriteBatchSystem();
 
         // Set the view matrix
         if (IS_3D) {
@@ -78,20 +78,25 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         Log.d("Setup", "Surface created.");
         try {
-            programHandle = ShaderHelper.compileShader(context, R.string.simple_vert, R.string.simple_frag, "simple");
+            programHandle = ShaderHelper.compileShader(context, R.string.simple_vert, R.string.texture_frag, "simple");
         }
         catch (IOException e){
             Log.d("Shader", "Error occurred during compilation");
         }
 
         dHelper.setProgHandles(programHandle);
-        TextureHelper.imageToTexture(context, R.drawable.texture1, "texture1");
+        TextureHelper.imageToTexture(context, R.drawable.texture1, "test1");
 
         Log.d("Setup", "After texture get");
 
         Log.d("Setup", "Shader successfully initialized.");
-        gHelper.createBuffers();
-        gHelper.createQuad(-1, -1, 0, 2, 2);
+        float[] ftmp = {255f, 255f, 255f, 255f};
+        Quadrilateral quad = new Quadrilateral();
+        quad = Quadrilateral.getQuad(quad, -1, -1, 0, 2, 2, ftmp);
+        //gHelper.addToBatch(quad, "master");
+        GeometryHelper.addToBatch(quad, "master");
+        //quad = Quadrilateral.getQuad(quad, 0,0,0,1,1,ftmp);
+        //SpriteBatchSystem.addSprite("test1", quad, TextureHelper.getTexture("test1"));
         Log.d("Setup", "Geometry buffers initialized and filled.");
 
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
@@ -107,10 +112,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
                     "vortest",
                     gameState.mapData.width,
                     gameState.mapData.height);
-           gameState.mapData.terrainTexture = TextureHelper.dataToTexture(gameState.mapData.terrainPixelBuffer,
-                   "tertest",
-                   gameState.mapData.width,
-                   gameState.mapData.height);
            gameState.mapData.territoryGraphMesh.finish(context);
         }
         // Redraw background color
@@ -120,12 +121,17 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         //GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
         GLES20.glUseProgram(programHandle);
-        if (showTerrain) {
-            dHelper.draw(camera, gHelper.mVertexBuffer, gHelper.mColorBuffer, gHelper.mTextCoordBuffer, gHelper.mIndicesBuffer, TextureHelper.getTexture("tertest"));
-        } else {
-            dHelper.draw(camera, gHelper.mVertexBuffer, gHelper.mColorBuffer, gHelper.mTextCoordBuffer, gHelper.mIndicesBuffer, TextureHelper.getTexture("vortest"));
-        }
+
+        dHelper.draw(camera, GeometryHelper.getVertBuff("master"), GeometryHelper.getColorBuff("master"), GeometryHelper.getTextBuff("master"), TextureHelper.getTexture("vortest"));
+
         if (showLines) gameState.mapData.territoryGraphMesh.renderLines(camera.getVPMatrix());
+
+        Enumeration vEnum = SpriteBatchSystem.sprites.elements();
+        while(vEnum.hasMoreElements()){
+            String name = vEnum.nextElement().toString();
+            SpriteBatchSystem.sprite s = SpriteBatchSystem.getSprite(name);
+            dHelper.draw(camera, s.vBuf, s.tBuf, s.cBuf, TextureHelper.getTexture(name));
+        }
     }
 
     @Override
@@ -136,7 +142,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         if (IS_3D) {
             camera.setSurface(width, height, 0.1f, 10000.0f);
         } else {
-            camera.ortho(width, height);
+            camera.ortho(1, 1);
         }
     }
 }
