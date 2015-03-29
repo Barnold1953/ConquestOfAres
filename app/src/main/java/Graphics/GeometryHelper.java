@@ -34,7 +34,7 @@ public class GeometryHelper {
     }
 
     private static float[] removeFromFloatArray(float[] source, int index, int amount){
-        float[]temp = new float[source.length - amount];
+        float[] temp = new float[source.length - amount];
         System.arraycopy(source, 0, temp, 0, index);
         System.arraycopy(source, index + amount, temp, index, source.length - index - amount);
         return temp;
@@ -88,6 +88,19 @@ public class GeometryHelper {
             bg.tcBuff.put(bg.textureCoordinates).position(0);
             bg.cBuff.put(bg.colors).position(0);
         }
+    }
+
+    public static FloatBuffer getFrameTexture(String name, float width, float height, float fWidth, float fHeight, int frameX, int frameY){
+        float[] temp = new float[BatchMap.get(name).textureCoordinates.length];
+        System.arraycopy(BatchMap.get(name).textureCoordinates, 0, temp, 0, temp.length);
+
+        for(int i = 0; i < temp.length; i+=2){
+            temp[i] = ((temp[i] * fWidth) + (frameX * fWidth)) / width;
+            temp[i+1] = ((temp[i+1] * fHeight) + (frameY * fHeight)) / height;
+        }
+
+        BatchMap.get(name).tcBuff.put(temp).position(0);
+        return BatchMap.get(name).tcBuff;
     }
 
     public static FloatBuffer getVertBuff(String name){

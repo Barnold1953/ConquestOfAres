@@ -1,7 +1,6 @@
 package Graphics;
 
 import android.opengl.GLES20;
-import android.util.Log;
 
 import java.nio.FloatBuffer;
 
@@ -15,13 +14,22 @@ public class DrawHelper {
     private int mMVPMatrixHandle;
     private int mTCoordHandle;
     private int mTextureHandle;
+    private int mTotalFramesW, mTotalFramesH;
+    private int mCurrentFrameW, mCurrentFrameH;
 
-    public void setProgHandles(int ph){
+    public void setProgHandles(int ph, String shader){
         mMVPMatrixHandle = GLES20.glGetUniformLocation(ph, "uMVPMatrix");
         mPositionHandle = GLES20.glGetAttribLocation(ph, "vPosition");
         mColorHandle = GLES20.glGetAttribLocation(ph, "vColor");
         mTCoordHandle = GLES20.glGetAttribLocation(ph, "vTextCoords");
         mTextureHandle = GLES20.glGetAttribLocation(ph, "texture");
+
+        if(shader.equals("animate")){
+            mCurrentFrameW = GLES20.glGetUniformLocation(ph, "currentFrameW");
+            mCurrentFrameH = GLES20.glGetUniformLocation(ph, "currentFrameH");
+            mTotalFramesW = GLES20.glGetUniformLocation(ph, "totalFramesW");
+            mTotalFramesH = GLES20.glGetUniformLocation(ph, "totalFramesH");
+        }
     }
 
     public void draw(Camera camera, FloatBuffer mVertexBuffer, FloatBuffer mColorBuffer, FloatBuffer mTextCoordBuffer, int textureId){

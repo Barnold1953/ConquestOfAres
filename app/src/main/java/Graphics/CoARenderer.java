@@ -2,7 +2,6 @@ package Graphics;
 
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.HashMap;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -26,9 +25,9 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     Camera camera;
     MapData mapData;
     GameState gameState = null;
+    int frame;
 
     DrawHelper dHelper;
-    SpriteBatchSystem sbsHelper;
 
     final boolean IS_3D = false; ///< Temporary: determines if we are rendering in 3D or 2D
 
@@ -62,7 +61,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         camera = new Camera();
         dHelper = new DrawHelper(camera);
-        sbsHelper = new SpriteBatchSystem();
 
         // Set the view matrix
         if (IS_3D) {
@@ -72,31 +70,34 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
+        frame = 0;
         // Set the background frame color
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        GLES20.glEnable(GLES20.GL_BLEND);
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 
         Log.d("Setup", "Surface created.");
         try {
+            //programHandle = ShaderHelper.compileShader(context, R.string.simple_vert, R.string.animate_frag, "animate");
+            //dHelper.setProgHandles(programHandle, "animate");
             programHandle = ShaderHelper.compileShader(context, R.string.simple_vert, R.string.texture_frag, "simple");
+            dHelper.setProgHandles(programHandle, "simple");
         }
         catch (IOException e){
             Log.d("Shader", "Error occurred during compilation");
         }
 
-        dHelper.setProgHandles(programHandle);
         TextureHelper.imageToTexture(context, R.drawable.texture1, "test1");
+        TextureHelper.imageToTexture(context, R.drawable.character1walk, "soldier");
 
-        Log.d("Setup", "After texture get");
-
-        Log.d("Setup", "Shader successfully initialized.");
         float[] ftmp = {255f, 255f, 255f, 255f};
         Quadrilateral quad = new Quadrilateral();
         quad = Quadrilateral.getQuad(quad, -1, -1, 0, 2, 2, ftmp);
         //gHelper.addToBatch(quad, "master");
         GeometryHelper.addToBatch(quad, "master");
-        //quad = Quadrilateral.getQuad(quad, 0,0,0,1,1,ftmp);
-        //SpriteBatchSystem.addSprite("test1", quad, TextureHelper.getTexture("test1"));
+        quad = Quadrilateral.getQuad(quad, 0,0,0,1,1,ftmp);
+        SpriteBatchSystem.addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
         Log.d("Setup", "Geometry buffers initialized and filled.");
 
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
@@ -120,6 +121,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
         //GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
+        //programHandle = ShaderHelper.getShader("simple");
         GLES20.glUseProgram(programHandle);
 
         dHelper.draw(camera, GeometryHelper.getVertBuff("master"), GeometryHelper.getColorBuff("master"), GeometryHelper.getTextBuff("master"), TextureHelper.getTexture("vortest"));
@@ -127,11 +129,16 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         if (showLines) gameState.mapData.territoryGraphMesh.renderLines(camera.getVPMatrix());
 
         Enumeration vEnum = SpriteBatchSystem.sprites.elements();
+        //programHandle = ShaderHelper.getShader("animate");
+        //GLES20.glUseProgram(programHandle);
         while(vEnum.hasMoreElements()){
             String name = vEnum.nextElement().toString();
             SpriteBatchSystem.sprite s = SpriteBatchSystem.getSprite(name);
-            dHelper.draw(camera, s.vBuf, s.tBuf, s.cBuf, TextureHelper.getTexture(name));
+            SpriteSheetDimensions ssd = new SpriteSheetDimensions();
+            GeometryHelper.getFrameTexture(name, ssd.soldierWidth, ssd.soldierHeight, ssd.soldierFrameWidth, ssd.soldierFrameHeight, frame % ssd.soldierFrames, (frame / ssd.soldierFrames) % (int)(ssd.soldierHeight / ssd.soldierFrameHeight));
+            dHelper.draw(camera, s.vBuf, s.tBuf, s.tBuf, s.texture);
         }
+        frame++;
     }
 
     @Override
