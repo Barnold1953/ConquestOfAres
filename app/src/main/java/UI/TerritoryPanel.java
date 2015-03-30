@@ -27,7 +27,7 @@ public class TerritoryPanel extends LinearLayout {
         super(context, attrs);
     }
 
-    public TerritoryPanel(Context context, Territory territory) {
+    public TerritoryPanel(Context context, Territory territory, int screenHeight) {
         super(context);
 
         // set up the layout
@@ -42,6 +42,9 @@ public class TerritoryPanel extends LinearLayout {
         attributesPanel = createAttributesPanel();
         setBackgroundColor(getResources().getColor(R.color.lightGrey));
         addView(militaryPanel);
+
+        // hide the panel
+        setY(screenHeight);
     }
 
     private LinearLayout createMilitaryPanel() {

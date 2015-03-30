@@ -33,6 +33,8 @@ import UI.UserInterfaceHelper;
 
 public class GameActivity extends Activity {
 
+    int screenHeight = 0;
+    int screenWidth = 0;
     TextView [] toggleButtons;
     TerritoryPanel territoryPanel = null;
     View.OnTouchListener touchListener = null;
@@ -54,11 +56,12 @@ public class GameActivity extends Activity {
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        screenHeight = metrics.heightPixels;
+        screenWidth = metrics.widthPixels;
 
         Log.d("Display width: ", Integer.toString(metrics.widthPixels));
         Log.d("Display height: ", Integer.toString(metrics.heightPixels));
 
-        /* COMMENT THIS OUT IF GAME ACTIVITY IS YOUR STARTUP ACTIVITY */
         Intent intent = getIntent();
         if( intent != null ) {
             gameSettings = (GameSettings) intent.getParcelableExtra("Settings");
@@ -76,15 +79,28 @@ public class GameActivity extends Activity {
         mGLSurfaceView.setRenderer(coaRenderer);
 
         // Init the game
-        GameState gameState = new GameState();
+        final GameState gameState = new GameState();
         gameController.initGame(gameState, gameSettings);
         coaRenderer.setGameState(gameState);
 
         // Get game screen touch listener
         findViewById(R.id.glRenderArea).setOnTouchListener( new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
-                Territory t = gameController.onClick(event.getX(),event.getY());
-                getTerritoryMenu(v, t);
+                FrameLayout parent = (FrameLayout)v.getParent();
+                Territory territory = gameController.onClick(event.getX(),event.getY());
+                if(gameState.selectedTerritory == territory ) {
+                    gameState.selectedTerritory = null;
+                    toggleTerritoryPanel(false);
+                } else if ( gameState.selectedTerritory == null ) {
+                    getTerritoryMenu(parent, territory);
+                    toggleTerritoryPanel(true);
+                    gameState.selectedTerritory = territory;
+                } else {
+                    toggleTerritoryPanel(false);
+                    getTerritoryMenu(parent, territory);
+                    toggleTerritoryPanel(true);
+                    gameState.selectedTerritory = territory;
+                }
                 return true;
             }
         } );
@@ -106,14 +122,21 @@ public class GameActivity extends Activity {
         mGLSurfaceView.onPause();
     }
 
-    public void getTerritoryMenu(View v, Territory territory) {
-        FrameLayout parent = (FrameLayout)v.getParent();
-        if(parent != null) {
-            if(!territoryPanelShown) {
-                territoryPanelShown = true;
-                if(territoryPanel == null) territoryPanel = new TerritoryPanel(getBaseContext(), territory);
-                parent.addView(territoryPanel);
-            }
+    public void toggleTerritoryPanel(Boolean show) {
+        if(show) {
+            territoryPanelShown = true;
+            if(territoryPanel.getY() >= screenHeight) territoryPanel.animate().translationY(0-200);
+        } else {
+            territoryPanelShown = false;
+            if(territoryPanel.getY() < screenHeight) territoryPanel.animate().translationY(200);
+        }
+        Log.d("Territory Menu Height ", Float.toString(territoryPanel.getY()));
+    }
+
+    public void getTerritoryMenu(FrameLayout parent, Territory territory) {
+        if(territoryPanel == null) {
+            territoryPanel = new TerritoryPanel(getBaseContext(), territory, screenHeight);
+            parent.addView(territoryPanel);
         } else territoryPanel.update(territory);
     }
 

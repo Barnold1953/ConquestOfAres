@@ -49,20 +49,15 @@ public class GameController {
     }
 
     /// Call this method when the world is clicked on
-    public void onClick(float x, float y) {
+    public Territory onClick(float x, float y) {
         Territory territory = getTerritoryAtPoint(x, y);
-        if(territory == m_gameState.selectedTerritory){
-            m_gameState.selectedTerritory = null;
-        }
-        else {
-            m_gameState.selectedTerritory = territory;
-        }
-        switch (m_gameState.currentState) {
+        return territory;
+        /*switch (m_gameState.currentState) {
             case PLACING_UNITS:
                 break;
             case PLAYING:
                 break;
-        }
+        }*/
     }
 
     /// Returns the territory at a specific point
