@@ -32,6 +32,10 @@ public class GameController {
         m_gameState.currentPlayerIndex = -1; // Start at -1 so nextTurn goes to 0
     }
 
+    public GameState getGameState(){
+        return m_gameState;
+    }
+
     /// Call this to transition to the next turn
     void nextTurn() {
         // Go to next player (starts at -1)
@@ -93,14 +97,18 @@ public class GameController {
     }
 
     boolean attack(Territory attacker, Territory defender){
+        Action action = new Action(m_currentPlayer, Action.Category.attack, attacker, defender);
+
         while(attacker.army.units.size() > 0 && defender.army.units.size() > 0){
             // I figure we can change the chance of winning based on the type of unit it is, like tanks are weak to airplanes, airplanes are weak to soldiers, and soldiers are weak to tanks
             // kind of like a rock-paper-scissors dynamic
 
             if(m_gameState.random.nextInt() % 2 == 0){
+                action.sUnitsLost.add(attacker.army.units.get(attacker.army.units.size()-1));
                 attacker.army.units.remove(attacker.army.units.size()-1);
             }
             else{
+                action.dUnitsLost.add(defender.army.units.get(defender.army.units.size()-1));
                 defender.army.units.remove(defender.army.units.size()-1);
             }
         }
@@ -108,9 +116,21 @@ public class GameController {
     }
 
     void moveUnit(Territory source, Territory destination){
+        Action action = new Action(m_currentPlayer, Action.Category.moveUnit, source, destination);
+
         Unit unit = source.army.units.get(source.army.units.size()-1);
+        action.sUnitsLost.add(unit);
+        action.dUnitsGained.add(unit);
+        m_gameState.actions.add(action);
         destination.owner.extraUnits++;
         addUnit(destination, destination.x, destination.y, unit.type);
         source.army.units.remove(source.army.units.size()-1);
+
+        unit.path = new PathFinding().getPath(source, destination);
+        unit.frame = 0;
+
+        source.owner.unitsInFlight.add(unit);
     }
+
+
 }

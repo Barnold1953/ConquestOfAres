@@ -107,4 +107,14 @@ public class ShaderHelper {
 
         return programHandle;
     }
+
+    public static int getShader(String shader){
+        if(shaders.containsKey(shader)){
+            return shaders.get(shader);
+        }
+        else{
+            Log.d("Shader", "Requested shader doesn't exist");
+            return -1;
+        }
+    }
 }
