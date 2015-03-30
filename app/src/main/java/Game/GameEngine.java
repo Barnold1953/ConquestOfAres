@@ -14,12 +14,19 @@ public class GameEngine {
     public MapGenerator mapGenerator = new MapGenerator(); ///< Generates the map
     private GameState m_gameState = null; ///< Handle to game
     private GameSettings m_gameSettings = null; ///< Settings TODO(Aaron): pass in good settings in initGame
+    private GameController m_gameController = null;
+
+    private byte[][] playerColors = new byte[6][3];
 
     /// Initializes a game by setting up game state and map
-    public void initGame(GameState gameState, GameSettings gameSettings) {
+    public void initGame(GameState gameState, GameSettings gameSettings, GameController gameController) {
+
+        initPlayerColors();
+
         // Set handles so we don't have to pass shit around everywhere
         m_gameState = gameState;
         m_gameSettings = gameSettings;
+        m_gameController = gameController;
         // Generate the map
         MapData mapData = mapGenerator.generateMap(gameSettings.getMapGenParams());
         m_gameState.territories = mapData.territories;
@@ -33,8 +40,40 @@ public class GameEngine {
         Log.d("Init: ", "initGame finished.");
     }
 
+    private void initPlayerColors() {
+        playerColors[0][0] = (byte)255;
+        playerColors[0][1] = (byte)0;
+        playerColors[0][2] = (byte)0;
+        playerColors[1][0] = (byte)0;
+        playerColors[1][1] = (byte)255;
+        playerColors[1][2] = (byte)0;
+        playerColors[2][0] = (byte)0;
+        playerColors[2][1] = (byte)0;
+        playerColors[2][2] = (byte)255;
+        playerColors[3][0] = (byte)255;
+        playerColors[3][1] = (byte)255;
+        playerColors[3][2] = (byte)0;
+        playerColors[4][0] = (byte)0;
+        playerColors[4][1] = (byte)255;
+        playerColors[4][2] = (byte)255;
+        playerColors[5][0] = (byte)255;
+        playerColors[5][1] = (byte)0;
+        playerColors[5][2] = (byte)255;
+    }
+
     private void initPlayers(int numPlayers, int numAI) {
-        // TODO: Set up all the players and assign random colors
+       for (int i = 0; i < numPlayers; i++) {
+           Player p = new Player();
+           if (i < numAI) {
+               p.isAI = true;
+           }
+           p.color[0] = playerColors[i][0];
+           p.color[0] = playerColors[i][1];
+           p.color[0] = playerColors[i][2];
+           p.extraUnits = 0;
+           p.name = "Player " + Integer.toString(i + 1);
+           m_gameState.players.add(p);
+       }
     }
 
     /// Assignes territories to players based on the TerritoryDistMode
@@ -45,7 +84,12 @@ public class GameEngine {
         // Assign territories to players
         switch (m_gameSettings.getTerritoryDistMode()) {
             case RANDOM:
-                // TODO: Implement. Randomly loop through each territories and assign to players
+                int j = 0;
+                for (int i = 0; i < m_gameState.territories.size(); i++) {
+                    m_gameState.players.get(j).addTerritory(m_gameState.territories.get(i));
+                    j++;
+                    if (j == m_gameState.players.size()) j = 0;
+                }
                 break;
             case ROUND_ROBIN:
                 // TODO: This needs MP stuff or AI probably.
