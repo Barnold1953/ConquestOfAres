@@ -11,9 +11,13 @@ public class Territory {
     }
     // Copy constructor
     public Territory(Territory b) {
-        this.neighbors = b.neighbors;
-        this.army = b.army;
-        this.owner = b.owner;
+        this.neighbors = new Vector<Territory>(b.neighbors);
+        if (b.army != null) {
+            this.army = new Army(b.army);
+        }
+        if (b.owner != null) {
+            this.owner = new Player(b.owner);
+        }
         this.power = b.power;
         this.x = b.x;
         this.y = b.y;
