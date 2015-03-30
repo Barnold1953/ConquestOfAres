@@ -18,9 +18,20 @@ public class Player {
         color[2] = b.color[2];
     }
 
+    public void addTerritory(Territory t) {
+        t.owner = this;
+        territories.add(t);
+    }
+
+    public void removeTerritory(Territory t) {
+        territories.remove(t);
+        t.owner = null;
+    }
+
     public String name; ///< Player name for display
     public Vector<Army> armies = new Vector<Army>(); ///< List of all armies. TODO: Is this even needed?
     public Vector<Unit> unitsInFlight = new Vector<>();
+    public Vector<Territory> territories = new Vector<>();
     public int extraUnits;
     public boolean isAI = true; ///< True when controlled by AI
     public byte[] color = new byte[3]; ///< Players army color TODO: Use and set this in GameController
