@@ -36,7 +36,7 @@ public class GameEngine {
         // Assign territories
         assignTerritories();
         // Place units
-        initUnits();
+        initUnits(3);
         Log.d("Init: ", "initGame finished.");
     }
 
@@ -90,6 +90,7 @@ public class GameEngine {
                     j++;
                     if (j == m_gameState.players.size()) j = 0;
                 }
+                
                 break;
             case ROUND_ROBIN:
                 // TODO: This needs MP stuff or AI probably.
@@ -98,7 +99,20 @@ public class GameEngine {
     }
 
     /// Sets up all the initial armies
-    private void initUnits() {
-        // TODO: Implement
+    private void initUnits(int unitsPerTerritory) {
+        int totalUnits = unitsPerTerritory * m_gameState.territories.size();
+        int unitsPerPlayer = totalUnits / m_gameState.players.size();
+        for (Player p : m_gameState.players) {
+            int unitsRemaining = unitsPerPlayer;
+            for (Territory t : p.territories) {
+                Army a = new Army();
+                p.armies.add(a);
+                t.army = a;
+                for (int i = 0; i < unitsPerTerritory && unitsRemaining != 0; i++) {
+                    Unit u = new Unit(t.x, t.y, Unit.Type.soldier);
+                    a.units.add(u);
+                }
+            }
+        }
     }
 }
