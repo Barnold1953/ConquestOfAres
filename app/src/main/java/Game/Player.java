@@ -10,7 +10,7 @@ public class Player {
 
     public Player(Player b) {
         name = new String(b.name);
-        armies = new Vector<Army>(b.armies);
+        units = new Vector<Unit>(b.units);
         extraUnits = b.extraUnits;
         isAI = b.isAI;
         color[0] = b.color[0];
@@ -29,7 +29,7 @@ public class Player {
     }
 
     public String name; ///< Player name for display
-    public Vector<Army> armies = new Vector<Army>(); ///< List of all armies. TODO: Is this even needed?
+    public Vector<Unit> units = new Vector<Unit>();
     public Vector<Unit> unitsInFlight = new Vector<>();
     public Vector<Territory> territories = new Vector<>();
     public int extraUnits;

@@ -83,13 +83,14 @@ public class GameController {
         return MapGenerator.getClosestTerritory(x, y, m_gameState.territories);
     }
 
-    boolean addUnit(Territory territory, float x, float y, Unit.Type type){
+    public boolean addUnit(Territory territory, float x, float y, Unit.Type type){
         if(territory.owner.extraUnits > 0){
             Unit unit = new Unit(x,y, Unit.Type.soldier);
 
             SpriteBatchSystem.addUnit(unit.type, x, y);
 
-            territory.army.units.add(unit);
+            territory.units.add(unit);
+            territory.owner.units.add(unit);
             territory.owner.extraUnits--;
             return true;
         }
@@ -99,32 +100,32 @@ public class GameController {
     boolean attack(Territory attacker, Territory defender){
         Action action = new Action(m_currentPlayer, Action.Category.attack, attacker, defender);
 
-        while(attacker.army.units.size() > 0 && defender.army.units.size() > 0){
+        while(attacker.units.size() > 0 && defender.units.size() > 0){
             // I figure we can change the chance of winning based on the type of unit it is, like tanks are weak to airplanes, airplanes are weak to soldiers, and soldiers are weak to tanks
             // kind of like a rock-paper-scissors dynamic
 
             if(m_gameState.random.nextInt() % 2 == 0){
-                action.sUnitsLost.add(attacker.army.units.get(attacker.army.units.size()-1));
-                attacker.army.units.remove(attacker.army.units.size()-1);
+                action.sUnitsLost.add(attacker.units.get(attacker.units.size()-1));
+                attacker.units.remove(attacker.units.size()-1);
             }
             else{
-                action.dUnitsLost.add(defender.army.units.get(defender.army.units.size()-1));
-                defender.army.units.remove(defender.army.units.size()-1);
+                action.dUnitsLost.add(defender.units.get(defender.units.size()-1));
+                defender.units.remove(defender.units.size()-1);
             }
         }
-        return !attacker.army.units.isEmpty();
+        return !attacker.units.isEmpty();
     }
 
     void moveUnit(Territory source, Territory destination){
         Action action = new Action(m_currentPlayer, Action.Category.moveUnit, source, destination);
 
-        Unit unit = source.army.units.get(source.army.units.size()-1);
+        Unit unit = source.units.get(source.units.size()-1);
         action.sUnitsLost.add(unit);
         action.dUnitsGained.add(unit);
         m_gameState.actions.add(action);
         destination.owner.extraUnits++;
         addUnit(destination, destination.x, destination.y, unit.type);
-        source.army.units.remove(source.army.units.size()-1);
+        source.units.remove(source.units.size()-1);
 
         unit.path = new PathFinding().getPath(source, destination);
         unit.frame = 0;
