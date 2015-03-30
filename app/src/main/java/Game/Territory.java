@@ -37,4 +37,6 @@ public class Territory {
     public float y; ///< y coordinate of center
     public float height; ///< Terrain height value TODO: Use this for something maybe? Or remove it?
     public TerrainType terrainType; //< Type of terrain TODO: Use this for something
+    public double distance;///< used for PathFinding
+    public boolean visited;///< used for PathFinding
 }

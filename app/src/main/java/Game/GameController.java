@@ -32,6 +32,10 @@ public class GameController {
         m_gameState.currentPlayerIndex = -1; // Start at -1 so nextTurn goes to 0
     }
 
+    public GameState getGameState(){
+        return m_gameState;
+    }
+
     /// Call this to transition to the next turn
     void nextTurn() {
         // Go to next player (starts at -1)
@@ -121,5 +125,12 @@ public class GameController {
         destination.owner.extraUnits++;
         addUnit(destination, destination.x, destination.y, unit.type);
         source.army.units.remove(source.army.units.size()-1);
+
+        unit.path = new PathFinding().getPath(source, destination);
+        unit.frame = 0;
+
+        source.owner.unitsInFlight.add(unit);
     }
+
+
 }

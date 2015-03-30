@@ -83,6 +83,12 @@ public class SpriteBatchSystem {
     }
 
     public static void addUnit(Unit.Type type, float x, float y){
-
+        Quadrilateral quad = new Quadrilateral();
+        float[] color = {255,255,255,255};
+        switch (type){
+            case soldier:
+                quad = Quadrilateral.getQuad(quad, x, y, 0, .25f, .25f, color);
+                addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
+        }
     }
 }

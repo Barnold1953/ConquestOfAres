@@ -11,7 +11,11 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
+import org.w3c.dom.Text;
+
 import Game.GameState;
+import Game.Player;
+import Game.Unit;
 import Generation.MapData;
 import utkseniordesign.conquestofares.R;
 
@@ -98,6 +102,12 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         GeometryHelper.addToBatch(quad, "master");
         quad = Quadrilateral.getQuad(quad, 0,0,0,1,1,ftmp);
         SpriteBatchSystem.addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
+        quad = Quadrilateral.getQuad(quad, -1,0,0,1,1,ftmp);
+        SpriteBatchSystem.addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
+        quad = Quadrilateral.getQuad(quad, -1,-1,0,1,1,ftmp);
+        SpriteBatchSystem.addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
+        quad = Quadrilateral.getQuad(quad, 0,-1,0,1,1,ftmp);
+        SpriteBatchSystem.addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
         Log.d("Setup", "Geometry buffers initialized and filled.");
 
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
@@ -108,6 +118,32 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 unused) {
+        /*float[] ftmp = {255f, 255f, 255f, 255f};
+        Quadrilateral quad;
+        for(int i = 0; i < gameState.players.capacity(); i++){
+            Player p = gameState.players.get(i);
+            for(int j = 0; j < p.unitsInFlight.capacity(); j++){
+                Unit unit = p.unitsInFlight.get(j);
+                quad = unit.getUnit();
+                SpriteBatchSystem.removeSprite("soldier", quad);
+                unit.frame++;
+                if(unit.frame == 10){
+                    System.arraycopy(unit.destination, 0, unit.location, 0, unit.destination.length);
+                    unit.path.remove(unit.path.capacity()-1);
+                    unit.frame = 0;
+                    if(unit.path.capacity() != 0){
+                        unit.destination[0] = unit.path.get(unit.path.capacity()-1).x;
+                        unit.destination[1] = unit.path.get(unit.path.capacity()-1).y;
+                    }
+                    else{
+                        p.unitsInFlight.remove(unit);
+                    }
+                }
+                quad = unit.getUnit();
+                SpriteBatchSystem.addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
+            }
+        }*/
+
        if (gameState != null && gameState.mapData.texture == 0) {
            gameState.mapData.texture = TextureHelper.dataToTexture(gameState.mapData.pixelBuffer,
                     "vortest",
@@ -124,7 +160,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         //programHandle = ShaderHelper.getShader("simple");
         GLES20.glUseProgram(programHandle);
 
-        dHelper.draw(camera, GeometryHelper.getVertBuff("master"), GeometryHelper.getColorBuff("master"), GeometryHelper.getTextBuff("master"), TextureHelper.getTexture("vortest"));
+        dHelper.draw(camera, GeometryHelper.getVertBuff("master"), GeometryHelper.getColorBuff("master"), GeometryHelper.getTextBuff("master"), TextureHelper.getTexture("vortest"), GeometryHelper.getVerticesCount("master"));
 
         if (showLines) gameState.mapData.territoryGraphMesh.renderLines(camera.getVPMatrix());
 
@@ -136,7 +172,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
             SpriteBatchSystem.sprite s = SpriteBatchSystem.getSprite(name);
             SpriteSheetDimensions ssd = new SpriteSheetDimensions();
             GeometryHelper.getFrameTexture(name, ssd.soldierWidth, ssd.soldierHeight, ssd.soldierFrameWidth, ssd.soldierFrameHeight, frame % ssd.soldierFrames, (frame / ssd.soldierFrames) % (int)(ssd.soldierHeight / ssd.soldierFrameHeight));
-            dHelper.draw(camera, s.vBuf, s.tBuf, s.tBuf, s.texture);
+            dHelper.draw(camera, s.vBuf, s.tBuf, s.tBuf, s.texture, GeometryHelper.getVerticesCount(name));
         }
         frame++;
     }
