@@ -12,9 +12,7 @@ public class Territory {
     // Copy constructor
     public Territory(Territory b) {
         this.neighbors = new Vector<Territory>(b.neighbors);
-        if (b.army != null) {
-            this.army = new Army(b.army);
-        }
+        units = new Vector<Unit>(b.units);
         if (b.owner != null) {
             this.owner = new Player(b.owner);
         }
@@ -34,7 +32,7 @@ public class Territory {
     }
 
     public Vector<Territory> neighbors = new Vector<Territory>(); ///< Pointers to neighbor territories
-    public Army army = null; ///< Pointer to residing army
+    public Vector<Unit> units = new Vector<Unit>(); ///< Pointer to residing army
     public Player owner = null; ///< Owning player
     public int power = 0; ///< Power of the territory
     public float x; ///< x coordinate of center

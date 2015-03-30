@@ -105,12 +105,9 @@ public class GameEngine {
         for (Player p : m_gameState.players) {
             int unitsRemaining = unitsPerPlayer;
             for (Territory t : p.territories) {
-                Army a = new Army();
-                p.armies.add(a);
-                t.army = a;
                 for (int i = 0; i < unitsPerTerritory && unitsRemaining != 0; i++) {
-                    Unit u = new Unit(t.x, t.y, Unit.Type.soldier);
-                    a.units.add(u);
+                    p.extraUnits++;
+                    m_gameController.addUnit(t, t.x, t.y, Unit.Type.soldier);
                 }
             }
         }
