@@ -116,9 +116,8 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         GLES20.glDepthMask( true );
     }
 
-    @Override
-    public void onDrawFrame(GL10 unused) {
-        /*float[] ftmp = {255f, 255f, 255f, 255f};
+    private void moveUnits(){
+        float[] ftmp = {255f, 255f, 255f, 255f};
         Quadrilateral quad;
         for(int i = 0; i < gameState.players.capacity(); i++){
             Player p = gameState.players.get(i);
@@ -142,8 +141,11 @@ public class CoARenderer implements GLSurfaceView.Renderer {
                 quad = unit.getUnit();
                 SpriteBatchSystem.addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
             }
-        }*/
+        }
+    }
 
+    @Override
+    public void onDrawFrame(GL10 unused) {
        if (gameState != null && gameState.mapData.texture == 0) {
            gameState.mapData.texture = TextureHelper.dataToTexture(gameState.mapData.pixelBuffer,
                     "vortest",
