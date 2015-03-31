@@ -23,17 +23,17 @@ public class Unit {
         type = t;
     }
 
-    Type type;
+    public Type type;
     public float[] location = new float[2];
     public float[] destination = new float[2];
     public Vector<Territory> path;
     public int frame;
     // when health reaches 0, soldier is removed from army.units
-    float health = 100.0f;
+    public float health = 100.0f;
     // armor will divide the attacker's damage and then subtract that # from health
-    float armor;
+    public float armor;
     // damage will increase or decrease based on the type of units fighting
-    float damage;
+    public float damage;
 
     public Quadrilateral getUnit(){
         Quadrilateral quad = new Quadrilateral();

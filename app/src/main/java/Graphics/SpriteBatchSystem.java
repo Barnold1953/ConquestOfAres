@@ -49,6 +49,10 @@ public class SpriteBatchSystem {
         }
     }
 
+    public static void clear() {
+        sprites.clear();
+    }
+
     public static sprite getSprite(String name){
         sprite s = new sprite();
 
