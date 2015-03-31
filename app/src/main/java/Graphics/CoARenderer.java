@@ -146,12 +146,20 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 unused) {
+       // Upload mapData texture
        if (gameState != null && gameState.mapData.texture == 0) {
            gameState.mapData.texture = TextureHelper.dataToTexture(gameState.mapData.pixelBuffer,
                     "vortest",
                     gameState.mapData.width,
                     gameState.mapData.height);
            gameState.mapData.territoryGraphMesh.finish(context);
+        }
+        // Make sprites
+        SpriteBatchSystem.clear();
+        for (Player p : gameState.players) {
+            for (Unit u : p.units) {
+                SpriteBatchSystem.addUnit(u.type, u.location[0], u.location[1]);
+            }
         }
         // Redraw background color
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);

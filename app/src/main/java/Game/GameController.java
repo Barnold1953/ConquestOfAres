@@ -87,8 +87,6 @@ public class GameController {
         if(territory.owner.extraUnits > 0){
             Unit unit = new Unit(x,y, Unit.Type.soldier);
 
-            SpriteBatchSystem.addUnit(unit.type, x, y);
-
             territory.units.add(unit);
             territory.owner.units.add(unit);
             territory.owner.extraUnits--;
