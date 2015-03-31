@@ -2,7 +2,6 @@ package Graphics;
 
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.HashMap;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -12,7 +11,11 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
+import org.w3c.dom.Text;
+
 import Game.GameState;
+import Game.Player;
+import Game.Unit;
 import Generation.MapData;
 import utkseniordesign.conquestofares.R;
 
@@ -26,9 +29,9 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     Camera camera;
     MapData mapData;
     GameState gameState = null;
+    int frame;
 
     DrawHelper dHelper;
-    SpriteBatchSystem sbsHelper;
 
     final boolean IS_3D = false; ///< Temporary: determines if we are rendering in 3D or 2D
 
@@ -62,7 +65,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         camera = new Camera();
         dHelper = new DrawHelper(camera);
-        sbsHelper = new SpriteBatchSystem();
 
         // Set the view matrix
         if (IS_3D) {
@@ -72,31 +74,40 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
+        frame = 0;
         // Set the background frame color
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        GLES20.glEnable(GLES20.GL_BLEND);
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 
         Log.d("Setup", "Surface created.");
         try {
+            //programHandle = ShaderHelper.compileShader(context, R.string.simple_vert, R.string.animate_frag, "animate");
+            //dHelper.setProgHandles(programHandle, "animate");
             programHandle = ShaderHelper.compileShader(context, R.string.simple_vert, R.string.texture_frag, "simple");
+            dHelper.setProgHandles(programHandle, "simple");
         }
         catch (IOException e){
             Log.d("Shader", "Error occurred during compilation");
         }
 
-        dHelper.setProgHandles(programHandle);
         TextureHelper.imageToTexture(context, R.drawable.texture1, "test1");
+        TextureHelper.imageToTexture(context, R.drawable.character1walk, "soldier");
 
-        Log.d("Setup", "After texture get");
-
-        Log.d("Setup", "Shader successfully initialized.");
         float[] ftmp = {255f, 255f, 255f, 255f};
         Quadrilateral quad = new Quadrilateral();
         quad = Quadrilateral.getQuad(quad, -1, -1, 0, 2, 2, ftmp);
         //gHelper.addToBatch(quad, "master");
         GeometryHelper.addToBatch(quad, "master");
-        //quad = Quadrilateral.getQuad(quad, 0,0,0,1,1,ftmp);
-        //SpriteBatchSystem.addSprite("test1", quad, TextureHelper.getTexture("test1"));
+        quad = Quadrilateral.getQuad(quad, 0,0,0,1,1,ftmp);
+        SpriteBatchSystem.addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
+        quad = Quadrilateral.getQuad(quad, -1,0,0,1,1,ftmp);
+        SpriteBatchSystem.addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
+        quad = Quadrilateral.getQuad(quad, -1,-1,0,1,1,ftmp);
+        SpriteBatchSystem.addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
+        quad = Quadrilateral.getQuad(quad, 0,-1,0,1,1,ftmp);
+        SpriteBatchSystem.addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
         Log.d("Setup", "Geometry buffers initialized and filled.");
 
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
@@ -105,8 +116,37 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         GLES20.glDepthMask( true );
     }
 
+    private void moveUnits(){
+        float[] ftmp = {255f, 255f, 255f, 255f};
+        Quadrilateral quad;
+        for(int i = 0; i < gameState.players.capacity(); i++){
+            Player p = gameState.players.get(i);
+            for(int j = 0; j < p.unitsInFlight.capacity(); j++){
+                Unit unit = p.unitsInFlight.get(j);
+                quad = unit.getUnit();
+                SpriteBatchSystem.removeSprite("soldier", quad);
+                unit.frame++;
+                if(unit.frame == 10){
+                    System.arraycopy(unit.destination, 0, unit.location, 0, unit.destination.length);
+                    unit.path.remove(unit.path.capacity()-1);
+                    unit.frame = 0;
+                    if(unit.path.capacity() != 0){
+                        unit.destination[0] = unit.path.get(unit.path.capacity()-1).x;
+                        unit.destination[1] = unit.path.get(unit.path.capacity()-1).y;
+                    }
+                    else{
+                        p.unitsInFlight.remove(unit);
+                    }
+                }
+                quad = unit.getUnit();
+                SpriteBatchSystem.addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
+            }
+        }
+    }
+
     @Override
     public void onDrawFrame(GL10 unused) {
+       // Upload mapData texture
        if (gameState != null && gameState.mapData.texture == 0) {
            gameState.mapData.texture = TextureHelper.dataToTexture(gameState.mapData.pixelBuffer,
                     "vortest",
@@ -114,24 +154,37 @@ public class CoARenderer implements GLSurfaceView.Renderer {
                     gameState.mapData.height);
            gameState.mapData.territoryGraphMesh.finish(context);
         }
+        // Make sprites
+        SpriteBatchSystem.clear();
+        for (Player p : gameState.players) {
+            for (Unit u : p.units) {
+                SpriteBatchSystem.addUnit(u.type, u.location[0], u.location[1]);
+            }
+        }
         // Redraw background color
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         //GLES20.glClearDepthf(1.0f);
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
         //GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
+        //programHandle = ShaderHelper.getShader("simple");
         GLES20.glUseProgram(programHandle);
 
-        dHelper.draw(camera, GeometryHelper.getVertBuff("master"), GeometryHelper.getColorBuff("master"), GeometryHelper.getTextBuff("master"), TextureHelper.getTexture("vortest"));
+        dHelper.draw(camera, GeometryHelper.getVertBuff("master"), GeometryHelper.getColorBuff("master"), GeometryHelper.getTextBuff("master"), TextureHelper.getTexture("vortest"), GeometryHelper.getVerticesCount("master"));
 
         if (showLines) gameState.mapData.territoryGraphMesh.renderLines(camera.getVPMatrix());
 
         Enumeration vEnum = SpriteBatchSystem.sprites.elements();
+        //programHandle = ShaderHelper.getShader("animate");
+        //GLES20.glUseProgram(programHandle);
         while(vEnum.hasMoreElements()){
             String name = vEnum.nextElement().toString();
             SpriteBatchSystem.sprite s = SpriteBatchSystem.getSprite(name);
-            dHelper.draw(camera, s.vBuf, s.tBuf, s.cBuf, TextureHelper.getTexture(name));
+            SpriteSheetDimensions ssd = new SpriteSheetDimensions();
+            GeometryHelper.getFrameTexture(name, ssd.soldierWidth, ssd.soldierHeight, ssd.soldierFrameWidth, ssd.soldierFrameHeight, frame % ssd.soldierFrames, (frame / ssd.soldierFrames) % (int)(ssd.soldierHeight / ssd.soldierFrameHeight));
+            dHelper.draw(camera, s.vBuf, s.tBuf, s.tBuf, s.texture, GeometryHelper.getVerticesCount(name));
         }
+        frame++;
     }
 
     @Override

@@ -12,8 +12,13 @@ public class Territory {
     // Copy constructor
     public Territory(Territory b) {
         this.neighbors = b.neighbors;
-        this.armies = b.armies;
+        this.units = b.units;
         this.owner = b.owner;
+        this.neighbors = new Vector<Territory>(b.neighbors);
+        this.units = new Vector<Unit>(b.units);
+        if (b.owner != null) {
+            this.owner = new Player(b.owner);
+        }
         this.power = b.power;
         this.x = b.x;
         this.y = b.y;
@@ -29,18 +34,18 @@ public class Territory {
         Forest
     }
 
-    public ArrayList<Territory> neighbors = new ArrayList<Territory>(); ///< Pointers to neighbor territories
-    public ArrayList<Army> armies = new ArrayList<Army>(); ///< Pointer to residing armies
+    public Vector<Territory> neighbors = new Vector<Territory>(); ///< Pointers to neighbor territories
+    public Vector<Unit> units = new Vector<Unit>(); ///< Pointer to residing armies
+    public Player owner = null; ///< Owning player
     public int power = 0; ///< Power of the territory
     public int economy = 0;
     public float x; ///< x coordinate of center
     public float y; ///< y coordinate of center
     public float height; ///< Terrain height value TODO: Use this for something maybe? Or remove it?
     public TerrainType terrainType; //< Type of terrain TODO: Use this for something
-    public Player owner;
 
     public void resolveControl() {
-        Random randomNumberGenerator = new Random();
+        /* Random randomNumberGenerator = new Random();
         int defense_bonus = 1;
         Army defender = armies.get(0);
         Army attacker = armies.get(1);
@@ -59,6 +64,8 @@ public class Territory {
         if( !attacker.units.isEmpty() ) {
             defender.owner.territories.remove( this );
             attacker.owner.territories.add( this );
-        }
+        }*/
     }
+    public double distance;///< used for PathFinding
+    public boolean visited;///< used for PathFinding
 }

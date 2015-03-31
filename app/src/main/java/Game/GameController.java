@@ -28,8 +28,12 @@ public class GameController {
         m_gameState = gameState;
         m_gameSettings = gameSettings;
        // Initialize the game
-        m_gameEngine.initGame(m_gameState, m_gameSettings);
+        m_gameEngine.initGame(m_gameState, m_gameSettings, this);
         m_gameState.currentPlayerIndex = -1; // Start at -1 so nextTurn goes to 0
+    }
+
+    public GameState getGameState(){
+        return m_gameState;
     }
 
     /// Call this to transition to the next turn

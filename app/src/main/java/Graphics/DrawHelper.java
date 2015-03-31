@@ -1,7 +1,6 @@
 package Graphics;
 
 import android.opengl.GLES20;
-import android.util.Log;
 
 import java.nio.FloatBuffer;
 
@@ -16,7 +15,7 @@ public class DrawHelper {
     private int mTCoordHandle;
     private int mTextureHandle;
 
-    public void setProgHandles(int ph){
+    public void setProgHandles(int ph, String shader){
         mMVPMatrixHandle = GLES20.glGetUniformLocation(ph, "uMVPMatrix");
         mPositionHandle = GLES20.glGetAttribLocation(ph, "vPosition");
         mColorHandle = GLES20.glGetAttribLocation(ph, "vColor");
@@ -24,7 +23,10 @@ public class DrawHelper {
         mTextureHandle = GLES20.glGetAttribLocation(ph, "texture");
     }
 
-    public void draw(Camera camera, FloatBuffer mVertexBuffer, FloatBuffer mColorBuffer, FloatBuffer mTextCoordBuffer, int textureId){
+    public void draw(Camera camera, FloatBuffer mVertexBuffer, FloatBuffer mColorBuffer, FloatBuffer mTextCoordBuffer, int textureId, int vCount){
+        int programHandle = ShaderHelper.getShader("simple");
+        GLES20.glUseProgram(programHandle);
+
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId);
         GLES20.glUniform1i(mTextureHandle, 0);
@@ -43,14 +45,7 @@ public class DrawHelper {
 
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, camera.getVPMatrix(), 0);
 
-        //GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, ibo[0]);
-        //GLES20.glDrawElements(GLES20.GL_TRIANGLES, 36, GLES20.GL_FLOAT, 0);
-        //GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, GeometryHelper.getVerticesCount("master")/3);
-
-     //   GLES20.glDisableVertexAttribArray(mPositionHandle);
-     //   GLES20.glDisableVertexAttribArray(mColorHandle);
-     //   GLES20.glDisableVertexAttribArray(mTCoordHandle);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vCount/3);
     }
 
     public DrawHelper(Camera mh){

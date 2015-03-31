@@ -76,6 +76,23 @@
                   gl_FragColor = texture2D(texture, tCoords);
                 }\n
     </string>
+    <string name="animate.frag">
+                precision mediump float;\n
+                \n
+                uniform sampler2D texture;\n
+                varying vec4 color;\n
+                varying vec2 tCoords;\n
+                uniform float currentFrameW;\n
+                uniform float currentFrameH;\n
+                uniform float totalFramesW;\n
+                uniform float totalFramesH;\n
+                tCoords.x = (tCoords.x + currentFrameW) / totalFramesW;\n
+                tCoords.y = (tCoords.y + currentFrameH) / totalFramesH;\n
+                \n
+                void main(){\n
+                    gl_FragColor = texture2D(texture, tCoords);\n
+                }\n
+    </string>
     <string name="color.vert">
                 uniform mat4 uMVPMatrix;\n
                 \n
