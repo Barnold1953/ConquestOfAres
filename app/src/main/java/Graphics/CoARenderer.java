@@ -29,7 +29,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     Camera camera;
     MapData mapData;
     GameState gameState = null;
-    int frame;
+    int frame, previousUnitCount = 0;
 
     DrawHelper dHelper;
 
@@ -95,19 +95,15 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         TextureHelper.imageToTexture(context, R.drawable.texture1, "test1");
         TextureHelper.imageToTexture(context, R.drawable.character1walk, "soldier");
 
-        float[] ftmp = {255f, 255f, 255f, 255f};
-        Quadrilateral quad = new Quadrilateral();
-        quad = Quadrilateral.getQuad(quad, -1, -1, 0, 2, 2, ftmp);
         //gHelper.addToBatch(quad, "master");
-        GeometryHelper.addToBatch(quad, "master");
-        quad = Quadrilateral.getQuad(quad, 0,0,0,1,1,ftmp);
+        /*quad = Quadrilateral.getQuad(quad, 0,0,0,1,1,ftmp);
         SpriteBatchSystem.addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
         quad = Quadrilateral.getQuad(quad, -1,0,0,1,1,ftmp);
         SpriteBatchSystem.addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
         quad = Quadrilateral.getQuad(quad, -1,-1,0,1,1,ftmp);
         SpriteBatchSystem.addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
         quad = Quadrilateral.getQuad(quad, 0,-1,0,1,1,ftmp);
-        SpriteBatchSystem.addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
+        SpriteBatchSystem.addSprite("soldier", quad, TextureHelper.getTexture("soldier"));*/
         Log.d("Setup", "Geometry buffers initialized and filled.");
 
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
@@ -156,11 +152,23 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         }
         // Make sprites
         SpriteBatchSystem.clear();
+
+        int unitCount = 0;
+        for(Player p : gameState.players){
+            unitCount += p.units.capacity();
+        }
+
+        SpriteBatchSystem.Initialize(unitCount);
+
         for (Player p : gameState.players) {
             for (Unit u : p.units) {
-                SpriteBatchSystem.addUnit(u.type, u.location[0], u.location[1]);
+                SpriteBatchSystem.addUnit(u.type, (u.location[0]/gameState.mapData.width) * 2 - 1 - (.25f / 2), (u.location[1]/gameState.mapData.height) * 2 - 1 - (.25f / 2));
             }
         }
+
+        GeometryHelper.allocateBuffs(previousUnitCount);
+
+        previousUnitCount = unitCount;
         // Redraw background color
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         //GLES20.glClearDepthf(1.0f);
@@ -168,7 +176,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         //GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
         //programHandle = ShaderHelper.getShader("simple");
-        GLES20.glUseProgram(programHandle);
 
         dHelper.draw(camera, GeometryHelper.getVertBuff("master"), GeometryHelper.getColorBuff("master"), GeometryHelper.getTextBuff("master"), TextureHelper.getTexture("vortest"), GeometryHelper.getVerticesCount("master"));
 
