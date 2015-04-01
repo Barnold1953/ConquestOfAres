@@ -31,6 +31,11 @@ public class SpriteBatchSystem {
 
     private static HashMap<String, sprite> sprites = new HashMap<>();
 */
+    public static void Initialize(int count){
+        GeometryHelper.initializeMaster();
+        GeometryHelper.initializeSoldier(count);
+    }
+
     public static void addSprite(String name, Quadrilateral quadrilateral, int rid){
         /*sprite s;
         if(sprites.containsKey(name)){
@@ -51,6 +56,7 @@ public class SpriteBatchSystem {
 
     public static void clear() {
         sprites.clear();
+        GeometryHelper.clear();
     }
 
     public static sprite getSprite(String name){
@@ -82,7 +88,6 @@ public class SpriteBatchSystem {
         if(!(sprites.contains(name))){
             return;
         }
-
         GeometryHelper.removeFromBatch(name, quadrilateral);
     }
 
