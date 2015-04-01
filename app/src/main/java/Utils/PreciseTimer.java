@@ -20,7 +20,7 @@ public class PreciseTimer {
     }
 
     // Returns time in milliseconds since last start call
-    public float stop() {
-        return (float)(System.nanoTime() - startTime) / 1000000.0f;
+    public double stop() {
+        return (double)(System.nanoTime() - startTime) / 1000000.0;
     }
 }
