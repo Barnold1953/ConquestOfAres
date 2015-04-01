@@ -9,8 +9,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import Game.Army;
 import Game.Territory;
 import Game.Unit;
 import utkseniordesign.conquestofares.R;
@@ -42,8 +40,6 @@ public class TerritoryPanel extends LinearLayout {
         attributesPanel = createAttributesPanel();
         setBackgroundColor(getResources().getColor(R.color.lightGrey));
         addView(militaryPanel);
-
-        // hide the panel
         setY(screenHeight);
     }
 
@@ -53,7 +49,7 @@ public class TerritoryPanel extends LinearLayout {
         LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         panel.setLayoutParams(layoutParams);
         panel.setPadding(20,20,20,20);
-        if(currentTerritory.armies.isEmpty()) {
+        if(currentTerritory.units.isEmpty()) {
             TextView territoryEmptyIndicator = new TextView(getContext());
             territoryEmptyIndicator.setText("No Units Available");
             territoryEmptyIndicator.setTextSize(24);
@@ -63,13 +59,11 @@ public class TerritoryPanel extends LinearLayout {
             panel.addView(territoryEmptyIndicator);
         }
         else {
-            for (Army army : currentTerritory.armies) {
-                for (Unit unit : army.units) {
-                    ImageView soldierIcon = new ImageView(getContext());
-                    soldierIcon.setBackgroundColor(getResources().getColor(R.color.offWhite));
-                    soldierIcon.setImageResource(R.drawable.soldier);
-                    panel.addView(soldierIcon);
-                }
+            for (Unit unit : currentTerritory.units) {
+                ImageView soldierIcon = new ImageView(getContext());
+                soldierIcon.setBackgroundColor(getResources().getColor(R.color.offWhite));
+                soldierIcon.setImageResource(R.drawable.soldier);
+                panel.addView(soldierIcon);
             }
         }
         return panel;
