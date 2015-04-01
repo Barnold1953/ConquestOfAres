@@ -74,7 +74,6 @@ public class ColorMesh {
     }
 
     public void renderLines(float[] vpMatrix) {
-
         GLES20.glUseProgram(m_programHandle);
 
         m_vertexBuffer.position(0);
@@ -84,7 +83,7 @@ public class ColorMesh {
         m_colorBuffer.position(0);
         GLES20.glEnableVertexAttribArray(m_colorHandle);
         GLES20.glVertexAttribPointer(m_colorHandle, 3, GLES20.GL_FLOAT, false, 0, m_colorBuffer);
-
+/*
         GLES20.glUniformMatrix4fv(m_mvpHandle, 1, false, vpMatrix, 0);
 
         GLES20.glLineWidth(10.0f);
@@ -92,7 +91,7 @@ public class ColorMesh {
            // GLES20.glDrawElements(GLES20.GL_LINES, m_numIndices, GLES20.GL_UNSIGNED_SHORT, 0);
         //} else {
             GLES20.glDrawArrays(GLES20.GL_LINES, 0, vertexVec.size() / 3);
-        //}
+*/        //}
     }
 
     public void renderTriangles(float[] vpMatrix) {

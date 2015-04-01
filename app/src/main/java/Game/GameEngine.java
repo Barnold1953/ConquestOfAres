@@ -2,6 +2,8 @@ package Game;
 
 import android.util.Log;
 
+import java.util.Random;
+
 import Generation.MapData;
 import Generation.MapGenerator;
 import Utils.PreciseTimer;
@@ -40,7 +42,7 @@ public class GameEngine {
         // Assign territories
         assignTerritories();
         // Place units
-        initUnits(3);
+        initUnits(64);
         Log.d("Init: ", "initGame finished.");
     }
 
@@ -104,6 +106,7 @@ public class GameEngine {
 
     /// Sets up all the initial armies
     private void initUnits(int unitsPerTerritory) {
+        Random r = new Random();
         int totalUnits = unitsPerTerritory * m_gameState.territories.size();
         int unitsPerPlayer = totalUnits / m_gameState.players.size();
         for (Player p : m_gameState.players) {
@@ -111,7 +114,7 @@ public class GameEngine {
             for (Territory t : p.territories) {
                 for (int i = 0; i < unitsPerTerritory && unitsRemaining != 0; i++) {
                     p.extraUnits++;
-                    m_gameController.addUnit(t, t.x, t.y, Unit.Type.soldier);
+                    m_gameController.addUnit(t, t.x + r.nextFloat() * 60.0f, t.y + r.nextFloat() * 60.0f, Unit.Type.soldier);
                 }
             }
         }

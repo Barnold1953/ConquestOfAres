@@ -17,6 +17,7 @@ import Game.GameState;
 import Game.Player;
 import Game.Unit;
 import Generation.MapData;
+import Utils.PreciseTimer;
 import utkseniordesign.conquestofares.R;
 
 /**
@@ -30,6 +31,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     MapData mapData;
     GameState gameState = null;
     int frame, previousUnitCount = 0;
+    double[] fTime = new double[100];
 
     DrawHelper dHelper;
 
@@ -143,12 +145,14 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     @Override
     public void onDrawFrame(GL10 unused) {
        // Upload mapData texture
-       if (gameState != null && gameState.mapData.texture == 0) {
+        PreciseTimer timer = new PreciseTimer();
+        if (gameState != null && gameState.mapData.texture == 0) {
            gameState.mapData.texture = TextureHelper.dataToTexture(gameState.mapData.pixelBuffer,
                     "vortest",
                     gameState.mapData.width,
                     gameState.mapData.height);
            gameState.mapData.territoryGraphMesh.finish(context);
+            Log.d("Line", "Got here");
         }
         // Make sprites
         SpriteBatchSystem.clear();
@@ -191,7 +195,18 @@ public class CoARenderer implements GLSurfaceView.Renderer {
             GeometryHelper.getFrameTexture(name, ssd.soldierWidth, ssd.soldierHeight, ssd.soldierFrameWidth, ssd.soldierFrameHeight, frame % ssd.soldierFrames, (frame / ssd.soldierFrames) % (int)(ssd.soldierHeight / ssd.soldierFrameHeight));
             dHelper.draw(camera, s.vBuf, s.tBuf, s.tBuf, s.texture, GeometryHelper.getVerticesCount(name));
         }
+
+        fTime[frame % 100] = timer.stop();
         frame++;
+        /*GLES20.glFinish();
+        if(frame % 100 == 0 && frame / 100 > 0) {
+            Double avgTime = 0.0;
+            for (int i = 0; i < 100; i++) {
+                avgTime += fTime[i];
+            }
+            avgTime /= 100.0;
+            Log.d("*TIME render:", avgTime.toString() + " Units: " + unitCount);
+        }*/
     }
 
     @Override
