@@ -4,6 +4,7 @@ import android.util.Log;
 
 import Generation.MapData;
 import Generation.MapGenerator;
+import Utils.PreciseTimer;
 
 /**
  * Created by brb55_000 on 3/6/2015.
@@ -28,7 +29,10 @@ public class GameEngine {
         m_gameSettings = gameSettings;
         m_gameController = gameController;
         // Generate the map
+        PreciseTimer timer = new PreciseTimer();
         MapData mapData = mapGenerator.generateMap(gameSettings.getMapGenParams());
+        Log.d("*TIME generateMap:", Float.toString(timer.stop()));
+
         m_gameState.territories = mapData.territories;
         m_gameState.mapData = mapData;
         // Initialize players
