@@ -2,6 +2,7 @@ package Graphics;
 
 import android.util.Log;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -22,7 +23,7 @@ public class SpriteBatchSystem {
         int texture;
         FloatBuffer vBuf;
         FloatBuffer tBuf;
-        FloatBuffer cBuf;
+        ByteBuffer cBuf;
     }
     /*public class sprite{
         int texture;
@@ -37,17 +38,6 @@ public class SpriteBatchSystem {
     }
 
     public static void addSprite(String name, Quadrilateral quadrilateral, int rid){
-        /*sprite s;
-        if(sprites.containsKey(name)){
-            s = sprites.get(name);
-        }
-        else {
-            s = new sprite();
-            s.texture = TextureHelper.getTexture(name);
-        }
-        GeometryHelper.addToBatch(quadrilateral, name);
-        sprites.put(name, s);*/
-
         GeometryHelper.addToBatch(quadrilateral, name);
         if(!(sprites.contains(name))){
             sprites.add(name);
@@ -70,7 +60,7 @@ public class SpriteBatchSystem {
         return s;
     }
 
-    public static FloatBuffer getBuffer(String name, BufferType type){
+    public static Buffer getBuffer(String name, BufferType type){
         switch (type){
             case Vertices:
                 return GeometryHelper.getVertBuff(name);
@@ -84,16 +74,8 @@ public class SpriteBatchSystem {
         return tmp;
     }
 
-    public static void removeSprite(String name, Quadrilateral quadrilateral){
-        if(!(sprites.contains(name))){
-            return;
-        }
-        GeometryHelper.removeFromBatch(name, quadrilateral);
-    }
-
-    public static void addUnit(Unit.Type type, float x, float y){
+    public static void addUnit(Unit.Type type, float x, float y, byte[] color){
         Quadrilateral quad = new Quadrilateral();
-        float[] color = {255,255,255,255};
         switch (type){
             case soldier:
                 quad = Quadrilateral.getQuad(quad, x, y, 0, .1f, .1f, color);

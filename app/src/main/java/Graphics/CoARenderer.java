@@ -137,7 +137,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         for (Player p : gameState.players) {
             for (Unit u : p.units) {
-                SpriteBatchSystem.addUnit(u.type, (u.location[0]/gameState.mapData.width) * 2 - 1 - (.1f / 2), (u.location[1]/gameState.mapData.height) * 2 - 1 - (.1f / 2));
+                SpriteBatchSystem.addUnit(u.type, (u.location[0]/gameState.mapData.width) * 2 - 1 - (.1f / 2), (u.location[1]/gameState.mapData.height) * 2 - 1 - (.1f / 2), p.color);
             }
         }
 
@@ -165,7 +165,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
             SpriteSheetDimensions ssd = new SpriteSheetDimensions(name);
             GeometryHelper.setFrameTexture(name, ssd.width, ssd.height, ssd.frameWidth, ssd.frameHeight, frame/5);
 
-            dHelper.draw(camera, s.vBuf, s.tBuf, s.tBuf, s.texture, GeometryHelper.getVerticesCount(name));
+            dHelper.draw(camera, s.vBuf, s.cBuf, s.tBuf, s.texture, GeometryHelper.getVerticesCount(name));
         }
 
         fTime[frame % 100] = timer.stop();

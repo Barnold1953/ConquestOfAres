@@ -20,25 +20,9 @@ public class GeometryHelper {
     private final static float[] quad = {0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f};
     private final static float[] quadNormals = {0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f};
     private final static float[] quadTextCoords = {0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f};
-    private final static float[] quadColors = {1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f};
+    //private final static float[] quadColors = {1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f};
 
     private final static int mBytesPerFloat = 4;
-
-    private static float[] addToFloatArray(float[] destination, float[] source){
-        float[] temp = new float[destination.length + source.length];
-        System.arraycopy(destination, 0, temp, 0, destination.length);
-        //System.arraycopy(source, 0, temp, destination.length, source.length);
-        destination = new float[temp.length];
-        System.arraycopy(temp, 0, destination, 0, temp.length);
-        System.arraycopy(source, 0, destination, destination.length-source.length, source.length);
-        temp = new float[0];
-        source = new float[0];
-        return destination;
-        //destination = new float[temp.length];
-        //System.arraycopy(temp, 0, destination, 0, temp.length);
-
-        //return destination;
-    }
 
     private static float[] removeFromFloatArray(float[] source, int index, int amount){
         float[] temp = new float[source.length - amount];
@@ -49,21 +33,19 @@ public class GeometryHelper {
     }
 
     public static void initializeMaster(){
-        float[] ftmp = {255f, 255f, 255f, 255f};
+        byte[] ftmp = {(byte)255, (byte)255, (byte)255};
         Quadrilateral quad = new Quadrilateral();
         quad = Quadrilateral.getQuad(quad, -1, -1, 0, 2, 2, ftmp);
         BatchGeometry bg = new BatchGeometry();
         bg.vertices = new float[18];
         bg.textureCoordinates = new float[12];
-        bg.colors = new float[24];
+        bg.colors = new byte[18];
 
         float[] newV = {quad.x,quad.y+quad.height,quad.z,quad.x,quad.y,quad.z,quad.x+quad.width,quad.y,quad.z,quad.x+quad.width,quad.y,quad.z,quad.x+quad.width,quad.y+quad.height,quad.z,quad.x,quad.y+quad.height,quad.z};
 
-        Integer tmp = bg.vertices.length;
-
-        float[] temp = new float[quadColors.length];
-        for(int i = 0; i < quadColors.length; i++){
-            temp[i] = quad.color[i % 4];
+        float[] temp = new float[bg.colors.length];
+        for(int i = 0; i < bg.colors.length; i++){
+            temp[i] = quad.color[i % 3];
         }
 
         //Log.d("Geometry3", tmp.toString());
@@ -72,7 +54,8 @@ public class GeometryHelper {
         for(int i = 0; i < quadTextCoords.length; i+=2){
             bg.textureCoordinates[i+1] = 1.0f - bg.textureCoordinates[i+1];
         }
-        System.arraycopy(temp, 0, bg.colors, unitCount*24, temp.length);
+        byte[] tempB = new byte[bg.colors.length];
+        System.arraycopy(tempB, 0, bg.colors, unitCount*18, tempB.length);
 
         if(bg.vBuff != null && bg.tcBuff != null && bg.cBuff != null) {
             bg.vBuff.reset();
@@ -82,7 +65,7 @@ public class GeometryHelper {
 
         bg.vBuff = ByteBuffer.allocateDirect(bg.vertices.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
         bg.tcBuff = ByteBuffer.allocateDirect(bg.textureCoordinates.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
-        bg.cBuff = ByteBuffer.allocateDirect(bg.colors.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
+        bg.cBuff = ByteBuffer.allocateDirect(bg.colors.length).order(ByteOrder.nativeOrder());
 
         bg.vBuff.put(bg.vertices).position(0);
         bg.tcBuff.put(bg.textureCoordinates).position(0);
@@ -95,7 +78,7 @@ public class GeometryHelper {
         BatchGeometry bg = new BatchGeometry();
         bg.vertices = new float[count * 18];
         bg.textureCoordinates = new float[count * 12];
-        bg.colors = new float[count * 24];
+        bg.colors = new byte[count * 18];
 
         totalUnits = count;
 
@@ -117,16 +100,16 @@ public class GeometryHelper {
             bg = new BatchGeometry();
             bg.vertices = new float[18 * totalUnits];
             bg.textureCoordinates = new float[12 * totalUnits];
-            bg.colors = new float[24 * totalUnits];
+            bg.colors = new byte[18 * totalUnits];
         }
 
         float[] newV = {quad.x,quad.y+quad.height,quad.z,quad.x,quad.y,quad.z,quad.x+quad.width,quad.y,quad.z,quad.x+quad.width,quad.y,quad.z,quad.x+quad.width,quad.y+quad.height,quad.z,quad.x,quad.y+quad.height,quad.z};
 
         //bg.vertices = addToFloatArray(bg.vertices, newV);
         //bg.textureCoordinates = addToFloatArray(bg.textureCoordinates, quadTextCoords);
-        float[] temp = new float[quadColors.length];
-        for(int i = 0; i < quadColors.length; i++){
-            temp[i] = quad.color[i % 4];
+        byte[] temp = new byte[18];
+        for(int i = 0; i < temp.length; i++){
+            temp[i] = quad.color[i % 3];
         }
         //bg.colors = addToFloatArray(bg.colors, temp);
 
@@ -135,7 +118,7 @@ public class GeometryHelper {
         //Log.d("Geometry3", tmp.toString());
         System.arraycopy(newV, 0, bg.vertices, unitCount * 18, newV.length);
         System.arraycopy(quadTextCoords, 0, bg.textureCoordinates, unitCount*12, quadTextCoords.length);
-        System.arraycopy(temp, 0, bg.colors, unitCount*24, temp.length);
+        System.arraycopy(temp, 0, bg.colors, unitCount*18, temp.length);
 
         unitCount++;
 
@@ -154,7 +137,7 @@ public class GeometryHelper {
 
             bg.vBuff = ByteBuffer.allocateDirect(bg.vertices.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
             bg.tcBuff = ByteBuffer.allocateDirect(bg.textureCoordinates.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
-            bg.cBuff = ByteBuffer.allocateDirect(bg.colors.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
+            bg.cBuff = ByteBuffer.allocateDirect(bg.colors.length).order(ByteOrder.nativeOrder());
         }
 
         bg.vBuff.put(bg.vertices).position(0);
@@ -162,22 +145,6 @@ public class GeometryHelper {
         bg.cBuff.put(bg.colors).position(0);
 
         BatchMap.put("soldier", bg);
-    }
-
-    public static void removeFromBatch(String name, Quadrilateral quad){
-        BatchGeometry bg = BatchMap.get(name);
-
-        for(int i = 0; i < bg.vertices.length; i+=18){
-            if(bg.vertices[i] == quad.x && bg.vertices[i+1] == quad.y+quad.height && bg.vertices[i+2] == quad.z){
-                bg.vertices = removeFromFloatArray(bg.vertices, i, 18);
-                bg.textureCoordinates = removeFromFloatArray(bg.textureCoordinates, (i / 18) * 12, 12);
-                bg.colors = removeFromFloatArray(bg.colors, (i / 18) * 24, 24);
-                break;
-            }
-            bg.vBuff.put(bg.vertices).position(0);
-            bg.tcBuff.put(bg.textureCoordinates).position(0);
-            bg.cBuff.put(bg.colors).position(0);
-        }
     }
 
     //public static FloatBuffer getFrameTexture(String name, float width, float height, float fWidth, float fHeight, int frameX, int frameY){
@@ -201,7 +168,7 @@ public class GeometryHelper {
     public static FloatBuffer getVertBuff(String name){
         return BatchMap.get(name).vBuff;
     }
-    public static FloatBuffer getColorBuff(String name){
+    public static ByteBuffer getColorBuff(String name){
         return BatchMap.get(name).cBuff;
     }
     public static FloatBuffer getTextBuff(String name){

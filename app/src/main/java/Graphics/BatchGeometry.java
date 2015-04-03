@@ -1,5 +1,6 @@
 package Graphics;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 /**
@@ -7,6 +8,8 @@ import java.nio.FloatBuffer;
  */
 
 public class BatchGeometry{
-    float[] vertices, textureCoordinates, colors;
-    FloatBuffer vBuff, tcBuff, cBuff;
+    float[] vertices, textureCoordinates;
+    byte[] colors;
+    FloatBuffer vBuff, tcBuff;
+    ByteBuffer cBuff;
 }

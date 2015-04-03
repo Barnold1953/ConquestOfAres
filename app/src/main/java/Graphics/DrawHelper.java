@@ -2,6 +2,7 @@ package Graphics;
 
 import android.opengl.GLES20;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 /**
@@ -23,7 +24,7 @@ public class DrawHelper {
         mTextureHandle = GLES20.glGetAttribLocation(ph, "texture");
     }
 
-    public void draw(Camera camera, FloatBuffer mVertexBuffer, FloatBuffer mColorBuffer, FloatBuffer mTextCoordBuffer, int textureId, int vCount){
+    public void draw(Camera camera, FloatBuffer mVertexBuffer, ByteBuffer mColorBuffer, FloatBuffer mTextCoordBuffer, int textureId, int vCount){
         int programHandle = ShaderHelper.getShader("simple");
         GLES20.glUseProgram(programHandle);
 
@@ -36,7 +37,7 @@ public class DrawHelper {
         GLES20.glEnableVertexAttribArray(mPositionHandle);
 
         mColorBuffer.position(0);
-        GLES20.glVertexAttribPointer(mColorHandle, 4, GLES20.GL_FLOAT, false, 0, mColorBuffer);
+        GLES20.glVertexAttribPointer(mColorHandle, 3, GLES20.GL_BYTE, false, 0, mColorBuffer);
         GLES20.glEnableVertexAttribArray(mColorHandle);
 
         mTextCoordBuffer.position(0);

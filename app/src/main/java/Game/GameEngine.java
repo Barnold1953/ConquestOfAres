@@ -42,7 +42,7 @@ public class GameEngine {
         // Assign territories
         assignTerritories();
         // Place units
-        initUnits(16);
+        initUnits(32);
         Log.d("Init: ", "initGame finished.");
     }
 
@@ -74,8 +74,8 @@ public class GameEngine {
                p.isAI = true;
            }
            p.color[0] = playerColors[i][0];
-           p.color[0] = playerColors[i][1];
-           p.color[0] = playerColors[i][2];
+           p.color[1] = playerColors[i][1];
+           p.color[2] = playerColors[i][2];
            p.extraUnits = 0;
            p.name = "Player " + Integer.toString(i + 1);
            m_gameState.players.add(p);
