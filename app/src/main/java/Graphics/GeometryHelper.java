@@ -180,7 +180,13 @@ public class GeometryHelper {
         }
     }
 
-    public static FloatBuffer getFrameTexture(String name, float width, float height, float fWidth, float fHeight, int frameX, int frameY){
+    //public static FloatBuffer getFrameTexture(String name, float width, float height, float fWidth, float fHeight, int frameX, int frameY){
+    public static void setFrameTexture(String name, float width, float height, float fWidth, float fHeight, int frame){
+        int frameX = (int)width / (int)fWidth;
+        int frameY = (int)height / (int)fHeight;
+        frameY = (frame / frameX) % frameY;
+        frameX = frame % frameX;
+
         float[] temp = new float[BatchMap.get(name).textureCoordinates.length];
         System.arraycopy(BatchMap.get(name).textureCoordinates, 0, temp, 0, temp.length);
 
@@ -190,7 +196,6 @@ public class GeometryHelper {
         }
 
         BatchMap.get(name).tcBuff.put(temp).position(0);
-        return BatchMap.get(name).tcBuff;
     }
 
     public static FloatBuffer getVertBuff(String name){

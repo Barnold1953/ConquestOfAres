@@ -96,7 +96,7 @@ public class SpriteBatchSystem {
         float[] color = {255,255,255,255};
         switch (type){
             case soldier:
-                quad = Quadrilateral.getQuad(quad, x, y, 0, .25f, .25f, color);
+                quad = Quadrilateral.getQuad(quad, x, y, 0, .1f, .1f, color);
                 addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
         }
     }

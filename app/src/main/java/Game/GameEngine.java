@@ -42,7 +42,7 @@ public class GameEngine {
         // Assign territories
         assignTerritories();
         // Place units
-        initUnits(64);
+        initUnits(16);
         Log.d("Init: ", "initGame finished.");
     }
 
@@ -114,7 +114,23 @@ public class GameEngine {
             for (Territory t : p.territories) {
                 for (int i = 0; i < unitsPerTerritory && unitsRemaining != 0; i++) {
                     p.extraUnits++;
-                    m_gameController.addUnit(t, t.x + r.nextFloat() * 60.0f, t.y + r.nextFloat() * 60.0f, Unit.Type.soldier);
+                    int direction = r.nextInt();
+                    switch (direction%4){
+                        case 0:
+                            m_gameController.addUnit(t, t.x + r.nextFloat() * 60.0f, t.y + r.nextFloat() * 60.0f, Unit.Type.soldier);
+                            break;
+                        case 1:
+                            m_gameController.addUnit(t, t.x - r.nextFloat() * 60.0f, t.y + r.nextFloat() * 60.0f, Unit.Type.soldier);
+                            break;
+                        case 2:
+                            m_gameController.addUnit(t, t.x + r.nextFloat() * 60.0f, t.y - r.nextFloat() * 60.0f, Unit.Type.soldier);
+                            break;
+                        case 3:
+                            m_gameController.addUnit(t, t.x - r.nextFloat() * 60.0f, t.y - r.nextFloat() * 60.0f, Unit.Type.soldier);
+                            break;
+                    }
+                    //m_gameController.addUnit(t, t.x + r.nextFloat() * 60.0f, t.y + r.nextFloat() * 60.0f, Unit.Type.soldier);
+                    //m_gameController.addUnit(t, t.x, t.y, Unit.Type.soldier);
                 }
             }
         }

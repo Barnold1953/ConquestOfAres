@@ -38,7 +38,7 @@ public class Unit {
     public Quadrilateral getUnit(){
         Quadrilateral quad = new Quadrilateral();
         float[] color = {255,255,255,255};
-        quad = Quadrilateral.getQuad(quad, location[0]+(((destination[0]-location[0]) / 10) * frame), location[1]+(((destination[1]-location[1]) / 10) * frame), 0, 0.25f, 0.25f, color);
+        quad = Quadrilateral.getQuad(quad, location[0]+(((destination[0]-location[0]) / 10) * frame), location[1]+(((destination[1]-location[1]) / 10) * frame), 0, 0.1f, 0.1f, color);
 
         return quad;
     }

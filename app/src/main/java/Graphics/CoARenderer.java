@@ -11,8 +11,6 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
-import org.w3c.dom.Text;
-
 import Game.GameState;
 import Game.Player;
 import Game.Unit;
@@ -95,7 +93,8 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         }
 
         TextureHelper.imageToTexture(context, R.drawable.texture1, "test1");
-        TextureHelper.imageToTexture(context, R.drawable.character1walk, "soldier");
+        //TextureHelper.imageToTexture(context, R.drawable.character1walk, "soldier");
+        TextureHelper.imageToTexture(context, R.drawable.man_frames_top, "soldier");
 
         //gHelper.addToBatch(quad, "master");
         /*quad = Quadrilateral.getQuad(quad, 0,0,0,1,1,ftmp);
@@ -112,34 +111,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         GLES20.glEnable(GLES20.GL_TEXTURE_2D);
         GLES20.glDepthFunc( GLES20.GL_LEQUAL );
         GLES20.glDepthMask( true );
-    }
-
-    private void moveUnits(){
-        float[] ftmp = {255f, 255f, 255f, 255f};
-        Quadrilateral quad;
-        for(int i = 0; i < gameState.players.capacity(); i++){
-            Player p = gameState.players.get(i);
-            for(int j = 0; j < p.unitsInFlight.capacity(); j++){
-                Unit unit = p.unitsInFlight.get(j);
-                quad = unit.getUnit();
-                SpriteBatchSystem.removeSprite("soldier", quad);
-                unit.frame++;
-                if(unit.frame == 10){
-                    System.arraycopy(unit.destination, 0, unit.location, 0, unit.destination.length);
-                    unit.path.remove(unit.path.capacity()-1);
-                    unit.frame = 0;
-                    if(unit.path.capacity() != 0){
-                        unit.destination[0] = unit.path.get(unit.path.capacity()-1).x;
-                        unit.destination[1] = unit.path.get(unit.path.capacity()-1).y;
-                    }
-                    else{
-                        p.unitsInFlight.remove(unit);
-                    }
-                }
-                quad = unit.getUnit();
-                SpriteBatchSystem.addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
-            }
-        }
     }
 
     @Override
@@ -166,7 +137,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         for (Player p : gameState.players) {
             for (Unit u : p.units) {
-                SpriteBatchSystem.addUnit(u.type, (u.location[0]/gameState.mapData.width) * 2 - 1 - (.25f / 2), (u.location[1]/gameState.mapData.height) * 2 - 1 - (.25f / 2));
+                SpriteBatchSystem.addUnit(u.type, (u.location[0]/gameState.mapData.width) * 2 - 1 - (.1f / 2), (u.location[1]/gameState.mapData.height) * 2 - 1 - (.1f / 2));
             }
         }
 
@@ -191,8 +162,9 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         while(vEnum.hasMoreElements()){
             String name = vEnum.nextElement().toString();
             SpriteBatchSystem.sprite s = SpriteBatchSystem.getSprite(name);
-            SpriteSheetDimensions ssd = new SpriteSheetDimensions();
-            GeometryHelper.getFrameTexture(name, ssd.soldierWidth, ssd.soldierHeight, ssd.soldierFrameWidth, ssd.soldierFrameHeight, frame % ssd.soldierFrames, (frame / ssd.soldierFrames) % (int)(ssd.soldierHeight / ssd.soldierFrameHeight));
+            SpriteSheetDimensions ssd = new SpriteSheetDimensions(name);
+            GeometryHelper.setFrameTexture(name, ssd.width, ssd.height, ssd.frameWidth, ssd.frameHeight, frame/5);
+
             dHelper.draw(camera, s.vBuf, s.tBuf, s.tBuf, s.texture, GeometryHelper.getVerticesCount(name));
         }
 
