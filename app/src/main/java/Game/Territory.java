@@ -53,13 +53,41 @@ public class Territory {
     public boolean isSelected = false;
 
     // Animation stuff
-    private final float MAX_BLEND = 0.5f;
-    private final float MIN_BLEND = 0.3f;
+    private final float MAX_BLEND = 0.7f;
+    private final float MIN_BLEND = 0.35f;
     private final float BLEND_SPEED = 0.01f;
     private boolean m_isIncreasing = true;
 
     public void select() {
-        
+        if (!isSelected) {
+            isSelected = true;
+            m_isIncreasing = true;
+        }
+    }
+
+    public void unselect() {
+        isSelected = false;
+    }
+
+    public void updateAnimation() {
+        if (isSelected) {
+            if (m_isIncreasing) {
+                mixWeight += BLEND_SPEED;
+                if (mixWeight > MAX_BLEND) {
+                    mixWeight = MAX_BLEND;
+                    m_isIncreasing = false;
+                }
+            } else {
+                mixWeight -= BLEND_SPEED;
+                if (mixWeight < MIN_BLEND) {
+                    mixWeight = MIN_BLEND;
+                    m_isIncreasing = true;
+                }
+            }
+        } else {
+            mixWeight -= BLEND_SPEED;
+            if (mixWeight < 0.0f) mixWeight = 0.0f;
+        }
     }
 
     public void setSecondaryColor(float r, float g, float b) {

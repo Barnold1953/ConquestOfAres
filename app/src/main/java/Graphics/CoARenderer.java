@@ -179,6 +179,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         //programHandle = ShaderHelper.getShader("simple");
 
         for (Territory t: gameState.mapData.territories) {
+            t.updateAnimation();
             if (t.mesh != null) t.mesh.render(t, t.texture, camera.getVPMatrix());
         }
 

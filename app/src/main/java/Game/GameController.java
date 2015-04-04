@@ -61,7 +61,17 @@ public class GameController {
     /// Call this method when the world is clicked on
     public Territory onClick(float x, float y) {
         Territory territory = getTerritoryAtPoint(x, y);
-        Log.d("ben is a bully", Float.toString(x) + " " + Float.toString(y));
+        if (m_gameState.selectedTerritory == territory) {
+            territory.unselect();
+            m_gameState.selectedTerritory = null;
+        } else if (m_gameState.selectedTerritory == null) {
+            territory.select();
+            m_gameState.selectedTerritory = territory;
+        } else {
+            m_gameState.selectedTerritory.unselect();
+            territory.select();
+            m_gameState.selectedTerritory = territory;
+        }
         return territory;
     }
 

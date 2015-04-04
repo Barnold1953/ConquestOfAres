@@ -2,17 +2,14 @@ package utkseniordesign.conquestofares;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Point;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+
 import Game.GameController;
 import Game.GameState;
 import Game.Territory;
@@ -20,7 +17,6 @@ import Game.GameSettings;
 import Graphics.CoARenderer;
 import UI.GamePlayBanner;
 import UI.TerritoryPanel;
-import UI.UserInterfaceHelper;
 import Utils.Device;
 import Utils.Utils;
 
@@ -87,17 +83,16 @@ public class GameActivity extends Activity {
                     coordx = coords[0];
                     coordy = coords[1];
                     //Log.d("Coordinates:",Float.toString(coordx) + " " + Float.toString(coordy));
-                    Territory territory = gameController.onClick(coordx, coordy);
-                    if (gameState.selectedTerritory == territory) {
-                        gameState.selectedTerritory = null;
-                        toggleTerritoryPanel(false);
-                    } else if (gameState.selectedTerritory == null) {
-                        gameState.selectedTerritory = territory;
-                        getTerritoryMenu(territory);
-                        toggleTerritoryPanel(true);
+                    Territory oldTerritory = gameState.selectedTerritory;
+                    Territory newTerritory = gameController.onClick(coordx, coordy);
+                    // Check if selected territory changed
+                    if (oldTerritory == newTerritory) {
+                        setShowTerritoryPanel(false);
+                    } else if (oldTerritory == null) {
+                        updateTerritoryMenu(newTerritory);
+                        setShowTerritoryPanel(true);
                     } else {
-                        gameState.selectedTerritory = territory;
-                        getTerritoryMenu(territory);
+                        updateTerritoryMenu(newTerritory);
                     }
                 }
                 return true;
@@ -130,7 +125,7 @@ public class GameActivity extends Activity {
         territoryPanel.setUpPanel(this);
     }
 
-    public void toggleTerritoryPanel(Boolean show) {
+    public void setShowTerritoryPanel(Boolean show) {
         if(show) {
             // if the panel is in fully hidden or fully shown position, good, otherwise the user jumped the gun, rapid clicking, ignore it
             territoryPanel.animating = YoYo.with(Techniques.SlideInUp).duration(500).playOn(territoryPanel);
@@ -139,7 +134,7 @@ public class GameActivity extends Activity {
         }
     }
 
-    public void getTerritoryMenu(Territory territory) {
+    public void updateTerritoryMenu(Territory territory) {
         if(territoryPanel.getVisibility()==View.GONE) {
             territoryPanel.update(territory);
             territoryPanel.setVisibility(View.VISIBLE);

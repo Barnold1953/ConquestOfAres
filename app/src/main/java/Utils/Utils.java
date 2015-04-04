@@ -31,7 +31,6 @@ public class Utils {
         y = (Device.screenHeight - y);
         y = y/Device.screenHeight;
         y = y*size.getHeight();
-        Log.d("ben is a bully", Float.toString(x) + " " + Float.toString(y));
         return new float[] {x,y};
         //Log.d("Coordinates:", Float.toString(x) + " " + Float.toString(y));
     }

@@ -46,21 +46,21 @@ public class GameEngine {
     }
 
     private void initPlayerColors() {
-        playerColors[0][0] = (byte)255;
+        playerColors[0][0] = (byte)200;
         playerColors[0][1] = (byte)0;
         playerColors[0][2] = (byte)0;
         playerColors[1][0] = (byte)0;
-        playerColors[1][1] = (byte)255;
+        playerColors[1][1] = (byte)200;
         playerColors[1][2] = (byte)0;
         playerColors[2][0] = (byte)0;
         playerColors[2][1] = (byte)0;
         playerColors[2][2] = (byte)255;
-        playerColors[3][0] = (byte)255;
-        playerColors[3][1] = (byte)255;
+        playerColors[3][0] = (byte)200;
+        playerColors[3][1] = (byte)200;
         playerColors[3][2] = (byte)0;
         playerColors[4][0] = (byte)0;
-        playerColors[4][1] = (byte)255;
-        playerColors[4][2] = (byte)255;
+        playerColors[4][1] = (byte)200;
+        playerColors[4][2] = (byte)200;
         playerColors[5][0] = (byte)255;
         playerColors[5][1] = (byte)0;
         playerColors[5][2] = (byte)255;
