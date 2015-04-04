@@ -1,9 +1,11 @@
 package Game;
-import android.util.Log;
 
+import java.nio.ByteBuffer;
 import java.util.*;
 
-import Graphics.SpriteBatchSystem;
+import Graphics.TerritoryMesh;
+
+import android.util.Log;
 
 /**
  * Created by brb55_000 on 2/6/2015.
@@ -11,7 +13,7 @@ import Graphics.SpriteBatchSystem;
 public class Territory {
 
     public Territory() {
-        // Empty
+        setSecondaryColor(1.0f, 1.0f, 1.0f);
     }
     // Copy constructor
     public Territory(Territory b) {
@@ -46,6 +48,53 @@ public class Territory {
     public float y; ///< y coordinate of center
     public float height; ///< Terrain height value TODO: Use this for something maybe? Or remove it?
     public TerrainType terrainType; //< Type of terrain TODO: Use this for something
+    public float mixWeight = 0.0f; ///< When 0, its player color. When 1, its secondaryColor
+    public float[] secondaryColor = new float[3];
+    public boolean isSelected = false;
+
+    // Animation stuff
+    private final float MAX_BLEND = 0.7f;
+    private final float MIN_BLEND = 0.35f;
+    private final float BLEND_SPEED = 0.01f;
+    private boolean m_isIncreasing = true;
+
+    public void select() {
+        if (!isSelected) {
+            isSelected = true;
+            m_isIncreasing = true;
+        }
+    }
+
+    public void unselect() {
+        isSelected = false;
+    }
+
+    public void updateAnimation() {
+        if (isSelected) {
+            if (m_isIncreasing) {
+                mixWeight += BLEND_SPEED;
+                if (mixWeight > MAX_BLEND) {
+                    mixWeight = MAX_BLEND;
+                    m_isIncreasing = false;
+                }
+            } else {
+                mixWeight -= BLEND_SPEED;
+                if (mixWeight < MIN_BLEND) {
+                    mixWeight = MIN_BLEND;
+                    m_isIncreasing = true;
+                }
+            }
+        } else {
+            mixWeight -= BLEND_SPEED;
+            if (mixWeight < 0.0f) mixWeight = 0.0f;
+        }
+    }
+
+    public void setSecondaryColor(float r, float g, float b) {
+        secondaryColor[0] = r;
+        secondaryColor[1] = g;
+        secondaryColor[2] = b;
+    }
 
     public boolean addUnit(float x, float y, Unit.Type type) {
         if(owner.placeableUnits > 0) {
@@ -117,4 +166,14 @@ public class Territory {
     }
     public double distance;///< used for PathFinding
     public boolean visited;///< used for PathFinding
+    public int texture = 0;
+    public int textureWidth = 1;
+    public int textureHeight = 1;
+    public int textureX = 999999999;
+    public int textureY = 999999999;
+    public int maxX = 0; ///< Used in map generation only
+    public int maxY = 0; ///< Used in map generation only
+    public int index = -1;
+    public ByteBuffer pixelBuffer = null;
+    public TerritoryMesh mesh = null;
 }
