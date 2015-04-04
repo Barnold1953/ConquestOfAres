@@ -11,6 +11,7 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
+import Game.GameController;
 import Game.GameState;
 import Game.Player;
 import Game.Territory;
@@ -132,6 +133,24 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         return slope;
     }
 
+    void renderUnits(Territory territory){
+        Player currentPlayer = gameState.players.get(gameState.currentPlayerIndex%gameState.players.size());
+        if(gameState.currentState == GameState.State.PLACING_UNITS_RR){
+            if(territory.owner == currentPlayer){
+                for (Unit u : territory.units) {
+                    float[] slope = getSlope(u);
+                    SpriteBatchSystem.addUnit(u.type, (slope[0]/gameState.mapData.width) * 2 - 1 - (.1f / 2), (slope[1]/gameState.mapData.height) * 2 - 1 - (.1f / 2), territory.owner.color);
+                }
+            }
+        }
+        else{
+            for (Unit u : territory.units) {
+                float[] slope = getSlope(u);
+                SpriteBatchSystem.addUnit(u.type, (slope[0]/gameState.mapData.width) * 2 - 1 - (.1f / 2), (slope[1]/gameState.mapData.height) * 2 - 1 - (.1f / 2), territory.owner.color);
+            }
+        }
+    }
+
     @Override
     public void onDrawFrame(GL10 unused) {
        // Upload mapData texture
@@ -149,17 +168,13 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         int unitCount = 0;
         for(Territory t : gameState.territories){
-            unitCount += t.units.capacity();
+            unitCount += t.units.size();
         }
 
         SpriteBatchSystem.Initialize(unitCount);
 
         for (Territory t : gameState.territories) {
-            for (Unit u : t.units) {
-                float[] slope = getSlope(u);
-                SpriteBatchSystem.addUnit(u.type, (slope[0]/gameState.mapData.width) * 2 - 1 - (.1f / 2), (slope[1]/gameState.mapData.height) * 2 - 1 - (.1f / 2), t.owner.color);
-                //SpriteBatchSystem.addUnit(u.type, (u.location[0]/gameState.mapData.width) * 2 - 1 - (.1f / 2), (u.location[1]/gameState.mapData.height) * 2 - 1 - (.1f / 2), t.owner.color);
-            }
+            renderUnits(t);
         }
 
         GeometryHelper.allocateBuffs(previousUnitCount);

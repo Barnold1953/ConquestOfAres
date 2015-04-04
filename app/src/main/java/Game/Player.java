@@ -11,7 +11,7 @@ public class Player {
     public Vector<Unit> unitsInFlight = new Vector<>();
     public int placeableUnits;
     public boolean isAI = true; ///< True when controlled by AI
-    public byte[] color = new byte[3]; ///< Players army color TODO: Use and set this in GameController
+    public byte[] color = new byte[3]; ///< Players army color
     // TODO: Statistics?
     // TODO: Networking stuff
 

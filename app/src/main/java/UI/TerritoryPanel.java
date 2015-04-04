@@ -27,6 +27,7 @@ import utkseniordesign.conquestofares.R;
 /**
  * Created by lasth_000 on 3/25/2015.
  */
+
 public class TerritoryPanel extends LinearLayout {
     GameActivity parentActivity = null;
     Territory currentTerritory = null;

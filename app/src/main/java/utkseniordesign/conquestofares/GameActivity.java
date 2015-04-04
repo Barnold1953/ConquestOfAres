@@ -54,11 +54,14 @@ public class GameActivity extends Activity {
         // Initlialize device
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
-        Device.screenHeight = (int)dm.heightPixels;
-        Device.screenWidth = (int)dm.widthPixels;
-        //Point point = Utils.getScreenDimensions(this);
-        //Device.screenHeight = point.y;
-        //Device.screenWidth = point.x;
+        //Device.screenHeight = (int)dm.heightPixels;
+        //Device.screenWidth = (int)dm.widthPixels;
+        Point point = Utils.getScreenDimensions(this);
+        Device.screenHeight = point.y;
+        Device.screenWidth = point.x;
+        //Device.screenHeight = mGLSurfaceView.getMeasuredHeight();
+        //Device.screenWidth = mGLSurfaceView.getMeasuredWidth();
+
 
         // Initialize the glSurfaceView
         mGLSurfaceView = ( GLSurfaceView ) findViewById( R.id.glRenderArea );
@@ -86,7 +89,6 @@ public class GameActivity extends Activity {
                     float[] coords = Utils.translateCoordinatePair(coordx,coordy,gameSettings.getMapGenParams().mapSize);
                     coordx = coords[0];
                     coordy = coords[1];
-                    //Log.d("Coordinates:",Float.toString(coordx) + " " + Float.toString(coordy));
                     Territory territory = gameController.onClick(coordx, coordy);
                     if (gameState.selectedTerritory == territory) {
                         gameState.selectedTerritory = null;

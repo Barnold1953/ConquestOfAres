@@ -11,8 +11,9 @@ public class GameState {
 
     public enum State {
         GAME_START,
-        PLACING_UNITS,
-        PLAYING
+        PLACING_UNITS_RANDOM,
+        PLACING_UNITS_RR,
+        PLAYING,
     }
 
     public int currentPlayerIndex = -1; ///< Index of the current player into players TODO: Use this
