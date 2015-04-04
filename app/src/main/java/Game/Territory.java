@@ -1,6 +1,8 @@
 package Game;
 import java.util.*;
 
+import Graphics.SpriteBatchSystem;
+
 /**
  * Created by brb55_000 on 2/6/2015.
  */
@@ -14,7 +16,6 @@ public class Territory {
         this.neighbors = b.neighbors;
         this.units = b.units;
         this.owner = b.owner;
-        this.neighbors = new Vector<Territory>(b.neighbors);
         this.units = new Vector<Unit>(b.units);
         if (b.owner != null) {
             this.owner = new Player(b.owner);
@@ -43,6 +44,31 @@ public class Territory {
     public float y; ///< y coordinate of center
     public float height; ///< Terrain height value TODO: Use this for something maybe? Or remove it?
     public TerrainType terrainType; //< Type of terrain TODO: Use this for something
+
+    public boolean addUnit(float x, float y, Unit.Type type) {
+        if(owner.placeableUnits > 0) {
+            Unit unit = new Unit(x, y, type);
+            units.add(unit);
+            owner.placeableUnits--;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeUnits(float x, float y, Unit.Type type) {
+        Unit unit = null;
+        for( Unit unitOfType : units ) {
+            if(type == unitOfType.type) {
+                unit = unitOfType;
+            }
+        }
+        if(unit != null) {
+            units.remove(units.firstElement());
+            owner.placeableUnits++;
+            return true;
+        }
+        return false;
+    }
 
     public void resolveControl() {
         /* Random randomNumberGenerator = new Random();

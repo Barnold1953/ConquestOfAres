@@ -14,14 +14,13 @@ import Utils.PreciseTimer;
 public class GameEngine {
     public MapGenerator mapGenerator = new MapGenerator(); ///< Generates the map
     private GameState m_gameState = null; ///< Handle to game
-    private GameSettings m_gameSettings = null; ///< Settings TODO(Aaron): pass in good settings in initGame
+    private GameSettings m_gameSettings = null; ///< Settings
     private GameController m_gameController = null;
 
     private byte[][] playerColors = new byte[6][3];
 
     /// Initializes a game by setting up game state and map
     public void initGame(GameState gameState, GameSettings gameSettings, GameController gameController) {
-
         initPlayerColors();
 
         // Set handles so we don't have to pass shit around everywhere
@@ -40,7 +39,7 @@ public class GameEngine {
         // Assign territories
         assignTerritories();
         // Place units
-        initUnits(3);
+        //initUnits(3);
         Log.d("Init: ", "initGame finished.");
     }
 
@@ -67,15 +66,13 @@ public class GameEngine {
 
     private void initPlayers(int numPlayers, int numAI) {
        for (int i = 0; i < numPlayers; i++) {
-           Player p = new Player();
+           Player p = new Player("Player " + (i+1),m_gameSettings);
            if (i < numAI) {
                p.isAI = true;
            }
            p.color[0] = playerColors[i][0];
            p.color[0] = playerColors[i][1];
            p.color[0] = playerColors[i][2];
-           p.extraUnits = 0;
-           p.name = "Player " + Integer.toString(i + 1);
            m_gameState.players.add(p);
        }
     }
