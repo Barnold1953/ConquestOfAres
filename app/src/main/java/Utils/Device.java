@@ -1,5 +1,7 @@
 package Utils;
 
+import android.util.DisplayMetrics;
+
 /**
  * Created by lasth_000 on 4/4/2015.
  */

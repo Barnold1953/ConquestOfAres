@@ -61,6 +61,7 @@ public class GameController {
     /// Call this method when the world is clicked on
     public Territory onClick(float x, float y) {
         Territory territory = getTerritoryAtPoint(x, y);
+        Log.d("ben is a bully", Float.toString(x) + " " + Float.toString(y));
         return territory;
     }
 
