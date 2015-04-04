@@ -18,6 +18,6 @@ public class MapData {
     public int[][] territoryIndices = null;
     public ColorMesh territoryGraphMesh;
     public MapGenerationParams params;
-    public int width;
-    public int height;
+    public float width;
+    public float height;
 }
