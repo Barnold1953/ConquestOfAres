@@ -64,6 +64,7 @@ public class GameActivity extends Activity {
         // Get game screen touch listener
         mGLSurfaceView.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
+                //Log.d("Listener", "(" + event.getX() + ", " + event.getY() + ")");
                 Territory territory = gameController.onClick(event.getX(), event.getY());
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     if (gameState.selectedTerritory == territory) {

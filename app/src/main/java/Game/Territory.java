@@ -1,4 +1,6 @@
 package Game;
+import android.util.Log;
+
 import java.util.*;
 
 import Graphics.SpriteBatchSystem;
@@ -47,7 +49,28 @@ public class Territory {
 
     public boolean addUnit(float x, float y, Unit.Type type) {
         if(owner.placeableUnits > 0) {
-            Unit unit = new Unit(x, y, type);
+            Random r = new Random();
+            float spread = 30.0f;
+            int direction = r.nextInt();
+            Unit unit;
+            switch (direction%4){
+                case 0:
+                    Log.d("addUnit", "case 0");
+                    unit = new Unit(x + r.nextFloat() * spread, y + r.nextFloat() * spread, Unit.Type.soldier);
+                    break;
+                case 1:
+                    Log.d("addUnit", "case 1");
+                    unit = new Unit(x - r.nextFloat() * spread, y + r.nextFloat() * spread, Unit.Type.soldier);
+                    break;
+                case 2:
+                    Log.d("addUnit", "case 2");
+                    unit = new Unit(x + r.nextFloat() * spread, y - r.nextFloat() * spread, Unit.Type.soldier);
+                    break;
+                default:
+                    Log.d("addUnit", "case 3");
+                    unit = new Unit(x - r.nextFloat() * spread, y - r.nextFloat() * spread, Unit.Type.soldier);
+                    break;
+            }
             units.add(unit);
             owner.placeableUnits--;
             return true;

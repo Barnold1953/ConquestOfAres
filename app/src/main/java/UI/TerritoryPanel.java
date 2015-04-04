@@ -54,7 +54,7 @@ public class TerritoryPanel extends LinearLayout {
             @Override
             public void onClick(View v) {
                 Player currentPlayer = parentActivity.getGameController().getCurrentPlayer();
-                if (!currentTerritory.addUnit(0, 0, Unit.Type.soldier)) {
+                if (!currentTerritory.addUnit(currentTerritory.x, currentTerritory.y, Unit.Type.soldier)) {
                     YoYo.with(Techniques.Shake).duration(500).playOn(parentActivity.getGamePlayBanner().label);
                 }
                 parentActivity.getGamePlayBanner().changeContent(parentActivity.getGameController().getGameState());

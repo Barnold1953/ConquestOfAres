@@ -86,20 +86,21 @@ public class GameController {
         return !attacker.units.isEmpty();
     }
 
-    /*void moveUnit(Territory source, Territory destination){
+    void moveUnit(Territory source, Territory destination){
         Action action = new Action(m_currentPlayer, Action.Category.moveUnit, source, destination);
 
-        Unit unit = source.units.get(source.units.size()-1);
+        Unit unit = source.units.remove(source.units.size()-1);
         action.sUnitsLost.add(unit);
         action.dUnitsGained.add(unit);
         m_gameState.actions.add(action);
-        destination.owner.extraUnits++;
+
         //addUnit(destination, destination.x, destination.y, unit.type);
-        source.units.remove(source.units.size()-1);
 
         unit.path = new PathFinding().getPath(source, destination);
         unit.frame = 0;
-
-        source.owner.unitsInFlight.add(unit);
-    }*/
+        unit.location = new float[] {source.x, source.y};
+        unit.destination = new float[] {unit.path.get(unit.path.capacity()-1).x, unit.path.get(unit.path.capacity()-1).y};
+        source.units.add(unit);
+        //source.owner.unitsInFlight.add(unit);
+    }
 }
