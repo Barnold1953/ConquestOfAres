@@ -13,6 +13,9 @@ import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.ToggleButton;
 
+import Generation.MapGenerationParams;
+import Utils.Device;
+
 /**
  * Created by Aaron Pool on 2/24/2015.
  *

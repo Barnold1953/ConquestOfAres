@@ -1,6 +1,7 @@
 package Game;
 
 import android.content.Context;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import java.util.*;
@@ -10,6 +11,7 @@ import Generation.MapGenerator;
 import Generation.MapGenerationParams;
 import Graphics.Quadrilateral;
 import Graphics.SpriteBatchSystem;
+import Utils.Device;
 
 /**
  * Created by brb55_000 on 2/6/2015.
@@ -59,6 +61,7 @@ public class GameController {
     /// Call this method when the world is clicked on
     public Territory onClick(float x, float y) {
         Territory territory = getTerritoryAtPoint(x, y);
+        Log.d("ben is a bully", Float.toString(x) + " " + Float.toString(y));
         return territory;
     }
 
@@ -86,20 +89,21 @@ public class GameController {
         return !attacker.units.isEmpty();
     }
 
-    /*void moveUnit(Territory source, Territory destination){
+    void moveUnit(Territory source, Territory destination){
         Action action = new Action(m_currentPlayer, Action.Category.moveUnit, source, destination);
 
-        Unit unit = source.units.get(source.units.size()-1);
+        Unit unit = source.units.remove(source.units.size()-1);
         action.sUnitsLost.add(unit);
         action.dUnitsGained.add(unit);
         m_gameState.actions.add(action);
-        destination.owner.extraUnits++;
+
         //addUnit(destination, destination.x, destination.y, unit.type);
-        source.units.remove(source.units.size()-1);
 
         unit.path = new PathFinding().getPath(source, destination);
         unit.frame = 0;
-
-        source.owner.unitsInFlight.add(unit);
-    }*/
+        unit.location = new float[] {source.x, source.y};
+        unit.destination = new float[] {unit.path.get(unit.path.capacity()-1).x, unit.path.get(unit.path.capacity()-1).y};
+        source.units.add(unit);
+        //source.owner.unitsInFlight.add(unit);
+    }
 }
