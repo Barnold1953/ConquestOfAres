@@ -11,7 +11,9 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import Game.GameController;
 import Game.GameState;
@@ -30,7 +32,8 @@ import com.daimajia.androidanimations.library.YoYo;
 public class GameActivity extends Activity {
     TerritoryPanel territoryPanel = null;
     GamePlayBanner gamePlayBanner = null;
-    FrameLayout mainView = null;
+    ImageView checkMark = null;
+    RelativeLayout mainView = null;
 
     private GLSurfaceView mGLSurfaceView;
     private GameController gameController;
@@ -40,7 +43,7 @@ public class GameActivity extends Activity {
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_gamescreen );
-        mainView = (FrameLayout) findViewById(R.id.gameScreen);
+        mainView = (RelativeLayout) findViewById(R.id.gameScreen);
         territoryPanel = (TerritoryPanel)findViewById(R.id.territoryLayout);
 
         // Get Game Settings, everything except MapGenParams
@@ -97,6 +100,14 @@ public class GameActivity extends Activity {
             }
         });
 
+        checkMark.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                }
+                return true;
+            }
+        });
+
         createScreen();
     }
 
@@ -121,6 +132,7 @@ public class GameActivity extends Activity {
         gamePlayBanner.changeContent(gameController.getGameState());
         mainView.addView(gamePlayBanner);
         territoryPanel.setUpPanel(this);
+        checkMark = (ImageView) findViewById(R.id.checkMark);
     }
 
     public void toggleTerritoryPanel(Boolean show) {
@@ -129,6 +141,15 @@ public class GameActivity extends Activity {
             territoryPanel.animating = YoYo.with(Techniques.SlideInUp).duration(500).playOn(territoryPanel);
         } else {
             territoryPanel.animating = YoYo.with(Techniques.SlideOutDown).duration(500).playOn(territoryPanel);
+        }
+    }
+
+    public void toggleCheckMark(Boolean show) {
+        if(show) {
+            if(checkMark.getVisibility()==View.GONE) checkMark.setVisibility(View.VISIBLE);
+            YoYo.with(Techniques.RollIn).duration(500).playOn(checkMark);
+        } else {
+            YoYo.with(Techniques.RollOut).duration(500).playOn(checkMark);
         }
     }
 

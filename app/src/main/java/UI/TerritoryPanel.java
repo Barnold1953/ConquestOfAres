@@ -56,7 +56,7 @@ public class TerritoryPanel extends LinearLayout {
                 Player currentPlayer = parentActivity.getGameController().getCurrentPlayer();
                 if (!currentTerritory.addUnit(0, 0, Unit.Type.soldier)) {
                     YoYo.with(Techniques.Shake).duration(500).playOn(parentActivity.getGamePlayBanner().label);
-                }
+                } else if(currentTerritory.owner.placeableUnits == 0) { parentActivity.toggleCheckMark(true); }
                 parentActivity.getGamePlayBanner().changeContent(parentActivity.getGameController().getGameState());
                 update(currentTerritory);
             }
@@ -67,7 +67,7 @@ public class TerritoryPanel extends LinearLayout {
                 Player currentPlayer = parentActivity.getGameController().getCurrentPlayer();
                 if(!currentTerritory.removeUnits(0, 0, Unit.Type.soldier)) {
                     YoYo.with(Techniques.Shake).duration(500).playOn(emptyIndicator);
-                }
+                } else if(currentTerritory.owner.placeableUnits == 1) { parentActivity.toggleCheckMark(false); }
                 parentActivity.getGamePlayBanner().changeContent(parentActivity.getGameController().getGameState());
                 update(currentTerritory);
             }
@@ -82,7 +82,7 @@ public class TerritoryPanel extends LinearLayout {
             for (Unit unit : currentTerritory.units) {
                 ImageView soldierIcon = new ImageView(getContext());
                 soldierIcon.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
-                soldierIcon.setPadding(2,2,2,2);
+                soldierIcon.setPadding(2,1,2,1);
                 soldierIcon.setBackgroundColor(getResources().getColor(R.color.offWhite));
                 soldierIcon.setImageResource(R.drawable.soldier);
                 soldierIcon.setAdjustViewBounds(true);
