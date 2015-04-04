@@ -13,6 +13,7 @@ import android.util.Log;
 
 import Game.GameState;
 import Game.Player;
+import Game.Territory;
 import Game.Unit;
 import Generation.MapData;
 import Utils.PreciseTimer;
@@ -24,7 +25,6 @@ import utkseniordesign.conquestofares.R;
 
 public class CoARenderer implements GLSurfaceView.Renderer {
     int programHandle;
-    int mapShader;
     Context context;
     Camera camera;
     MapData mapData;
@@ -88,8 +88,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
             //dHelper.setProgHandles(programHandle, "animate");
             programHandle = ShaderHelper.compileShader(context, R.string.simple_vert, R.string.texture_frag, "simple");
             dHelper.setProgHandles(programHandle, "simple");
-            mapShader = ShaderHelper.compileShader(context, R.string.simple_vert, R.string.map_frag, "map");
-            dHelper.setProgHandles(programHandle, "map");
         }
         catch (IOException e){
             Log.d("Shader", "Error occurred during compilation");
@@ -120,13 +118,20 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     public void onDrawFrame(GL10 unused) {
        // Upload mapData texture
         PreciseTimer timer = new PreciseTimer();
-        if (gameState != null && gameState.mapData.texture == 0) {
-           gameState.mapData.texture = TextureHelper.dataToTexture(gameState.mapData.pixelBuffer,
-                    "vortest",
-                    gameState.mapData.width,
-                    gameState.mapData.height);
-           gameState.mapData.territoryGraphMesh.finish(context);
+        if (gameState != null && gameState.mapData.isDoneGenerating) {
+            for (Territory t : gameState.territories) {
+                t.texture = TextureHelper.dataToTexture(t.pixelBuffer, "t" + t.index, t.textureWidth, t.textureHeight);
+                t.pixelBuffer = null;
+                t.mesh = new TerritoryMesh();
+                t.mesh.init(((float)t.textureX / gameState.mapData.width) * 2.0f - 1.0f,
+                        ((float)t.textureY / gameState.mapData.height) * 2.0f - 1.0f,
+                        ((float)t.textureWidth / gameState.mapData.width) * 2.0f,
+                        ((float)t.textureHeight / gameState.mapData.height) * 2.0f,
+                        context);
+            }
+            gameState.mapData.territoryGraphMesh.finish(context);
             Log.d("Line", "Got here");
+            gameState.mapData.isDoneGenerating = false;
         }
         // Make sprites
         SpriteBatchSystem.clear();
@@ -155,7 +160,9 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         //programHandle = ShaderHelper.getShader("simple");
 
-        dHelper.draw(camera, GeometryHelper.getVertBuff("master"), GeometryHelper.getColorBuff("master"), GeometryHelper.getTextBuff("master"), TextureHelper.getTexture("vortest"), GeometryHelper.getVerticesCount("master"), "map");
+        for (Territory t: gameState.mapData.territories) {
+            if (t.mesh != null) t.mesh.render(1.0f, 1.0f, 1.0f, t.texture, camera.getVPMatrix());
+        }
 
         if (showLines) gameState.mapData.territoryGraphMesh.renderLines(camera.getVPMatrix());
 

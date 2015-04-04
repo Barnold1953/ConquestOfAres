@@ -1,5 +1,8 @@
 package Game;
+import java.nio.ByteBuffer;
 import java.util.*;
+
+import Graphics.TerritoryMesh;
 
 /**
  * Created by brb55_000 on 2/6/2015.
@@ -41,4 +44,14 @@ public class Territory {
     public TerrainType terrainType; //< Type of terrain TODO: Use this for something
     public double distance;///< used for PathFinding
     public boolean visited;///< used for PathFinding
+    public int texture = 0;
+    public int textureWidth = 1;
+    public int textureHeight = 1;
+    public int textureX = 999999999;
+    public int textureY = 999999999;
+    public int maxX = 0; ///< Used in map generation only
+    public int maxY = 0; ///< Used in map generation only
+    public int index = -1;
+    public ByteBuffer pixelBuffer = null;
+    public TerritoryMesh mesh = null;
 }

@@ -43,7 +43,7 @@ public class GameEngine {
         // Assign territories
         assignTerritories();
         // Place units
-        initUnits(16);
+        initUnits(1);
         Log.d("Init: ", "initGame finished.");
     }
 

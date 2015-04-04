@@ -47,7 +47,7 @@ public class ShaderHelper {
                 GLES20.glGetShaderiv(vertexShaderHandle, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
 
                 if (compileStatus[0] == 0) {
-                    Log.d("Shader", GLES20.glGetShaderInfoLog(vertexShaderHandle));
+                    Log.d("Vertex Shader", GLES20.glGetShaderInfoLog(vertexShaderHandle));
                     GLES20.glDeleteShader(vertexShaderHandle);
                     vertexShaderHandle = 0;
                 }
@@ -69,6 +69,7 @@ public class ShaderHelper {
                 GLES20.glGetShaderiv(fragmentShaderHandle, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
 
                 if (compileStatus[0] == 0) {
+                    Log.d("Fragment Shader", GLES20.glGetShaderInfoLog(fragmentShaderHandle));
                     GLES20.glDeleteShader(fragmentShaderHandle);
                     fragmentShaderHandle = 0;
                 }
