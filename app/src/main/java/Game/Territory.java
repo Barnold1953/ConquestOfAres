@@ -13,7 +13,7 @@ import android.util.Log;
 public class Territory {
 
     public Territory() {
-        // Empty
+        setSecondaryColor(1.0f, 1.0f, 1.0f);
     }
     // Copy constructor
     public Territory(Territory b) {
@@ -48,6 +48,25 @@ public class Territory {
     public float y; ///< y coordinate of center
     public float height; ///< Terrain height value TODO: Use this for something maybe? Or remove it?
     public TerrainType terrainType; //< Type of terrain TODO: Use this for something
+    public float mixWeight = 0.0f; ///< When 0, its player color. When 1, its secondaryColor
+    public float[] secondaryColor = new float[3];
+    public boolean isSelected = false;
+
+    // Animation stuff
+    private final float MAX_BLEND = 0.5f;
+    private final float MIN_BLEND = 0.3f;
+    private final float BLEND_SPEED = 0.01f;
+    private boolean m_isIncreasing = true;
+
+    public void select() {
+        
+    }
+
+    public void setSecondaryColor(float r, float g, float b) {
+        secondaryColor[0] = r;
+        secondaryColor[1] = g;
+        secondaryColor[2] = b;
+    }
 
     public boolean addUnit(float x, float y, Unit.Type type) {
         if(owner.placeableUnits > 0) {
