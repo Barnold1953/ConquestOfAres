@@ -120,7 +120,6 @@ public class GameActivity extends Activity {
     public void getTerritoryMenu(Territory territory) {
         if(territoryPanel.getVisibility()==View.GONE) {
             territoryPanel.update(territory);
-            YoYo.with(Techniques.SlideOutDown).duration(0).playOn(territoryPanel);
             territoryPanel.setVisibility(View.VISIBLE);
         } else territoryPanel.update(territory);
     }
