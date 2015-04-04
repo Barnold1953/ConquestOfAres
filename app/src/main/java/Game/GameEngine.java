@@ -16,14 +16,13 @@ import Utils.PreciseTimer;
 public class GameEngine {
     public MapGenerator mapGenerator = new MapGenerator(); ///< Generates the map
     private GameState m_gameState = null; ///< Handle to game
-    private GameSettings m_gameSettings = null; ///< Settings TODO(Aaron): pass in good settings in initGame
+    private GameSettings m_gameSettings = null; ///< Settings
     private GameController m_gameController = null;
 
     private byte[][] playerColors = new byte[6][3];
 
     /// Initializes a game by setting up game state and map
     public void initGame(GameState gameState, GameSettings gameSettings, GameController gameController) {
-
         initPlayerColors();
 
         // Set handles so we don't have to pass shit around everywhere
@@ -42,7 +41,6 @@ public class GameEngine {
         // Assign territories
         assignTerritories();
         // Place units
-        initUnits(16);
         Log.d("Init: ", "initGame finished.");
     }
 
@@ -69,14 +67,14 @@ public class GameEngine {
 
     private void initPlayers(int numPlayers, int numAI) {
        for (int i = 0; i < numPlayers; i++) {
-           Player p = new Player();
+           Player p = new Player("Player " + (i+1),m_gameSettings);
            if (i < numAI) {
                p.isAI = true;
            }
            p.color[0] = playerColors[i][0];
            p.color[1] = playerColors[i][1];
            p.color[2] = playerColors[i][2];
-           p.extraUnits = 0;
+           p.placeableUnits = 35;
            p.name = "Player " + Integer.toString(i + 1);
            m_gameState.players.add(p);
        }
@@ -109,7 +107,7 @@ public class GameEngine {
 
     /// Sets up all the initial armies
     private void initUnits(int unitsPerTerritory) {
-        Random r = new Random();
+        /* Random r = new Random();
         int totalUnits = unitsPerTerritory * m_gameState.territories.size();
         int unitsPerPlayer = totalUnits / m_gameState.players.size();
         for (Player p : m_gameState.players) {
@@ -137,6 +135,6 @@ public class GameEngine {
                     //m_gameController.addUnit(t, t.x, t.y, Unit.Type.soldier);
                 }
             }
-        }
+        }*/
     }
 }
