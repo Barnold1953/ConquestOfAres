@@ -2,6 +2,8 @@ package Game;
 
 import android.util.Log;
 
+import java.util.Random;
+
 import Generation.MapData;
 import Generation.MapGenerator;
 import Utils.PreciseTimer;
@@ -41,7 +43,7 @@ public class GameEngine {
         // Assign territories
         assignTerritories();
         // Place units
-        initUnits(3);
+        initUnits(16);
         Log.d("Init: ", "initGame finished.");
     }
 
@@ -73,8 +75,8 @@ public class GameEngine {
                p.isAI = true;
            }
            p.color[0] = playerColors[i][0];
-           p.color[0] = playerColors[i][1];
-           p.color[0] = playerColors[i][2];
+           p.color[1] = playerColors[i][1];
+           p.color[2] = playerColors[i][2];
            p.extraUnits = 0;
            p.name = "Player " + Integer.toString(i + 1);
            m_gameState.players.add(p);
@@ -91,8 +93,11 @@ public class GameEngine {
             case RANDOM:
                 int j = 0;
                 for (int i = 0; i < m_gameState.territories.size(); i++) {
-                    m_gameState.players.get(j).addTerritory(m_gameState.territories.get(i));
-                    j++;
+                    if(m_gameState.territories.get(i).terrainType != Territory.TerrainType.Ocean) {
+                        m_gameState.players.get(j).addTerritory(m_gameState.territories.get(i));
+
+                        j++;
+                    }
                     if (j == m_gameState.players.size()) j = 0;
                 }
                 
@@ -105,6 +110,7 @@ public class GameEngine {
 
     /// Sets up all the initial armies
     private void initUnits(int unitsPerTerritory) {
+        Random r = new Random();
         int totalUnits = unitsPerTerritory * m_gameState.territories.size();
         int unitsPerPlayer = totalUnits / m_gameState.players.size();
         for (Player p : m_gameState.players) {
@@ -112,7 +118,24 @@ public class GameEngine {
             for (Territory t : p.territories) {
                 for (int i = 0; i < unitsPerTerritory && unitsRemaining != 0; i++) {
                     p.extraUnits++;
-                    m_gameController.addUnit(t, t.x, t.y, Unit.Type.soldier);
+                    int direction = r.nextInt();
+                    float spread = 30.0f;
+                    switch (direction%4){
+                        case 0:
+                            m_gameController.addUnit(t, t.x + r.nextFloat() * spread, t.y + r.nextFloat() * spread, Unit.Type.soldier);
+                            break;
+                        case 1:
+                            m_gameController.addUnit(t, t.x - r.nextFloat() * spread, t.y + r.nextFloat() * spread, Unit.Type.soldier);
+                            break;
+                        case 2:
+                            m_gameController.addUnit(t, t.x + r.nextFloat() * spread, t.y - r.nextFloat() * spread, Unit.Type.soldier);
+                            break;
+                        case 3:
+                            m_gameController.addUnit(t, t.x - r.nextFloat() * spread, t.y - r.nextFloat() * spread, Unit.Type.soldier);
+                            break;
+                    }
+                    //m_gameController.addUnit(t, t.x + r.nextFloat() * 60.0f, t.y + r.nextFloat() * 60.0f, Unit.Type.soldier);
+                    //m_gameController.addUnit(t, t.x, t.y, Unit.Type.soldier);
                 }
             }
         }
