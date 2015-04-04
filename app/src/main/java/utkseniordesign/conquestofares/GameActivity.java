@@ -57,8 +57,11 @@ public class GameActivity extends Activity {
         // Initlialize device
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
-        Device.screenHeight = dm.heightPixels;
-        Device.screenWidth = dm.widthPixels;
+        Device.screenHeight = (int)dm.heightPixels;
+        Device.screenWidth = (int)dm.widthPixels;
+        //Point point = Utils.getScreenDimensions(this);
+        //Device.screenHeight = point.y;
+        //Device.screenWidth = point.x;
 
         // Initialize the glSurfaceView
         mGLSurfaceView = ( GLSurfaceView ) findViewById( R.id.glRenderArea );
@@ -77,12 +80,16 @@ public class GameActivity extends Activity {
         // Get game screen touch listener
         mGLSurfaceView.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
-                // scale coordinates
+                //Log.d("Listener", "(" + event.getX() + ", " + event.getY() + ")");
+               // Territory territory = gameController.onClick(event.getX(), event.getY());
+
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     float coordx = event.getX();
                     float coordy = event.getY();
-                    Utils.translateCoordinatePair(coordx,coordy,gameSettings.getMapGenParams().mapSize);
-                    Log.d("Coordinates:",Float.toString(coordx) + " " + Float.toString(coordy));
+                    float[] coords = Utils.translateCoordinatePair(coordx,coordy,gameSettings.getMapGenParams().mapSize);
+                    coordx = coords[0];
+                    coordy = coords[1];
+                    //Log.d("Coordinates:",Float.toString(coordx) + " " + Float.toString(coordy));
                     Territory territory = gameController.onClick(coordx, coordy);
                     if (gameState.selectedTerritory == territory) {
                         gameState.selectedTerritory = null;

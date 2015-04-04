@@ -41,18 +41,18 @@ public class GeometryHelper {
         }
 
         //Log.d("Geometry3", tmp.toString());
-        System.arraycopy(newV, 0, bg.vertices, unitCount * 18, newV.length);
-        System.arraycopy(quadTextCoords, 0, bg.textureCoordinates, unitCount*12, quadTextCoords.length);
+        System.arraycopy(newV, 0, bg.vertices, 0, newV.length);
+        System.arraycopy(quadTextCoords, 0, bg.textureCoordinates, 0, quadTextCoords.length);
         for(int i = 0; i < quadTextCoords.length; i+=2){
             bg.textureCoordinates[i+1] = 1.0f - bg.textureCoordinates[i+1];
         }
         byte[] tempB = new byte[bg.colors.length];
-        System.arraycopy(tempB, 0, bg.colors, unitCount*18, tempB.length);
+        System.arraycopy(tempB, 0, bg.colors, 0, tempB.length);
 
         if(bg.vBuff != null && bg.tcBuff != null && bg.cBuff != null) {
-            bg.vBuff.reset();
-            bg.tcBuff.reset();
-            bg.cBuff.reset();
+            bg.vBuff.clear();
+            bg.tcBuff.clear();
+            bg.cBuff.clear();
         }
 
         bg.vBuff = ByteBuffer.allocateDirect(bg.vertices.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
@@ -95,21 +95,15 @@ public class GeometryHelper {
             bg.colors = new byte[18 * totalUnits];
         }
 
-        float[] newV = {quad.x,quad.y+quad.height,quad.z,quad.x,quad.y,quad.z,quad.x+quad.width,quad.y,quad.z,quad.x+quad.width,quad.y,quad.z,quad.x+quad.width,quad.y+quad.height,quad.z,quad.x,quad.y+quad.height,quad.z};
+        float[] newV = new float[] {quad.x,quad.y+quad.height,quad.z,quad.x,quad.y,quad.z,quad.x+quad.width,quad.y,quad.z,quad.x+quad.width,quad.y,quad.z,quad.x+quad.width,quad.y+quad.height,quad.z,quad.x,quad.y+quad.height,quad.z};
 
-        //bg.vertices = addToFloatArray(bg.vertices, newV);
-        //bg.textureCoordinates = addToFloatArray(bg.textureCoordinates, quadTextCoords);
         byte[] temp = new byte[18];
         for(int i = 0; i < temp.length; i++){
             temp[i] = quad.color[i % 3];
         }
         //bg.colors = addToFloatArray(bg.colors, temp);
 
-        Integer tmp = bg.vertices.length;
-
-        //Log.d("Geometry3", tmp.toString());
         System.arraycopy(newV, 0, bg.vertices, unitCount * 18, newV.length);
-        //System.arraycopy(quadTextCoords, 0, bg.textureCoordinates, unitCount*12, quadTextCoords.length);
         System.arraycopy(temp, 0, bg.colors, unitCount*18, temp.length);
 
         unitCount++;
