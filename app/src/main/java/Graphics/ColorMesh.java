@@ -74,7 +74,6 @@ public class ColorMesh {
     }
 
     public void renderLines(float[] vpMatrix) {
-
         GLES20.glUseProgram(m_programHandle);
 
         m_vertexBuffer.position(0);

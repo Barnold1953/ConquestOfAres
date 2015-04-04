@@ -122,7 +122,7 @@ public class GameController {
         action.dUnitsGained.add(unit);
         m_gameState.actions.add(action);
         destination.owner.extraUnits++;
-        addUnit(destination, destination.x, destination.y, unit.type);
+        //addUnit(destination, destination.x, destination.y, unit.type);
         source.units.remove(source.units.size()-1);
 
         unit.path = new PathFinding().getPath(source, destination);
@@ -130,6 +130,4 @@ public class GameController {
 
         source.owner.unitsInFlight.add(unit);
     }
-
-
 }
