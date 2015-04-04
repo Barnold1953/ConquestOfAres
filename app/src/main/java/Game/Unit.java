@@ -16,10 +16,8 @@ public class Unit {
 
     public Unit(float x, float y, Type t){
         hasMoved = true;
-        location[0] = x;
-        location[1] = y;
-        destination[0] = x;
-        destination[0] = y;
+        location = new float[] {x,y};
+        destination = new float[] {x,y};
         type = t;
     }
 
@@ -34,4 +32,15 @@ public class Unit {
     public float armor;
     // damage will increase or decrease based on the type of units fighting
     public float damage;
+
+    public void destinationStep(){
+        frame = 0;
+        location = destination;
+        if(path != null && !path.isEmpty()) {
+            path.remove(path.capacity()-1);
+            if(!path.isEmpty()){
+                destination = new float[] {path.get(path.capacity()-1).x, path.get(path.capacity()-1).y};
+            }
+        }
+    }
 }

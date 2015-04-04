@@ -1,8 +1,11 @@
 package Game;
+
 import java.nio.ByteBuffer;
 import java.util.*;
 
 import Graphics.TerritoryMesh;
+
+import android.util.Log;
 
 /**
  * Created by brb55_000 on 2/6/2015.
@@ -14,8 +17,10 @@ public class Territory {
     }
     // Copy constructor
     public Territory(Territory b) {
-        this.neighbors = new Vector<Territory>(b.neighbors);
-        units = new Vector<Unit>(b.units);
+        this.neighbors = b.neighbors;
+        this.units = b.units;
+        this.owner = b.owner;
+        this.units = new Vector<Unit>(b.units);
         if (b.owner != null) {
             this.owner = new Player(b.owner);
         }
@@ -35,13 +40,83 @@ public class Territory {
     }
 
     public Vector<Territory> neighbors = new Vector<Territory>(); ///< Pointers to neighbor territories
-    public Vector<Unit> units = new Vector<Unit>(); ///< Pointer to residing army
+    public Vector<Unit> units = new Vector<Unit>(); ///< Pointer to residing armies
     public Player owner = null; ///< Owning player
     public int power = 0; ///< Power of the territory
+    public int economy = 0;
     public float x; ///< x coordinate of center
     public float y; ///< y coordinate of center
     public float height; ///< Terrain height value TODO: Use this for something maybe? Or remove it?
     public TerrainType terrainType; //< Type of terrain TODO: Use this for something
+
+    public boolean addUnit(float x, float y, Unit.Type type) {
+        if(owner.placeableUnits > 0) {
+            Random r = new Random();
+            float spread = 30.0f;
+            int direction = r.nextInt();
+            Unit unit;
+            switch (direction%4){
+                case 0:
+                    Log.d("addUnit", "case 0");
+                    unit = new Unit(x + r.nextFloat() * spread, y + r.nextFloat() * spread, Unit.Type.soldier);
+                    break;
+                case 1:
+                    Log.d("addUnit", "case 1");
+                    unit = new Unit(x - r.nextFloat() * spread, y + r.nextFloat() * spread, Unit.Type.soldier);
+                    break;
+                case 2:
+                    Log.d("addUnit", "case 2");
+                    unit = new Unit(x + r.nextFloat() * spread, y - r.nextFloat() * spread, Unit.Type.soldier);
+                    break;
+                default:
+                    Log.d("addUnit", "case 3");
+                    unit = new Unit(x - r.nextFloat() * spread, y - r.nextFloat() * spread, Unit.Type.soldier);
+                    break;
+            }
+            units.add(unit);
+            owner.placeableUnits--;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeUnits(float x, float y, Unit.Type type) {
+        Unit unit = null;
+        for( Unit unitOfType : units ) {
+            if(type == unitOfType.type) {
+                unit = unitOfType;
+            }
+        }
+        if(unit != null) {
+            units.remove(units.firstElement());
+            owner.placeableUnits++;
+            return true;
+        }
+        return false;
+    }
+
+    public void resolveControl() {
+        /* Random randomNumberGenerator = new Random();
+        int defense_bonus = 1;
+        Army defender = armies.get(0);
+        Army attacker = armies.get(1);
+        while( !defender.units.isEmpty() ) {
+            if( attacker.units.isEmpty() ) break;
+            else {
+                // Generates a number between 1 and 6 ( the argument is 7, because it's exclusive of the max )
+                int defenderRoll = randomNumberGenerator.nextInt( 7 );
+                int attackerRoll = randomNumberGenerator.nextInt( 7 );
+                if( defenderRoll < attackerRoll ) defender.units.remove( defender.units.size() - 1 );
+                else attacker.units.remove( defender.units.size() - 1 );
+            }
+        }
+
+        // if the attacker still has units, then the attacker won, change possession
+        if( !attacker.units.isEmpty() ) {
+            defender.owner.territories.remove( this );
+            attacker.owner.territories.add( this );
+        }*/
+    }
     public double distance;///< used for PathFinding
     public boolean visited;///< used for PathFinding
     public int texture = 0;

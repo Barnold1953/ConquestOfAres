@@ -1,6 +1,7 @@
 package Game;
 
 import android.content.Context;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import java.util.*;
@@ -10,6 +11,7 @@ import Generation.MapGenerator;
 import Generation.MapGenerationParams;
 import Graphics.Quadrilateral;
 import Graphics.SpriteBatchSystem;
+import Utils.Device;
 
 /**
  * Created by brb55_000 on 2/6/2015.
@@ -26,15 +28,19 @@ public class GameController {
     public void initGame(GameState gameState, GameSettings gameSettings) {
         // Set handles so we don't have to pass shit around everywhere
         m_gameState = gameState;
+        m_gameState.currentState = GameState.State.GAME_START;
         m_gameSettings = gameSettings;
-       // Initialize the game
+        // Initialize the game
         m_gameEngine.initGame(m_gameState, m_gameSettings, this);
-        m_gameState.currentPlayerIndex = -1; // Start at -1 so nextTurn goes to 0
+        m_gameState.currentPlayerIndex = 0; // Start at -1 so nextTurn goes to 0
+        m_currentPlayer = m_gameState.players.get(m_gameState.currentPlayerIndex);
     }
 
     public GameState getGameState(){
         return m_gameState;
     }
+
+    public Player getCurrentPlayer() { return m_currentPlayer; }
 
     /// Call this to transition to the next turn
     void nextTurn() {
@@ -53,46 +59,15 @@ public class GameController {
     }
 
     /// Call this method when the world is clicked on
-    void onClick(float x, float y) {
+    public Territory onClick(float x, float y) {
         Territory territory = getTerritoryAtPoint(x, y);
-        if(territory == m_gameState.selectedTerritory){
-            m_gameState.selectedTerritory = null;
-            return;
-        }
-        if(m_gameState.selectedTerritory == null){
-            m_gameState.selectedTerritory = territory;
-            return;
-        }
-        switch (m_gameState.currentState) {
-            case PLACING_UNITS:
-                addUnit(territory, x, y, Unit.Type.soldier);
-                break;
-            case PLAYING:
-                if(m_gameState.selectedTerritory.owner != territory.owner){
-                    attack(m_gameState.selectedTerritory, territory);
-                }
-                else{
-                    moveUnit(m_gameState.selectedTerritory, territory);
-                }
-                break;
-        }
+        Log.d("ben is a bully", Float.toString(x) + " " + Float.toString(y));
+        return territory;
     }
 
     /// Returns the territory at a specific point
     Territory getTerritoryAtPoint(float x, float y) {
         return MapGenerator.getClosestTerritory(x, y, m_gameState.territories);
-    }
-
-    public boolean addUnit(Territory territory, float x, float y, Unit.Type type){
-        if(territory.owner.extraUnits > 0){
-            Unit unit = new Unit(x,y, Unit.Type.soldier);
-
-            territory.units.add(unit);
-            territory.owner.units.add(unit);
-            territory.owner.extraUnits--;
-            return true;
-        }
-        return false;
     }
 
     boolean attack(Territory attacker, Territory defender){
@@ -117,17 +92,18 @@ public class GameController {
     void moveUnit(Territory source, Territory destination){
         Action action = new Action(m_currentPlayer, Action.Category.moveUnit, source, destination);
 
-        Unit unit = source.units.get(source.units.size()-1);
+        Unit unit = source.units.remove(source.units.size()-1);
         action.sUnitsLost.add(unit);
         action.dUnitsGained.add(unit);
         m_gameState.actions.add(action);
-        destination.owner.extraUnits++;
+
         //addUnit(destination, destination.x, destination.y, unit.type);
-        source.units.remove(source.units.size()-1);
 
         unit.path = new PathFinding().getPath(source, destination);
         unit.frame = 0;
-
-        source.owner.unitsInFlight.add(unit);
+        unit.location = new float[] {source.x, source.y};
+        unit.destination = new float[] {unit.path.get(unit.path.capacity()-1).x, unit.path.get(unit.path.capacity()-1).y};
+        source.units.add(unit);
+        //source.owner.unitsInFlight.add(unit);
     }
 }

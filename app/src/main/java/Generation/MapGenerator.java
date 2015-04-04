@@ -8,6 +8,7 @@ import java.util.*;
 
 import Game.Territory;
 import Graphics.ColorMesh;
+import Utils.Utils;
 
 /**
  * Created by brb55_000 on 1/21/2015.
@@ -32,35 +33,11 @@ public class MapGenerator {
         mapData = new MapData();
         mapData.params = p;
 
-        int width = 1;
-        int height = 1;
-        // TODO: These are arbitrary. Pick better values.
-        switch (p.mapSize) {
-            case CRAMPED:
-                width = 540;
-                height = 960;
-                break;
-            case SMALL:
-                width = 720;
-                height = 1280;
-                break;
-            case MEDIUM:
-                width = 900;
-                height = 1600;
-                break;
-            case LARGE:
-                width = 1080;
-                height = 1920;
-                break;
-            default:
-                break;
-        }
-
-        mapData.width = width;
-        mapData.height = height;
+        mapData.width = p.mapSize.getWidth();
+        mapData.height = p.mapSize.getHeight();
 
         // random.setSeed(p.seed);
-        generateTerritories(width, height, 100);
+        generateTerritories(Utils.fastFloor(mapData.width), Utils.fastFloor(mapData.height), 100);
 
         // TODO(Ben): Segment heightmap into territories
         mapData.isDoneGenerating = true;
@@ -95,7 +72,7 @@ public class MapGenerator {
         int pindex = 0;
         float dx, dy;
 
-        mapData.territoryIndices = new int[height][width];
+        mapData.territoryIndices = new int[Utils.fastFloor(height)][Utils.fastFloor(width)];
 
         // Determine bounds for placing territories based on wrap mode
         float startX = 0.0f, startY = 0.0f, genWidth = width, genHeight = height;

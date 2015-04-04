@@ -114,6 +114,21 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         GLES20.glDepthMask( true );
     }
 
+    float[] getSlope(Unit u){
+        if(u.frame == 10){
+            u.destinationStep();
+        }
+
+        float[] slope = new float[2];
+
+        slope[0] = (u.destination[0] - u.location[0]) / 10;
+        slope[1] = (u.destination[1] - u.location[1]) / 10;
+        slope[0] = u.location[0] + slope[0] * u.frame;
+        slope[1] = u.location[1] + slope[1] * u.frame;
+        u.frame++;
+        return slope;
+    }
+
     @Override
     public void onDrawFrame(GL10 unused) {
        // Upload mapData texture
@@ -130,6 +145,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
                         context);
             }
             gameState.mapData.territoryGraphMesh.finish(context);
+
             Log.d("Line", "Got here");
             gameState.mapData.isDoneGenerating = false;
         }
@@ -137,15 +153,17 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         SpriteBatchSystem.clear();
 
         int unitCount = 0;
-        for(Player p : gameState.players){
-            unitCount += p.units.capacity();
+        for(Territory t : gameState.territories){
+            unitCount += t.units.capacity();
         }
 
         SpriteBatchSystem.Initialize(unitCount);
 
-        for (Player p : gameState.players) {
-            for (Unit u : p.units) {
-                SpriteBatchSystem.addUnit(u.type, (u.location[0]/gameState.mapData.width) * 2 - 1 - (.1f / 2), (u.location[1]/gameState.mapData.height) * 2 - 1 - (.1f / 2), p.color);
+        for (Territory t : gameState.territories) {
+            for (Unit u : t.units) {
+                float[] slope = getSlope(u);
+                SpriteBatchSystem.addUnit(u.type, (slope[0]/gameState.mapData.width) * 2 - 1 - (.1f / 2), (slope[1]/gameState.mapData.height) * 2 - 1 - (.1f / 2), t.owner.color);
+                //SpriteBatchSystem.addUnit(u.type, (u.location[0]/gameState.mapData.width) * 2 - 1 - (.1f / 2), (u.location[1]/gameState.mapData.height) * 2 - 1 - (.1f / 2), t.owner.color);
             }
         }
 

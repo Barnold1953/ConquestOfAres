@@ -2,62 +2,63 @@ package utkseniordesign.conquestofares;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.opengl.GLES20;
+import android.graphics.Point;
 import android.opengl.GLSurfaceView;
-import android.opengl.GLUtils;
 import android.os.Bundle;
-
 import android.util.DisplayMetrics;
 import android.util.Log;
-
-import android.view.Gravity;
+import android.view.Display;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-
-import java.util.HashMap;
-
 import Game.GameController;
 import Game.GameState;
-import Generation.MapGenerationParams;
+import Game.Territory;
 import Game.GameSettings;
 import Graphics.CoARenderer;
+import UI.GamePlayBanner;
+import UI.TerritoryPanel;
 import UI.UserInterfaceHelper;
+import Utils.Device;
+import Utils.Utils;
+
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 
 public class GameActivity extends Activity {
-
-    TextView [] toggleButtons;
-    Boolean devPanelShown = false;
+    TerritoryPanel territoryPanel = null;
+    GamePlayBanner gamePlayBanner = null;
+    FrameLayout mainView = null;
 
     private GLSurfaceView mGLSurfaceView;
-    private GameState gameState;
     private GameController gameController;
     private CoARenderer coaRenderer;
     private GameSettings gameSettings;
 
     protected void onCreate( Bundle savedInstanceState ) {
-        toggleButtons = new TextView[3];
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_gamescreen );
+        mainView = (FrameLayout) findViewById(R.id.gameScreen);
+        territoryPanel = (TerritoryPanel)findViewById(R.id.territoryLayout);
 
         // Get Game Settings, everything except MapGenParams
-
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-        Log.d("Display width: ", Integer.toString(metrics.widthPixels));
-        Log.d("Display height: ", Integer.toString(metrics.heightPixels));
-
-        /* COMMENT THIS OUT IF GAME ACTIVITY IS YOUR STARTUP ACTIVITY */
         Intent intent = getIntent();
         if( intent != null ) {
             gameSettings = (GameSettings) intent.getParcelableExtra("Settings");
         } else {
             gameSettings = new GameSettings();
         }
+
+        // Initlialize device
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        Device.screenHeight = (int)dm.heightPixels;
+        Device.screenWidth = (int)dm.widthPixels;
+        //Point point = Utils.getScreenDimensions(this);
+        //Device.screenHeight = point.y;
+        //Device.screenWidth = point.x;
 
         // Initialize the glSurfaceView
         mGLSurfaceView = ( GLSurfaceView ) findViewById( R.id.glRenderArea );
@@ -69,9 +70,41 @@ public class GameActivity extends Activity {
         mGLSurfaceView.setRenderer(coaRenderer);
 
         // Init the game
-        GameState gameState = new GameState();
+        final GameState gameState = new GameState();
         gameController.initGame(gameState, gameSettings);
         coaRenderer.setGameState(gameState);
+
+        // Get game screen touch listener
+        mGLSurfaceView.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                //Log.d("Listener", "(" + event.getX() + ", " + event.getY() + ")");
+               // Territory territory = gameController.onClick(event.getX(), event.getY());
+
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    float coordx = event.getX();
+                    float coordy = event.getY();
+                    float[] coords = Utils.translateCoordinatePair(coordx,coordy,gameSettings.getMapGenParams().mapSize);
+                    coordx = coords[0];
+                    coordy = coords[1];
+                    //Log.d("Coordinates:",Float.toString(coordx) + " " + Float.toString(coordy));
+                    Territory territory = gameController.onClick(coordx, coordy);
+                    if (gameState.selectedTerritory == territory) {
+                        gameState.selectedTerritory = null;
+                        toggleTerritoryPanel(false);
+                    } else if (gameState.selectedTerritory == null) {
+                        gameState.selectedTerritory = territory;
+                        getTerritoryMenu(territory);
+                        toggleTerritoryPanel(true);
+                    } else {
+                        gameState.selectedTerritory = territory;
+                        getTerritoryMenu(territory);
+                    }
+                }
+                return true;
+            }
+        });
+
+        createScreen();
     }
 
     @Override
@@ -90,52 +123,35 @@ public class GameActivity extends Activity {
         mGLSurfaceView.onPause();
     }
 
-    public void toggleDevPanel(View v) {
-        LinearLayout parent = (LinearLayout)v.getParent();
-        if(parent != null) {
-            if (!devPanelShown) {
-                devPanelShown = true;
-                parent.setBackgroundColor(getResources().getColor(R.color.transparentBlack));
-                createPanelTextViews();
-                for (int i = 0; i < 3; i++) parent.addView(toggleButtons[i]);
-            } else {
-                devPanelShown = false;
-                parent.setBackgroundColor(getResources().getColor(R.color.transparent));
-                for (int i = 0; i < 3; i++) parent.removeView(toggleButtons[i]);
-            }
+    public void createScreen() {
+        gamePlayBanner = new GamePlayBanner(getBaseContext());
+        gamePlayBanner.changeContent(gameController.getGameState());
+        mainView.addView(gamePlayBanner);
+        territoryPanel.setUpPanel(this);
+    }
+
+    public void toggleTerritoryPanel(Boolean show) {
+        if(show) {
+            // if the panel is in fully hidden or fully shown position, good, otherwise the user jumped the gun, rapid clicking, ignore it
+            territoryPanel.animating = YoYo.with(Techniques.SlideInUp).duration(500).playOn(territoryPanel);
+        } else {
+            territoryPanel.animating = YoYo.with(Techniques.SlideOutDown).duration(500).playOn(territoryPanel);
         }
     }
 
-    private void createPanelTextViews() {
-        toggleButtons = new TextView[3];
-        for( int i = 0; i < 3; i++ ) {
-            toggleButtons[i] = new TextView(this);
-            toggleButtons[i].setPadding(40,10,40,0);
-            toggleButtons[i].setTextSize(20);
-            toggleButtons[i].setTextColor(getResources().getColor(R.color.white));
-        }
+    public void getTerritoryMenu(Territory territory) {
+        if(territoryPanel.getVisibility()==View.GONE) {
+            territoryPanel.update(territory);
+            territoryPanel.setVisibility(View.VISIBLE);
+        } else territoryPanel.update(territory);
+    }
 
-        toggleButtons[0].setText("Graph");
-        toggleButtons[0].setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                coaRenderer.toggleLines();
-            }
-        });
-        toggleButtons[1].setText("Terrain");
-        toggleButtons[1].setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                coaRenderer.toggleTerrain();
-            }
-        });
-        toggleButtons[2].setText("Owners");
-        toggleButtons[2].setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+    public GamePlayBanner getGamePlayBanner() {
+        return gamePlayBanner;
+    }
 
-            }
-        });
+    public GameController getGameController() {
+        return gameController;
     }
 
     @Override
