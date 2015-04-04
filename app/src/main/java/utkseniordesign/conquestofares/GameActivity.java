@@ -11,7 +11,9 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import Game.GameController;
 import Game.GameState;
@@ -30,7 +32,8 @@ import com.daimajia.androidanimations.library.YoYo;
 public class GameActivity extends Activity {
     TerritoryPanel territoryPanel = null;
     GamePlayBanner gamePlayBanner = null;
-    FrameLayout mainView = null;
+    ImageView checkMark = null;
+    RelativeLayout mainView = null;
 
     private GLSurfaceView mGLSurfaceView;
     private GameController gameController;
@@ -40,7 +43,7 @@ public class GameActivity extends Activity {
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_gamescreen );
-        mainView = (FrameLayout) findViewById(R.id.gameScreen);
+        mainView = (RelativeLayout) findViewById(R.id.gameScreen);
         territoryPanel = (TerritoryPanel)findViewById(R.id.territoryLayout);
 
         // Get Game Settings, everything except MapGenParams
@@ -74,11 +77,41 @@ public class GameActivity extends Activity {
         gameController.initGame(gameState, gameSettings);
         coaRenderer.setGameState(gameState);
 
+        createScreen();
+    }
+
+    @Override
+    protected void onResume()
+    {
+        // The activity must call the GL surface view's onResume() on activity onResume().
+        super.onResume();
+        mGLSurfaceView.onResume();
+    }
+
+    @Override
+    protected void onPause()
+    {
+        // The activity must call the GL surface view's onPause() on activity onPause().
+        super.onPause();
+        mGLSurfaceView.onPause();
+    }
+
+    public void createScreen() {
+        gamePlayBanner = new GamePlayBanner(getBaseContext());
+        gamePlayBanner.changeContent(gameController.getGameState());
+        mainView.addView(gamePlayBanner);
+        territoryPanel.setUpPanel(this);
+        checkMark = (ImageView) findViewById(R.id.checkMark);
+        setListeners();
+    }
+
+    public void setListeners() {
+        final GameState gameState = gameController.getGameState();
         // Get game screen touch listener
         mGLSurfaceView.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
                 //Log.d("Listener", "(" + event.getX() + ", " + event.getY() + ")");
-               // Territory territory = gameController.onClick(event.getX(), event.getY());
+                // Territory territory = gameController.onClick(event.getX(), event.getY());
 
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     float coordx = event.getX();
@@ -104,30 +137,13 @@ public class GameActivity extends Activity {
             }
         });
 
-        createScreen();
-    }
-
-    @Override
-    protected void onResume()
-    {
-        // The activity must call the GL surface view's onResume() on activity onResume().
-        super.onResume();
-        mGLSurfaceView.onResume();
-    }
-
-    @Override
-    protected void onPause()
-    {
-        // The activity must call the GL surface view's onPause() on activity onPause().
-        super.onPause();
-        mGLSurfaceView.onPause();
-    }
-
-    public void createScreen() {
-        gamePlayBanner = new GamePlayBanner(getBaseContext());
-        gamePlayBanner.changeContent(gameController.getGameState());
-        mainView.addView(gamePlayBanner);
-        territoryPanel.setUpPanel(this);
+        checkMark.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                }
+                return true;
+            }
+        });
     }
 
     public void toggleTerritoryPanel(Boolean show) {
@@ -136,6 +152,15 @@ public class GameActivity extends Activity {
             territoryPanel.animating = YoYo.with(Techniques.SlideInUp).duration(500).playOn(territoryPanel);
         } else {
             territoryPanel.animating = YoYo.with(Techniques.SlideOutDown).duration(500).playOn(territoryPanel);
+        }
+    }
+
+    public void toggleCheckMark(Boolean show) {
+        if(show) {
+            if(checkMark.getVisibility()==View.GONE) checkMark.setVisibility(View.VISIBLE);
+            YoYo.with(Techniques.RollIn).duration(500).playOn(checkMark);
+        } else {
+            YoYo.with(Techniques.RollOut).duration(500).playOn(checkMark);
         }
     }
 
