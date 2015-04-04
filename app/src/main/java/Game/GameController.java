@@ -1,6 +1,7 @@
 package Game;
 
 import android.content.Context;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import java.util.*;
@@ -10,6 +11,7 @@ import Generation.MapGenerator;
 import Generation.MapGenerationParams;
 import Graphics.Quadrilateral;
 import Graphics.SpriteBatchSystem;
+import Utils.Device;
 
 /**
  * Created by brb55_000 on 2/6/2015.

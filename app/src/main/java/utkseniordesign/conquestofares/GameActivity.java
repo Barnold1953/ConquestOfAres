@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Point;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -19,6 +20,10 @@ import Game.GameSettings;
 import Graphics.CoARenderer;
 import UI.GamePlayBanner;
 import UI.TerritoryPanel;
+import UI.UserInterfaceHelper;
+import Utils.Device;
+import Utils.Utils;
+
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 
@@ -39,13 +44,18 @@ public class GameActivity extends Activity {
         territoryPanel = (TerritoryPanel)findViewById(R.id.territoryLayout);
 
         // Get Game Settings, everything except MapGenParams
-
         Intent intent = getIntent();
         if( intent != null ) {
             gameSettings = (GameSettings) intent.getParcelableExtra("Settings");
         } else {
             gameSettings = new GameSettings();
         }
+
+        // Initlialize device
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        Device.screenHeight = dm.heightPixels;
+        Device.screenWidth = dm.widthPixels;
 
         // Initialize the glSurfaceView
         mGLSurfaceView = ( GLSurfaceView ) findViewById( R.id.glRenderArea );
@@ -65,8 +75,14 @@ public class GameActivity extends Activity {
         mGLSurfaceView.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
                 //Log.d("Listener", "(" + event.getX() + ", " + event.getY() + ")");
-                Territory territory = gameController.onClick(event.getX(), event.getY());
+               // Territory territory = gameController.onClick(event.getX(), event.getY());
+
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    float coordx = event.getX();
+                    float coordy = event.getY();
+                    Utils.translateCoordinatePair(coordx,coordy,gameSettings.getMapGenParams().mapSize);
+                    Log.d("Coordinates:",Float.toString(coordx) + " " + Float.toString(coordy));
+                    Territory territory = gameController.onClick(coordx, coordy);
                     if (gameState.selectedTerritory == territory) {
                         gameState.selectedTerritory = null;
                         toggleTerritoryPanel(false);

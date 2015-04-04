@@ -139,8 +139,8 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         if (gameState != null && gameState.mapData.texture == 0) {
            gameState.mapData.texture = TextureHelper.dataToTexture(gameState.mapData.pixelBuffer,
                     "vortest",
-                    gameState.mapData.width,
-                    gameState.mapData.height);
+                   Math.round(gameState.mapData.width),
+                   Math.round(gameState.mapData.height));
            gameState.mapData.territoryGraphMesh.finish(context);
             Log.d("Line", "Got here");
         }
