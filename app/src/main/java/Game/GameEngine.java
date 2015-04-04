@@ -31,6 +31,7 @@ public class GameEngine {
         // Generate the map
         PreciseTimer timer = new PreciseTimer();
         MapData mapData = mapGenerator.generateMap(gameSettings.getMapGenParams());
+
         Log.d("*TIME generateMap:", Double.toString(timer.stop()));
 
         m_gameState.territories = mapData.territories;
