@@ -74,7 +74,19 @@
                 \n
                 void main() {\n
                   vec4 tex = texture2D(texture, tCoords);\n
-                  //gl_FragColor = vec4(tex.r * color.x, tex.g * color.y, tex.b * color.z, tex.a);\n
+                  //gl_FragColor = mix(texture2D(texture, tCoords), vec4(color,tex.a), .1);\n
+                  gl_FragColor = mix(tex, vec4(color,tex.a), .1);\n
+                }\n
+    </string>
+    <string name="map.frag">
+                precision mediump float;\n
+                \n
+                uniform sampler2D texture;\n
+                varying vec3 color;\n
+                varying vec2 tCoords;\n
+                \n
+                void main() {\n
+                  vec4 tex = texture2D(texture, tCoords);\n
                   gl_FragColor = tex;\n
                 }\n
     </string>

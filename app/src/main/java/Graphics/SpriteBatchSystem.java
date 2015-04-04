@@ -19,19 +19,14 @@ public class SpriteBatchSystem {
     }
 
     public static Vector sprites = new Vector();
+
     public static class sprite{
         int texture;
         FloatBuffer vBuf;
         FloatBuffer tBuf;
         ByteBuffer cBuf;
     }
-    /*public class sprite{
-        int texture;
-        BatchGeometry geo;
-    }
 
-    private static HashMap<String, sprite> sprites = new HashMap<>();
-*/
     public static void Initialize(int count){
         GeometryHelper.initializeMaster();
         GeometryHelper.initializeSoldier(count);
@@ -58,20 +53,6 @@ public class SpriteBatchSystem {
         s.cBuf = GeometryHelper.getColorBuff(name);
 
         return s;
-    }
-
-    public static Buffer getBuffer(String name, BufferType type){
-        switch (type){
-            case Vertices:
-                return GeometryHelper.getVertBuff(name);
-            case TextureCoordinates:
-                return GeometryHelper.getTextBuff(name);
-            case Colors:
-                return GeometryHelper.getColorBuff(name);
-        }
-        Log.d("Sprite", "Return failure");
-        FloatBuffer tmp = ByteBuffer.allocateDirect(0).order(ByteOrder.nativeOrder()).asFloatBuffer();
-        return tmp;
     }
 
     public static void addUnit(Unit.Type type, float x, float y, byte[] color){

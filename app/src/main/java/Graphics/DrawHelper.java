@@ -24,8 +24,8 @@ public class DrawHelper {
         mTextureHandle = GLES20.glGetAttribLocation(ph, "texture");
     }
 
-    public void draw(Camera camera, FloatBuffer mVertexBuffer, ByteBuffer mColorBuffer, FloatBuffer mTextCoordBuffer, int textureId, int vCount){
-        int programHandle = ShaderHelper.getShader("simple");
+    public void draw(Camera camera, FloatBuffer mVertexBuffer, ByteBuffer mColorBuffer, FloatBuffer mTextCoordBuffer, int textureId, int vCount, String shader){
+        int programHandle = ShaderHelper.getShader(shader);
         GLES20.glUseProgram(programHandle);
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);

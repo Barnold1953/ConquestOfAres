@@ -42,7 +42,7 @@ public class GameEngine {
         // Assign territories
         assignTerritories();
         // Place units
-        initUnits(32);
+        initUnits(16);
         Log.d("Init: ", "initGame finished.");
     }
 
@@ -92,8 +92,11 @@ public class GameEngine {
             case RANDOM:
                 int j = 0;
                 for (int i = 0; i < m_gameState.territories.size(); i++) {
-                    m_gameState.players.get(j).addTerritory(m_gameState.territories.get(i));
-                    j++;
+                    if(m_gameState.territories.get(i).terrainType != Territory.TerrainType.Ocean) {
+                        m_gameState.players.get(j).addTerritory(m_gameState.territories.get(i));
+
+                        j++;
+                    }
                     if (j == m_gameState.players.size()) j = 0;
                 }
                 
@@ -115,18 +118,19 @@ public class GameEngine {
                 for (int i = 0; i < unitsPerTerritory && unitsRemaining != 0; i++) {
                     p.extraUnits++;
                     int direction = r.nextInt();
+                    float spread = 30.0f;
                     switch (direction%4){
                         case 0:
-                            m_gameController.addUnit(t, t.x + r.nextFloat() * 60.0f, t.y + r.nextFloat() * 60.0f, Unit.Type.soldier);
+                            m_gameController.addUnit(t, t.x + r.nextFloat() * spread, t.y + r.nextFloat() * spread, Unit.Type.soldier);
                             break;
                         case 1:
-                            m_gameController.addUnit(t, t.x - r.nextFloat() * 60.0f, t.y + r.nextFloat() * 60.0f, Unit.Type.soldier);
+                            m_gameController.addUnit(t, t.x - r.nextFloat() * spread, t.y + r.nextFloat() * spread, Unit.Type.soldier);
                             break;
                         case 2:
-                            m_gameController.addUnit(t, t.x + r.nextFloat() * 60.0f, t.y - r.nextFloat() * 60.0f, Unit.Type.soldier);
+                            m_gameController.addUnit(t, t.x + r.nextFloat() * spread, t.y - r.nextFloat() * spread, Unit.Type.soldier);
                             break;
                         case 3:
-                            m_gameController.addUnit(t, t.x - r.nextFloat() * 60.0f, t.y - r.nextFloat() * 60.0f, Unit.Type.soldier);
+                            m_gameController.addUnit(t, t.x - r.nextFloat() * spread, t.y - r.nextFloat() * spread, Unit.Type.soldier);
                             break;
                     }
                     //m_gameController.addUnit(t, t.x + r.nextFloat() * 60.0f, t.y + r.nextFloat() * 60.0f, Unit.Type.soldier);

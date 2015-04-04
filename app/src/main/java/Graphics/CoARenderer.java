@@ -24,6 +24,7 @@ import utkseniordesign.conquestofares.R;
 
 public class CoARenderer implements GLSurfaceView.Renderer {
     int programHandle;
+    int mapShader;
     Context context;
     Camera camera;
     MapData mapData;
@@ -87,6 +88,8 @@ public class CoARenderer implements GLSurfaceView.Renderer {
             //dHelper.setProgHandles(programHandle, "animate");
             programHandle = ShaderHelper.compileShader(context, R.string.simple_vert, R.string.texture_frag, "simple");
             dHelper.setProgHandles(programHandle, "simple");
+            mapShader = ShaderHelper.compileShader(context, R.string.simple_vert, R.string.map_frag, "map");
+            dHelper.setProgHandles(programHandle, "map");
         }
         catch (IOException e){
             Log.d("Shader", "Error occurred during compilation");
@@ -152,7 +155,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         //programHandle = ShaderHelper.getShader("simple");
 
-        dHelper.draw(camera, GeometryHelper.getVertBuff("master"), GeometryHelper.getColorBuff("master"), GeometryHelper.getTextBuff("master"), TextureHelper.getTexture("vortest"), GeometryHelper.getVerticesCount("master"));
+        dHelper.draw(camera, GeometryHelper.getVertBuff("master"), GeometryHelper.getColorBuff("master"), GeometryHelper.getTextBuff("master"), TextureHelper.getTexture("vortest"), GeometryHelper.getVerticesCount("master"), "map");
 
         if (showLines) gameState.mapData.territoryGraphMesh.renderLines(camera.getVPMatrix());
 
@@ -165,7 +168,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
             SpriteSheetDimensions ssd = new SpriteSheetDimensions(name);
             GeometryHelper.setFrameTexture(name, ssd.width, ssd.height, ssd.frameWidth, ssd.frameHeight, frame/5);
 
-            dHelper.draw(camera, s.vBuf, s.cBuf, s.tBuf, s.texture, GeometryHelper.getVerticesCount(name));
+            dHelper.draw(camera, s.vBuf, s.cBuf, s.tBuf, s.texture, GeometryHelper.getVerticesCount(name), "simple");
         }
 
         fTime[frame % 100] = timer.stop();

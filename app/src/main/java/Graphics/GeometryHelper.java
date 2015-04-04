@@ -24,14 +24,6 @@ public class GeometryHelper {
 
     private final static int mBytesPerFloat = 4;
 
-    private static float[] removeFromFloatArray(float[] source, int index, int amount){
-        float[] temp = new float[source.length - amount];
-        System.arraycopy(source, 0, temp, 0, index);
-        System.arraycopy(source, index + amount, temp, index, source.length - index - amount);
-        return temp;
-        //System.arraycopy(temp, 0, source, 0, temp.length);
-    }
-
     public static void initializeMaster(){
         byte[] ftmp = {(byte)255, (byte)255, (byte)255};
         Quadrilateral quad = new Quadrilateral();
@@ -117,7 +109,7 @@ public class GeometryHelper {
 
         //Log.d("Geometry3", tmp.toString());
         System.arraycopy(newV, 0, bg.vertices, unitCount * 18, newV.length);
-        System.arraycopy(quadTextCoords, 0, bg.textureCoordinates, unitCount*12, quadTextCoords.length);
+        //System.arraycopy(quadTextCoords, 0, bg.textureCoordinates, unitCount*12, quadTextCoords.length);
         System.arraycopy(temp, 0, bg.colors, unitCount*18, temp.length);
 
         unitCount++;
@@ -158,8 +150,8 @@ public class GeometryHelper {
         System.arraycopy(BatchMap.get(name).textureCoordinates, 0, temp, 0, temp.length);
 
         for(int i = 0; i < temp.length; i+=2){
-            temp[i] = ((temp[i] * fWidth) + (frameX * fWidth)) / width;
-            temp[i+1] = ((temp[i+1] * fHeight) + (frameY * fHeight)) / height;
+            temp[i] = ((quadTextCoords[i % quadTextCoords.length] * fWidth) + (frameX * fWidth)) / width;
+            temp[i+1] = ((quadTextCoords[(i+1) % quadTextCoords.length] * fHeight) + (frameY * fHeight)) / height;
         }
 
         BatchMap.get(name).tcBuff.put(temp).position(0);
