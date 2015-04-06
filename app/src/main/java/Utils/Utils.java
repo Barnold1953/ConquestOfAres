@@ -16,13 +16,21 @@ import Generation.MapGenerationParams;
  * Created by lasth_000 on 4/4/2015.
  */
 public class Utils {
+
+    public static float[] byteColorToFloat(byte[] color) {
+        float[] newC = new float[3];
+        newC[0] = (((int)(color[0]) + 256) % 256) / 255.0f;
+        newC[1] = (((int)(color[1]) + 256) % 256) / 255.0f;
+        newC[2] = (((int)(color[2]) + 256) % 256) / 255.0f;
+        return newC;
+    }
+
     public static float[] translateCoordinatePair(float x, float y, MapGenerationParams.MapSize size) {
         x = x/Device.screenWidth;
         x = x*size.getWidth();
         y = (Device.screenHeight - y);
         y = y/Device.screenHeight;
         y = y*size.getHeight();
-        Log.d("ben is a bully", Float.toString(x) + " " + Float.toString(y));
         return new float[] {x,y};
         //Log.d("Coordinates:", Float.toString(x) + " " + Float.toString(y));
     }

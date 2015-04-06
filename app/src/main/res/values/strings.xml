@@ -79,16 +79,31 @@
                   gl_FragColor = mix(tex, vec4(color,tex.a), .1);\n
                 }\n
     </string>
+    <string name="map.vert">
+                uniform mat4 unMVPMatrix;\n
+                \n
+                attribute vec2 vPosition;\n
+                attribute vec2 vTexCoords;\n
+                \n
+                varying vec2 fTexCoords;\n
+                \n
+                void main() {\n
+                  fTexCoords = vTexCoords;\n
+                  gl_Position =  unMVPMatrix * vec4(vPosition, 0.0, 1.0);\n
+                }\n
+    </string>
     <string name="map.frag">
                 precision mediump float;\n
                 \n
-                uniform sampler2D texture;\n
-                varying vec3 color;\n
-                varying vec2 tCoords;\n
+                uniform sampler2D unTexture;\n
+                uniform vec3 unColor;\n
+                uniform vec3 unSColor;\n
+                uniform float unBlend;
+                varying vec2 fTexCoords;\n
                 \n
                 void main() {\n
-                  vec4 tex = texture2D(texture, tCoords);\n
-                  gl_FragColor = tex;\n
+                  vec4 tex = texture2D(unTexture, fTexCoords);\n
+                  gl_FragColor = tex * vec4(mix(unColor, unSColor, unBlend), 1.0);\n
                 }\n
     </string>
     <string name="color.vert">

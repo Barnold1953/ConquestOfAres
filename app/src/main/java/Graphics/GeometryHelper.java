@@ -33,7 +33,12 @@ public class GeometryHelper {
         bg.textureCoordinates = new float[12];
         bg.colors = new byte[18];
 
-        float[] newV = {quad.x,quad.y+quad.height,quad.z,quad.x,quad.y,quad.z,quad.x+quad.width,quad.y,quad.z,quad.x+quad.width,quad.y,quad.z,quad.x+quad.width,quad.y+quad.height,quad.z,quad.x,quad.y+quad.height,quad.z};
+        float[] newV = {quad.x,quad.y+quad.height,quad.z,
+                quad.x,quad.y,quad.z,
+                quad.x+quad.width,quad.y,quad.z,
+                quad.x+quad.width,quad.y,quad.z,
+                quad.x+quad.width,quad.y+quad.height,quad.z,
+                quad.x,quad.y+quad.height,quad.z};
 
         float[] temp = new float[bg.colors.length];
         for(int i = 0; i < bg.colors.length; i++){
