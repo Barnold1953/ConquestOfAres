@@ -12,6 +12,7 @@ import Generation.MapGenerationParams;
 import Graphics.Quadrilateral;
 import Graphics.SpriteBatchSystem;
 import Utils.Device;
+import utkseniordesign.conquestofares.GameActivity;
 
 /**
  * Created by brb55_000 on 2/6/2015.
@@ -43,9 +44,14 @@ public class GameController {
     public Player getCurrentPlayer() { return m_currentPlayer; }
 
     /// Call this to transition to the next turn
-    void nextTurn() {
+    public void nextTurn() {
+        Debug.logState(m_gameState);
         // Go to next player (starts at -1)
         m_gameState.currentPlayerIndex++;
+        Debug.logRound(m_gameState);
+        if(m_gameState.currentPlayerIndex / m_gameState.players.size() > 0){
+            m_gameState.currentState = GameState.State.PLAYING;
+        }
         m_currentPlayer = m_gameState.players.get(m_gameState.currentPlayerIndex % m_gameState.players.size());
         // Check if we should do AI
         if (m_currentPlayer.isAI) {
@@ -54,7 +60,7 @@ public class GameController {
             return;
         }
         // Current player is human, he is now placing units
-        m_gameState.currentState = GameState.State.PLACING_UNITS_RANDOM;
+        Debug.logState(m_gameState);
     }
 
     /// Call this method when the world is clicked on

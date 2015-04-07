@@ -142,6 +142,9 @@ public class GameActivity extends Activity {
         checkMark.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    setCheckMark(false);
+                    setShowTerritoryPanel(false);
+                    gameController.nextTurn();
                 }
                 return true;
             }

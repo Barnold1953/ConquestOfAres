@@ -46,7 +46,7 @@ public class GamePlayBanner extends RelativeLayout {
 
     public void changeContent(GameState state) {
         switch(state.currentState) {
-            case GAME_START:
+            case PLACING_UNITS:
                 // get positioning information
                 background.setImageResource(R.drawable.game_start_banner);
                 background.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);

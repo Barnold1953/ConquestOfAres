@@ -11,7 +11,6 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
-import Game.GameController;
 import Game.GameState;
 import Game.Player;
 import Game.Territory;
@@ -132,7 +131,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
     void renderUnits(Territory territory){
         Player currentPlayer = gameState.players.get(gameState.currentPlayerIndex%gameState.players.size());
-        if(gameState.currentState == GameState.State.PLACING_UNITS_RR){
+        if(gameState.currentState == GameState.State.PLACING_UNITS){
             if(territory.owner == currentPlayer){
                 for (Unit u : territory.units) {
                     float[] slope = getSlope(u);

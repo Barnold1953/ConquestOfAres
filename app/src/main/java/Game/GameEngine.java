@@ -2,8 +2,6 @@ package Game;
 
 import android.util.Log;
 
-import java.util.Random;
-
 import Generation.MapData;
 import Generation.MapGenerator;
 import Utils.PreciseTimer;
@@ -75,7 +73,7 @@ public class GameEngine {
            p.color[0] = playerColors[i][0];
            p.color[1] = playerColors[i][1];
            p.color[2] = playerColors[i][2];
-           p.placeableUnits = 35;
+           p.placeableUnits = 5;
            p.name = "Player " + Integer.toString(i + 1);
            m_gameState.players.add(p);
        }
@@ -83,6 +81,7 @@ public class GameEngine {
 
     /// Assignes territories to players based on the TerritoryDistMode
     private void assignTerritories() {
+        m_gameState.currentState = GameState.State.SELECTING_TERRITORIES;
         // Set gamestate
         //gameState.territories = gameSettings.mapGenParams.territories;
 
@@ -93,17 +92,18 @@ public class GameEngine {
                 for (int i = 0; i < m_gameState.territories.size(); i++) {
                     if(m_gameState.territories.get(i).terrainType != Territory.TerrainType.Ocean) {
                         m_gameState.players.get(j).addTerritory(m_gameState.territories.get(i));
-
                         j++;
                     }
                     if (j == m_gameState.players.size()) j = 0;
                 }
+                m_gameState.assignedTerritories = m_gameState.territories.size();
                 
                 break;
             case ROUND_ROBIN:
                 // TODO: This needs MP stuff or AI probably.
                 break;
         }
+        m_gameState.currentState = GameState.State.PLACING_UNITS;
     }
 
     /// Sets up all the initial armies

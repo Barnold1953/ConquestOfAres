@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 
+import Game.GameState;
 import Game.Player;
 import Game.Territory;
 import Game.Unit;
@@ -44,13 +45,14 @@ public class TerritoryPanel extends LinearLayout {
     }
 
     public void setListeners() {
+        final GameState.State state = parentActivity.getGameController().getGameState().currentState;
         addUnitButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Player currentPlayer = parentActivity.getGameController().getCurrentPlayer();
                 if (!currentTerritory.addUnit(currentTerritory.x, currentTerritory.y, Unit.Type.soldier)) {
                     YoYo.with(Techniques.Shake).duration(500).playOn(parentActivity.getGamePlayBanner().label);
-                } else if(currentTerritory.owner.placeableUnits == 0) { parentActivity.setCheckMark(true); }
+                } else if(currentTerritory.owner.placeableUnits == 0 && state == GameState.State.PLACING_UNITS) { parentActivity.setCheckMark(true); }
                 parentActivity.getGamePlayBanner().changeContent(parentActivity.getGameController().getGameState());
                 update(currentTerritory);
             }
@@ -61,7 +63,7 @@ public class TerritoryPanel extends LinearLayout {
                 Player currentPlayer = parentActivity.getGameController().getCurrentPlayer();
                 if(!currentTerritory.removeUnits(0, 0, Unit.Type.soldier)) {
                     YoYo.with(Techniques.Shake).duration(500).playOn(emptyIndicator);
-                } else if(currentTerritory.owner.placeableUnits == 1) { parentActivity.setCheckMark(false); }
+                } else if(currentTerritory.owner.placeableUnits == 1 || state == GameState.State.PLACING_UNITS) { parentActivity.setCheckMark(false); }
                 parentActivity.getGamePlayBanner().changeContent(parentActivity.getGameController().getGameState());
                 update(currentTerritory);
             }
@@ -113,7 +115,7 @@ public class TerritoryPanel extends LinearLayout {
             }
             ownerButtonsVisible = true;
         }
-        // TODO: Optomize so I just add new views, rather than removing them all and readding
+        // TODO: Optimize so I just add new views, rather than removing them all and reading
         militaryPanel.removeAllViews();
         populateMilitaryPanel();
     }
