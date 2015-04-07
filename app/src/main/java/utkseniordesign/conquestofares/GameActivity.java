@@ -56,9 +56,7 @@ public class GameActivity extends Activity {
         }
 
         // Initlialize device
-        Point point = Utils.getScreenDimensions(this);
-        Device.screenHeight = point.y;
-        Device.screenWidth = point.x;
+        Utils.getScreenDimensions(this);
 
         // Initialize the glSurfaceView
         mGLSurfaceView = ( GLSurfaceView ) findViewById( R.id.glRenderArea );
@@ -109,12 +107,13 @@ public class GameActivity extends Activity {
                 // Territory territory = gameController.onClick(event.getX(), event.getY());
 
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    float coordx = event.getX();
-                    float coordy = event.getY();
+                    float coordx = event.getRawX();
+                    float coordy = event.getRawY();
+                    Log.d("Coordinates before:",Float.toString(coordx) + " " + Float.toString(coordy));
                     float[] coords = Utils.translateCoordinatePair(coordx,coordy,gameSettings.getMapGenParams().mapSize);
                     coordx = coords[0];
                     coordy = coords[1];
-                    //Log.d("Coordinates:",Float.toString(coordx) + " " + Float.toString(coordy));
+                    Log.d("Coordinates after:",Float.toString(coordx) + " " + Float.toString(coordy));
                     Territory oldTerritory = gameState.selectedTerritory;
                     Territory newTerritory = gameController.onClick(coordx, coordy);
                     // Check if selected territory changed
