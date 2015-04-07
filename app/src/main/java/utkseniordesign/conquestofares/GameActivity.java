@@ -45,6 +45,7 @@ public class GameActivity extends Activity {
         setContentView( R.layout.activity_gamescreen );
         mainView = (RelativeLayout) findViewById(R.id.gameScreen);
         territoryPanel = (TerritoryPanel)findViewById(R.id.territoryLayout);
+        gamePlayBanner = (GamePlayBanner)findViewById(R.id.gameplayBanner);
 
         // Get Game Settings, everything except MapGenParams
         Intent intent = getIntent();
@@ -55,16 +56,9 @@ public class GameActivity extends Activity {
         }
 
         // Initlialize device
-        DisplayMetrics dm = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(dm);
-        //Device.screenHeight = (int)dm.heightPixels;
-        //Device.screenWidth = (int)dm.widthPixels;
         Point point = Utils.getScreenDimensions(this);
         Device.screenHeight = point.y;
         Device.screenWidth = point.x;
-        //Device.screenHeight = mGLSurfaceView.getMeasuredHeight();
-        //Device.screenWidth = mGLSurfaceView.getMeasuredWidth();
-
 
         // Initialize the glSurfaceView
         mGLSurfaceView = ( GLSurfaceView ) findViewById( R.id.glRenderArea );
@@ -100,9 +94,7 @@ public class GameActivity extends Activity {
     }
 
     public void createScreen() {
-        gamePlayBanner = new GamePlayBanner(getBaseContext());
-        gamePlayBanner.changeContent(gameController.getGameState());
-        mainView.addView(gamePlayBanner);
+        gamePlayBanner.setUpPanel(this);
         territoryPanel.setUpPanel(this);
         checkMark = (ImageView) findViewById(R.id.checkMark);
         setListeners();
