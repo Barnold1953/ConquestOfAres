@@ -1,7 +1,9 @@
 package UI;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+import android.media.Image;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
@@ -14,6 +16,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import Game.GameState;
+import utkseniordesign.conquestofares.GameActivity;
 import utkseniordesign.conquestofares.R;
 
 /**
@@ -21,51 +24,27 @@ import utkseniordesign.conquestofares.R;
  */
 
 public class GamePlayBanner extends RelativeLayout {
+    GameActivity parentActivity = null;
     ImageView background = null;
-    TextView label = null;
-    int width = 0;
-    int height = 0;
+    ImageView counter = null;
+    TextView counterLabel = null;
     public GamePlayBanner(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
-    public GamePlayBanner(Context context) {
-        super(context);
-        //set up layout
-        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
-        setLayoutParams(layoutParams);
 
-        // add background
-        background = new ImageView(getContext());
-        RelativeLayout.LayoutParams imageParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        imageParams.addRule(ALIGN_PARENT_TOP);
-        background.setLayoutParams(imageParams);
-        background.setAdjustViewBounds(true);
-        background.setId(1);
-        addView(background);
+    public void setUpPanel(Activity gameScreen) {
+        parentActivity = (GameActivity) gameScreen;
+        counter = (ImageView) findViewById(R.id.counter);
+        counterLabel = (TextView) findViewById(R.id.counterLabel);
+        background = (ImageView) findViewById(R.id.backgroundImage);
+        changeContent(parentActivity.getGameController().getGameState());
     }
 
     public void changeContent(GameState state) {
         switch(state.currentState) {
             case GAME_START:
-                // get positioning information
                 background.setImageResource(R.drawable.game_start_banner);
-                background.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
-                width = background.getMeasuredWidth();
-                height = background.getMeasuredHeight();
-
-                // add label if needed
-                if( label == null ) {
-                    label = new TextView(getContext());
-                    RelativeLayout.LayoutParams textParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-                    textParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                    textParams.addRule(RelativeLayout.ALIGN_TOP, 1);
-                    textParams.setMargins(0, height / 4, width / 8, 0);
-                    label.setLayoutParams(textParams);
-                    label.setTextColor(getResources().getColor(R.color.darkGrey));
-                    label.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25);
-                    addView(label);
-                }
-                label.setText(Integer.toString(state.players.get(state.currentPlayerIndex).placeableUnits));
+                counterLabel.setText(Integer.toString(state.players.get(state.currentPlayerIndex).placeableUnits));
                 break;
             default:
         }
