@@ -1,49 +1,56 @@
 package AI;
+
+import Game.GameState;
+import Game.Territory;
+
+import java.util.*;
+
 /**
  * Created by jeff on 1/16/15.
  */
 public class AI {
+    GameState s = null;
+    //sorted list of priority actions
+    List<WeightedAction> reactions;
 
-    AI(){
-        //initialize AI class
+    public AI(GameState s){
+        this.s = s;
     }
 
-    public void resetAIClass(){
-        //reset attributes of AI class
-        //so that new priorities and attributes
-        //can be assigned
-    }
-    class GameInterpreter {
-        //code to read game state
+    public ArrayList<WeightedAction> generateAssignments(){
+        Vector<Territory> neighbors = s.selectedTerritory.neighbors;
+        ArrayList<WeightedAction> possibleActions = new ArrayList<WeightedAction>();
+
+        return possibleActions;
     }
 
-    public class PrioritySystem{
-        //sort priorities based on game state
-        PrioritySystem(/*GameInterpreter g*/) {
-        }
+    protected void generateAttackAssignments(Vector<Territory> neighbors){
+        for(Territory n : neighbors){
+            if(n.owner != s.players.get(s.currentPlayerIndex)){
 
-        public void gatherTasks(){
-            //gather basic tasks to be performed
-        }
-
-        public void generateAssignments(){
-            //generate list of all possible
-            //assignments that could be made
-            //in the context of the situation
-        }
-
-        public void sortAssignments(){
-            //sort possible actions based on
-            //priority system
+            }
         }
     }
 
-    class Reactor {
-        //react to current game state based on
-        //priority system
-        //change NPCs accordingly
-        public void assignTask(){
-            //assign task based on which task gets priority
-        }
+    protected void generateMovementAssignments(Vector<Territory> t){
+
+    }
+
+    protected void generatePlacementAssignments(Vector<Territory> t) {
+
+    }
+
+    public void assignWeights(){
+        ArrayList<WeightedAction> reactions = generateAssignments();
+    }
+
+    public void sortReactions(){
+        Collections.sort(reactions, new GameActionComparator());
+    }
+
+    public void reset(){
+        this.s = null;
+        reactions.clear();
+        reactions = null;
     }
 }
