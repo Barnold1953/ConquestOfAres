@@ -26,6 +26,7 @@ public class MapGenerator {
     private static OpenSimplexNoise osNoise = new OpenSimplexNoise();
 
     public static MapData mapData;
+    public static GpuGenerator gpuGen = new GpuGenerator();
 
     /// Generates a map and returns the map data
     // TODO(Ben): Finish this
@@ -176,6 +177,8 @@ public class MapGenerator {
                 colors.add((byte) (m_random.nextFloat() * 255.0f));
             }
         }
+
+        gpuGen.generateMap(mapData.params, mapData.territories);
 
         float c;
         for (int y = 0; y < height; y++) {

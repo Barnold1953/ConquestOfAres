@@ -139,8 +139,6 @@
     <string name="noise.frag">
 in vec2 fPos;\n
 \n
-out vec4 pOutput;\n
-\n
 vec3 mod289(vec3 x) {\n
   return x - floor(x * (1.0 / 289.0)) * 289.0;\n
 }\n
@@ -230,8 +228,8 @@ float snoise(vec3 v)\n
             }\n
             return total / maxAmplitude;\n
         }\n
-uniform float unSeed;\n
-uniform vec2 unPos;\n
+uniform float unSeed = 0.0;\n
+uniform vec2 unPos = vec2(0.0, 0.0);\n
 uniform vec2 unDims;\n
         uniform vec2 unTPositions[256];\n
         uniform int unNumT;
@@ -271,7 +269,7 @@ void main() {\n
         }\n
     }\n
         float c = float(closestIndex) / 255.0;\n
-        gl_FragColor = vec4(c, c, c, 1.0);\n
+        gl_FragColor = vec4(c, 1.0, 1.0, 1.0);\n
 }\n
     </string>
 </resources>

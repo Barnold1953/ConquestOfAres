@@ -124,5 +124,7 @@ public class TerritoryMesh {
         GLES20.glUniform1f(m_blendHandle, t.mixWeight);
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
+
+        GLES20.glUseProgram(0);
     }
 }
