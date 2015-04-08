@@ -12,6 +12,7 @@ import Generation.MapGenerationParams;
 import Graphics.Quadrilateral;
 import Graphics.SpriteBatchSystem;
 import Utils.Device;
+import utkseniordesign.conquestofares.GameActivity;
 
 /**
  * Created by brb55_000 on 2/6/2015.
@@ -32,7 +33,7 @@ public class GameController {
         m_gameSettings = gameSettings;
         // Initialize the game
         m_gameEngine.initGame(m_gameState, m_gameSettings, this);
-        m_gameState.currentPlayerIndex = 0; // Start at -1 so nextTurn goes to 0
+        m_gameState.currentPlayerIndex = 0;
         m_currentPlayer = m_gameState.players.get(m_gameState.currentPlayerIndex);
     }
 
@@ -43,11 +44,15 @@ public class GameController {
     public Player getCurrentPlayer() { return m_currentPlayer; }
 
     /// Call this to transition to the next turn
-    void nextTurn() {
+    public void nextTurn() {
+        Debug.logState(m_gameState);
         // Go to next player (starts at -1)
         m_gameState.currentPlayerIndex++;
-        if (m_gameState.currentPlayerIndex >= m_gameState.players.size()) m_gameState.currentPlayerIndex = 0;
-        m_currentPlayer = m_gameState.players.get(m_gameState.currentPlayerIndex);
+        Debug.logRound(m_gameState);
+        if(m_gameState.currentPlayerIndex / m_gameState.players.size() > 0){
+            m_gameState.currentState = GameState.State.PLAYING;
+        }
+        m_currentPlayer = m_gameState.players.get(m_gameState.currentPlayerIndex % m_gameState.players.size());
         // Check if we should do AI
         if (m_currentPlayer.isAI) {
             // TODO: Do AI stuff
@@ -55,12 +60,13 @@ public class GameController {
             return;
         }
         // Current player is human, he is now placing units
-        m_gameState.currentState = GameState.State.PLACING_UNITS;
+        Debug.logState(m_gameState);
     }
 
     /// Call this method when the world is clicked on
     public Territory onClick(float x, float y) {
         Territory territory = getTerritoryAtPoint(x, y);
+
         if (m_gameState.selectedTerritory == territory) {
             territory.unselect();
             m_gameState.selectedTerritory = null;
@@ -112,7 +118,7 @@ public class GameController {
         unit.path = new PathFinding().getPath(source, destination);
         unit.frame = 0;
         unit.location = new float[] {source.x, source.y};
-        unit.destination = new float[] {unit.path.get(unit.path.capacity()-1).x, unit.path.get(unit.path.capacity()-1).y};
+        unit.destination = new float[] {unit.path.get(unit.path.size()-1).x, unit.path.get(unit.path.size()-1).y};
         source.units.add(unit);
         //source.owner.unitsInFlight.add(unit);
     }

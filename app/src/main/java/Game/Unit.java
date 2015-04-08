@@ -33,13 +33,13 @@ public class Unit {
     // damage will increase or decrease based on the type of units fighting
     public float damage;
 
-    public void destinationStep(){
+    public void destinationStep(){// calculates the location
         frame = 0;
         location = destination;
         if(path != null && !path.isEmpty()) {
-            path.remove(path.capacity()-1);
+            path.remove(path.size()-1);
             if(!path.isEmpty()){
-                destination = new float[] {path.get(path.capacity()-1).x, path.get(path.capacity()-1).y};
+                destination = new float[] {path.get(path.size()-1).x, path.get(path.size()-1).y};
             }
         }
     }
