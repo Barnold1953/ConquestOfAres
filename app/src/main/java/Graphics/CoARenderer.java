@@ -184,6 +184,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         }
 
         if (showLines) gameState.mapData.territoryGraphMesh.renderLines(camera.getVPMatrix());
+        
 
         Enumeration vEnum = SpriteBatchSystem.sprites.elements();
         //programHandle = ShaderHelper.getShader("animate");
