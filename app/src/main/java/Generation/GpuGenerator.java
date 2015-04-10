@@ -2,6 +2,7 @@ package Generation;
 
 import android.content.Context;
 import android.opengl.GLES20;
+import android.os.SystemClock;
 import android.util.Log;
 
 import java.io.IOException;
@@ -19,32 +20,30 @@ import utkseniordesign.conquestofares.R;
  */
 public class GpuGenerator {
 
-    public boolean isDone = false;
-    public boolean hasGenRequest = false;
-    private MapData m_md;
+    public static boolean isDone = false;
+    public static boolean hasGenRequest = false;
+    private static MapData m_md;
 
     private static int m_positionHandle;
     private static int m_programHandle = 0;
-    private FloatBuffer m_vertexBuffer;
-    private Vector<Territory> m_territories = null;
+    private static FloatBuffer m_vertexBuffer;
 
-    public boolean generateMap(MapData md, Vector<Territory> territories) {
+    public static boolean generateMap(MapData md) {
         if (hasGenRequest) return false;
         isDone = false;
         m_md = md;
-        m_territories = territories;
 
         hasGenRequest = true;
         return true;
     }
 
     // Call from render thread
-    public void updateGen(Context context) {
+    public static void updateGen(Context context) {
     //    if (!hasGenRequest) return;
-
+        SystemClock.sleep(1000);
         if (m_programHandle == 0) {
             try {
-                m_programHandle = ShaderHelper.compileShader(context, R.string.map_vert, R.string.map_frag, "territory");
+                m_programHandle = ShaderHelper.compileShader(context, R.string.gen_vert, R.string.gen_frag, "gen");
                 m_positionHandle = GLES20.glGetAttribLocation(m_programHandle, "vPosition");
             } catch (IOException e) {
                 Log.d("Shader", "Error occurred during compilation");
@@ -52,22 +51,22 @@ public class GpuGenerator {
 
             m_vertexBuffer = ByteBuffer.allocateDirect(12 * 2 * 4).order(ByteOrder.nativeOrder()).asFloatBuffer();
 
-            m_vertexBuffer.put(0.0f);
+            m_vertexBuffer.put(-1.0f);
             m_vertexBuffer.put(1.0f);
 
-            m_vertexBuffer.put(0.0f);
-            m_vertexBuffer.put(0.0f);
+            m_vertexBuffer.put(-1.0f);
+            m_vertexBuffer.put(-1.0f);
 
             m_vertexBuffer.put(1.0f);
-            m_vertexBuffer.put(0.0f);
+            m_vertexBuffer.put(-1.0f);
 
             m_vertexBuffer.put(1.0f);
-            m_vertexBuffer.put(0.0f);
+            m_vertexBuffer.put(-1.0f);
 
             m_vertexBuffer.put(1.0f);
             m_vertexBuffer.put(1.0f);
 
-            m_vertexBuffer.put(0.0f);
+            m_vertexBuffer.put(-1.0f);
             m_vertexBuffer.put(1.0f);
         }
 
@@ -81,6 +80,7 @@ public class GpuGenerator {
         GLES20.glUniform2f(GLES20.glGetUniformLocation(m_programHandle, "unDims"), (float)m_md.width, (float)m_md.height);
         GLES20.glUniform1i(GLES20.glGetUniformLocation(m_programHandle, "unNumT"), m_md.territories.size());
         GLES20.glUniform1i(GLES20.glGetUniformLocation(m_programHandle, "unHorizontalWrap"), 0);
+        Log.d("t ", Integer.toString(m_md.territories.size()));
         for (int i = 0; i < m_md.territories.size(); i++) {
             Territory t = m_md.territories.get(i);
             GLES20.glUniform2f(GLES20.glGetUniformLocation(m_programHandle, "unTPositions[" + Integer.toString(i) + "]"), t.x, t.y);

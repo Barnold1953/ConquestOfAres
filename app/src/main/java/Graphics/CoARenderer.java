@@ -15,6 +15,7 @@ import Game.GameState;
 import Game.Player;
 import Game.Territory;
 import Game.Unit;
+import Generation.GpuGenerator;
 import Generation.MapData;
 import Utils.PreciseTimer;
 import utkseniordesign.conquestofares.R;
@@ -191,7 +192,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         //GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
         //programHandle = ShaderHelper.getShader("simple");
-
         for (Territory t: gameState.mapData.territories) {
             t.updateAnimation();
             if (t.mesh != null) t.mesh.render(t, t.texture, camera.getVPMatrix());
@@ -210,6 +210,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
             dHelper.draw(camera, s.vBuf, s.cBuf, s.tBuf, s.texture, GeometryHelper.getVerticesCount(name), "simple");
         }
+        GpuGenerator.updateGen(context);
 
         fTime[frame % 100] = timer.stop();
         frame++;

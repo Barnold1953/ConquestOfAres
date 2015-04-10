@@ -128,7 +128,7 @@
                   gl_FragColor = color;\n
                 }\n
     </string>
-     <string name="noise.vert">
+     <string name="gen.vert">
                 in vec2 vPosition;\n
                 out vec2 fPos;\n
                 void main() {\n
@@ -136,7 +136,7 @@
                     gl_Position = vec4(vPosition, 0, 1);\n
                 }\n
     </string>
-    <string name="noise.frag">
+    <string name="gen.frag">
 in vec2 fPos;\n
 \n
 vec3 mod289(vec3 x) {\n
@@ -235,7 +235,7 @@ uniform vec2 unDims;\n
         uniform int unNumT;
         uniform int unHorizontalWrap;\n
         \n
-float MODULATE_SCALE = 32.0f;\n
+float MODULATE_SCALE = 32.0;\n
 float MODULATE_PERSISTENCE = 0.8;\n
 float MODULATE_FREQUENCY = 0.01;\n
 int MODULATE_OCTAVES = 5;\n
@@ -243,24 +243,25 @@ int MODULATE_OCTAVES = 5;\n
 void main() {\n
   vec3 pos;\n
   pos.x = unPos.x + fPos.x * unDims.x;\n
-  pos.y = unPos.y; + fPos.y * unDims.y;\n
+  pos.y = unPos.y + fPos.y * unDims.y;\n
   pos.z = unSeed;\n
     \n
     int closestIndex = 0;\n
-    float closestDist = 99999999999.9f;\n
+    float closestDist = 99999999999.9;\n
     float dx, dy;\n
     \n
-    pos.x += (float)octaveNoise2D(pos, MODULATE_PERSISTENCE, MODULATE_FREQUENCY, MODULATE_OCTAVES) * MODULATE_SCALE;\n
-    pos.y += (float)octaveNoise2D(pos + 2048.0, MODULATE_PERSISTENCE, MODULATE_FREQUENCY, MODULATE_OCTAVES) * MODULATE_SCALE;\n
+    dx = octaveNoise(pos, MODULATE_PERSISTENCE, MODULATE_FREQUENCY, MODULATE_OCTAVES) * MODULATE_SCALE;\n
+    dy = octaveNoise(pos + 2048.0, MODULATE_PERSISTENCE, MODULATE_FREQUENCY, MODULATE_OCTAVES) * MODULATE_SCALE;\n
+    pos += vec2(dx, dy);\n
     for (int i = 0; i &lt; unNumT; i++) {\n
         if (unHorizontalWrap &gt; 0) {\n
-            dx = Math.abs(pos.x - unTPositions[i].x);\n
-            dy = Math.abs(pos.y - unTPositions[i].y);\n
-            dx = Math.min(dx, unDims.x - dx);\n
-            dy = Math.min(dy, unDims.y - dy);\n
+            dx = abs(pos.x - unTPositions[i].x);\n
+            dy = abs(pos.y - unTPositions[i].y);\n
+            dx = min(dx, unDims.x - dx);\n
+            dy = min(dy, unDims.y - dy);\n
         } else {\n
-            dx = pos.x - territories.get(i).x;\n
-            dy = pos.y - territories.get(i).y;\n
+            dx = pos.x - unTPositions[i].x;\n
+            dy = pos.y - unTPositions[i].y;\n
         }\n
         float dist = dx * dx + dy * dy;\n
         if (dist &lt; closestDist) {\n
@@ -268,8 +269,8 @@ void main() {\n
             closestIndex = i;\n
         }\n
     }\n
-        float c = float(closestIndex) / 255.0;\n
-        gl_FragColor = vec4(c, 1.0, 1.0, 1.0);\n
+        float c = float(closestIndex) / 31.0;\n
+        gl_FragColor = vec4(c, 0.0, 0.0, 1.0);\n
 }\n
     </string>
 </resources>

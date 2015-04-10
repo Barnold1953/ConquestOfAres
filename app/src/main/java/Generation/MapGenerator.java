@@ -178,7 +178,7 @@ public class MapGenerator {
             }
         }
 
-        gpuGen.generateMap(mapData.params, mapData.territories);
+        gpuGen.generateMap(mapData);
 
         float c;
         for (int y = 0; y < height; y++) {
