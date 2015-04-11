@@ -95,7 +95,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         TextureHelper.imageToTexture(context, R.drawable.texture1, "test1");
         //TextureHelper.imageToTexture(context, R.drawable.character1walk, "soldier");
-        TextureHelper.imageToTexture(context, R.drawable.man_frames_top, "soldier");
+        TextureHelper.imageToTexture(context, R.drawable.man_run, "soldier");
 
         //gHelper.addToBatch(quad, "master");
         /*quad = Quadrilateral.getQuad(quad, 0,0,0,1,1,ftmp);
@@ -121,17 +121,17 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         float[] slope = new float[2];
 
-        slope[0] = (u.destination[0] - u.location[0]) / 10;
-        slope[1] = (u.destination[1] - u.location[1]) / 10;
-        slope[0] = u.location[0] + slope[0] * u.frame;
-        slope[1] = u.location[1] + slope[1] * u.frame;
+        slope[0] = (u.destination.x - u.location.x) / 10;
+        slope[1] = (u.destination.y - u.location.y) / 10;
+        slope[0] = u.location.x + slope[0] * u.frame;
+        slope[1] = u.location.y + slope[1] * u.frame;
         u.frame++;
         return slope;
     }
 
     void renderUnits(Territory territory){
         Player currentPlayer = gameState.players.get(gameState.currentPlayerIndex%gameState.players.size());
-        if(gameState.currentState == GameState.State.PLACING_UNITS){
+        if(gameState.currentState == GameState.State.INITIAL_UNIT_PLACEMENT){
             if(territory.owner == currentPlayer){
                 for (Unit u : territory.units) {
                     float[] slope = getSlope(u);
@@ -213,6 +213,9 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         fTime[frame % 100] = timer.stop();
         frame++;
+        if(frame >= 100000000){
+            frame = 0;
+        }
         /*GLES20.glFinish();
         if(frame % 100 == 0 && frame / 100 > 0) {
             Double avgTime = 0.0;

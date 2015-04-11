@@ -1,6 +1,8 @@
 package Game;
 
 import android.content.Context;
+import android.graphics.Point;
+import android.graphics.PointF;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -21,9 +23,10 @@ import utkseniordesign.conquestofares.GameActivity;
 /// Contains the game logic core
 public class GameController {
     private GameState m_gameState = null; ///< Handle to game
-    private GameSettings m_gameSettings = null; ///< Settings TODO(Aaron): pass in good settings in initGame
+    private GameSettings m_gameSettings = null; ///< Settings
     private GameEngine m_gameEngine = new GameEngine(); ///< Initializes the game
     private Player m_currentPlayer = null;
+    public Boolean stateHasChanged = false;
 
     /// Initializes a game by setting up game state and map
     public void initGame(GameState gameState, GameSettings gameSettings) {
@@ -50,9 +53,13 @@ public class GameController {
         m_gameState.currentPlayerIndex++;
         Debug.logRound(m_gameState);
         if(m_gameState.currentPlayerIndex / m_gameState.players.size() > 0){
-            m_gameState.currentState = GameState.State.PLAYING;
+            m_gameState.currentState = GameState.State.PLACING_UNITS;
+            stateHasChanged = true;
         }
         m_currentPlayer = m_gameState.players.get(m_gameState.currentPlayerIndex % m_gameState.players.size());
+        if(m_gameState.currentState == GameState.State.PLACING_UNITS) {
+            m_currentPlayer.placeableUnits = m_currentPlayer.territories.size() / 2;
+        }
         // Check if we should do AI
         if (m_currentPlayer.isAI) {
             // TODO: Do AI stuff
@@ -61,6 +68,24 @@ public class GameController {
         }
         // Current player is human, he is now placing units
         Debug.logState(m_gameState);
+    }
+
+    public void stepState(){
+        switch(m_gameState.currentState){
+            case PLACING_UNITS:
+                m_gameState.currentState = GameState.State.ATTACKING;
+                break;
+            case ATTACKING:
+                m_gameState.currentState = GameState.State.FORTIFYING;
+                break;
+            case INITIAL_UNIT_PLACEMENT:
+                nextTurn();
+                break;
+            default:
+                m_gameState.currentState = GameState.State.PLACING_UNITS;
+                nextTurn();
+                break;
+        }
     }
 
     /// Call this method when the world is clicked on
@@ -82,19 +107,21 @@ public class GameController {
     }
 
     /// Returns the territory at a specific point
-    Territory getTerritoryAtPoint(float x, float y) {
+    public Territory getTerritoryAtPoint(float x, float y) {
         return MapGenerator.getClosestTerritory(x, y, m_gameState.territories);
     }
 
-    boolean attack(Territory attacker, Territory defender){
+    public boolean attack(Territory attacker, Territory defender, int numAttackers){
         Action action = new Action(m_currentPlayer, Action.Category.attack, attacker, defender);
 
-        while(attacker.units.size() > 0 && defender.units.size() > 0){
+        while(defender.units.size() > 0 && numAttackers > 0){
             // I figure we can change the chance of winning based on the type of unit it is, like tanks are weak to airplanes, airplanes are weak to soldiers, and soldiers are weak to tanks
             // kind of like a rock-paper-scissors dynamic
 
             if(m_gameState.random.nextInt() % 2 == 0){
                 action.sUnitsLost.add(attacker.units.get(attacker.units.size()-1));
+                numAttackers--;
+                attacker.selectedUnits.remove(attacker.selectedUnits.size()-1);
                 attacker.units.remove(attacker.units.size()-1);
             }
             else{
@@ -102,24 +129,45 @@ public class GameController {
                 defender.units.remove(defender.units.size()-1);
             }
         }
+        if(defender.units.isEmpty() && numAttackers > 0){
+            Player p = defender.owner;
+            defender.owner.removeTerritory(defender);
+            attacker.owner.addTerritory(defender);
+            moveUnits(attacker, defender);
+            if(p.territories.isEmpty()){
+                m_gameState.players.remove(p);
+            }
+        }
+
         return !attacker.units.isEmpty();
     }
 
-    void moveUnit(Territory source, Territory destination){
+    public void moveUnits(Territory source, Territory destination){
         Action action = new Action(m_currentPlayer, Action.Category.moveUnit, source, destination);
 
-        Unit unit = source.units.remove(source.units.size()-1);
-        action.sUnitsLost.add(unit);
-        action.dUnitsGained.add(unit);
-        m_gameState.actions.add(action);
+        for(Unit unit : source.selectedUnits ) {
+            action.sUnitsLost.add(unit);
+            action.dUnitsGained.add(unit);
+            m_gameState.actions.add(action);
+            source.units.remove(unit);
+
+            if(source.neighbors.contains(destination)){
+                unit.destination = new PointF(destination.x,destination.y);
+            }
+            else {
+                unit.path = new PathFinding().getPath(source, destination);
+                unit.destination = new PointF(unit.path.get(unit.path.size()-1).x,unit.path.get(unit.path.size()-1).y);
+            }
+            unit.frame = 0;
+            unit.location = new PointF(source.x, source.y);
+
+            destination.units.add(unit);
+        }
+
+        source.selectedUnits.clear();
 
         //addUnit(destination, destination.x, destination.y, unit.type);
 
-        unit.path = new PathFinding().getPath(source, destination);
-        unit.frame = 0;
-        unit.location = new float[] {source.x, source.y};
-        unit.destination = new float[] {unit.path.get(unit.path.size()-1).x, unit.path.get(unit.path.size()-1).y};
-        source.units.add(unit);
         //source.owner.unitsInFlight.add(unit);
     }
 }
