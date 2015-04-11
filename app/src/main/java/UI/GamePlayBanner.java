@@ -90,10 +90,18 @@ public class GamePlayBanner extends RelativeLayout {
                 background.setImageResource(R.drawable.game_start_banner);
                 counterLabel.setText(Integer.toString(parentActivity.getGameController().getCurrentPlayer().placeableUnits));
                 break;
-            case PLAYING:
+            case INITIAL_UNIT_PLACEMENT:
+                // get positioning information
+                background.setImageResource(R.drawable.game_start_banner);
+                counterLabel.setText(Integer.toString(parentActivity.getGameController().getCurrentPlayer().placeableUnits));
+                break;
+            case ATTACKING:
                 background.setImageResource(R.drawable.attack_banner);
                 counter.setVisibility(GONE);
                 counterLabel.setVisibility(GONE);
+                break;
+            case FORTIFYING:
+                break;
             default:
         }
     }

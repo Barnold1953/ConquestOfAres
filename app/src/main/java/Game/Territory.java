@@ -73,8 +73,19 @@ public class Territory {
         isSelected = false;
     }
 
-    public void selectNeighbors() {
-        for( Territory t : neighbors ) t.select();
+    public void selectNeighbors(boolean attacking) {
+        for( Territory t : neighbors ) {
+            if(attacking){
+                if(t.owner != owner && t.owner != null){
+                    t.select();
+                }
+            }
+            else{
+                if(t.owner == owner && t.owner != null){
+                    t.select();
+                }
+            }
+        }
     }
 
     public void unselectNeighbors() {
@@ -178,6 +189,7 @@ public class Territory {
             attacker.owner.territories.add( this );
         }*/
     }
+
     public double distance;///< used for PathFinding
     public boolean visited;///< used for PathFinding
     public int texture = 0;

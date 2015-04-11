@@ -80,7 +80,7 @@ public class TerritoryPanel extends LinearLayout {
             public void onClick(View v) {
                 if (!currentTerritory.addUnit(Unit.Type.soldier)) {
                     YoYo.with(Techniques.Shake).duration(500).playOn(parentActivity.getGamePlayBanner().counterLabel);
-                } else if(currentTerritory.owner.placeableUnits == 0 && state == GameState.State.PLACING_UNITS) { parentActivity.setCheckMark(true); }
+                } else if(currentTerritory.owner.placeableUnits == 0 && (state == GameState.State.PLACING_UNITS || state == GameState.State.INITIAL_UNIT_PLACEMENT)) { parentActivity.setCheckMark(true); }
                 parentActivity.getGamePlayBanner().changeContent();
                 update(currentTerritory);
             }
@@ -90,7 +90,7 @@ public class TerritoryPanel extends LinearLayout {
             public void onClick(View v) {
                 if(!currentTerritory.removeUnits(Unit.Type.soldier)) {
                     YoYo.with(Techniques.Shake).duration(500).playOn(emptyIndicator);
-                } else if(currentTerritory.owner.placeableUnits == 1 && state == GameState.State.PLACING_UNITS) { parentActivity.setCheckMark(false); }
+                } else if(currentTerritory.owner.placeableUnits == 1 && (state == GameState.State.PLACING_UNITS || state == GameState.State.INITIAL_UNIT_PLACEMENT)) { parentActivity.setCheckMark(false); }
                 parentActivity.getGamePlayBanner().changeContent();
                 update(currentTerritory);
             }

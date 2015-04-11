@@ -44,24 +44,24 @@ public class GameEngine {
     }
 
     private void initPlayerColors() {
-        playerColors[0][0] = (byte)155;
-        playerColors[0][1] = (byte)54;
-        playerColors[0][2] = (byte)57;
-        playerColors[1][0] = (byte)81;
-        playerColors[1][1] = (byte)155;
-        playerColors[1][2] = (byte)54;
-        playerColors[2][0] = (byte)54;
-        playerColors[2][1] = (byte)89;
-        playerColors[2][2] = (byte)155;
-        playerColors[3][0] = (byte)155;
-        playerColors[3][1] = (byte)54;
-        playerColors[3][2] = (byte)155;
-        playerColors[4][0] = (byte)155;
-        playerColors[4][1] = (byte)155;
-        playerColors[4][2] = (byte)54;
-        playerColors[5][0] = (byte)155;
-        playerColors[5][1] = (byte)92;
-        playerColors[5][2] = (byte)54;
+        playerColors[0][0] = (byte)200;
+        playerColors[0][1] = (byte)0;
+        playerColors[0][2] = (byte)0;
+        playerColors[1][0] = (byte)0;
+        playerColors[1][1] = (byte)200;
+        playerColors[1][2] = (byte)0;
+        playerColors[2][0] = (byte)0;
+        playerColors[2][1] = (byte)0;
+        playerColors[2][2] = (byte)255;
+        playerColors[3][0] = (byte)200;
+        playerColors[3][1] = (byte)200;
+        playerColors[3][2] = (byte)0;
+        playerColors[4][0] = (byte)0;
+        playerColors[4][1] = (byte)200;
+        playerColors[4][2] = (byte)200;
+        playerColors[5][0] = (byte)255;
+        playerColors[5][1] = (byte)0;
+        playerColors[5][2] = (byte)255;
     }
 
     private void initPlayers(int numPlayers, int numAI) {
@@ -73,7 +73,7 @@ public class GameEngine {
            p.color[0] = playerColors[i][0];
            p.color[1] = playerColors[i][1];
            p.color[2] = playerColors[i][2];
-           p.placeableUnits = 5;
+           p.placeableUnits = 10;
            p.name = "Player " + Integer.toString(i + 1);
            m_gameState.players.add(p);
        }
@@ -103,7 +103,7 @@ public class GameEngine {
                 // TODO: This needs MP stuff or AI probably.
                 break;
         }
-        m_gameState.currentState = GameState.State.PLACING_UNITS;
+        m_gameState.currentState = GameState.State.INITIAL_UNIT_PLACEMENT;
     }
 
     /// Sets up all the initial armies

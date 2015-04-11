@@ -95,7 +95,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         TextureHelper.imageToTexture(context, R.drawable.texture1, "test1");
         //TextureHelper.imageToTexture(context, R.drawable.character1walk, "soldier");
-        TextureHelper.imageToTexture(context, R.drawable.man_frames_top, "soldier");
+        TextureHelper.imageToTexture(context, R.drawable.man_run, "soldier");
 
         //gHelper.addToBatch(quad, "master");
         /*quad = Quadrilateral.getQuad(quad, 0,0,0,1,1,ftmp);
@@ -131,7 +131,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
     void renderUnits(Territory territory){
         Player currentPlayer = gameState.players.get(gameState.currentPlayerIndex%gameState.players.size());
-        if(gameState.currentState == GameState.State.PLACING_UNITS){
+        if(gameState.currentState == GameState.State.INITIAL_UNIT_PLACEMENT){
             if(territory.owner == currentPlayer){
                 for (Unit u : territory.units) {
                     float[] slope = getSlope(u);
@@ -213,6 +213,9 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         fTime[frame % 100] = timer.stop();
         frame++;
+        if(frame >= 100000000){
+            frame = 0;
+        }
         /*GLES20.glFinish();
         if(frame % 100 == 0 && frame / 100 > 0) {
             Double avgTime = 0.0;

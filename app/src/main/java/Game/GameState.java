@@ -12,8 +12,10 @@ public class GameState {
     public enum State {
         GAME_START,
         SELECTING_TERRITORIES,
+        INITIAL_UNIT_PLACEMENT,
         PLACING_UNITS,
-        PLAYING,
+        ATTACKING,
+        FORTIFYING
     }
 
     public int currentPlayerIndex = -1; ///< Index of the current player into players TODO: Use this
