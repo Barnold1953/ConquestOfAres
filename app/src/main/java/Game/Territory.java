@@ -164,6 +164,7 @@ public class Territory {
             attacker.owner.territories.add( this );
         }*/
     }
+
     public double distance;///< used for PathFinding
     public boolean visited;///< used for PathFinding
     public int texture = 0;

@@ -213,6 +213,9 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         fTime[frame % 100] = timer.stop();
         frame++;
+        if(frame >= 100000000){
+            frame = 0;
+        }
         /*GLES20.glFinish();
         if(frame % 100 == 0 && frame / 100 > 0) {
             Double avgTime = 0.0;

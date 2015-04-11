@@ -13,7 +13,9 @@ public class GameState {
         GAME_START,
         SELECTING_TERRITORIES,
         PLACING_UNITS,
-        PLAYING,
+        ATTACKING,
+        FORTIFYING,
+        PLAYING
     }
 
     public int currentPlayerIndex = -1; ///< Index of the current player into players TODO: Use this
