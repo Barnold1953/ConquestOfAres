@@ -118,11 +118,16 @@ public class GameActivity extends Activity {
                         gameState.selectedTerritory == null ||
                         gameState.currentState == GameState.State.GAME_START ||
                         gameState.currentState == GameState.State.PLACING_UNITS  ||
+                        gameState.currentState == GameState.State.INITIAL_UNIT_PLACEMENT ||
                         gameState.selectedTerritory.selectedUnits.size() == 0
                     ) handleTerritorySelect(coords.x, coords.y);
                     else if(
-                        gameState.selectedTerritory.selectedUnits.size() > 0
+                        gameState.selectedTerritory.selectedUnits.size() > 0 &&
+                        gameState.currentState == GameState.State.FORTIFYING
                     ) handleUnitMove(coords.x, coords.x);
+                    else if(gameState.selectedTerritory.selectedUnits.size() > 0 &&
+                            gameState.currentState == GameState.State.ATTACKING
+                    ) handleUnitAttack(coords.x, coords.y);
                 }
                 return true;
             }
@@ -136,8 +141,8 @@ public class GameActivity extends Activity {
                         gameState.selectedTerritory = null;
                     }
                     if(territoryPanel.isVisible()) territoryPanel.toggle();
-                    setCheckMark(false);
-                    gameController.nextTurn();
+                    //setCheckMark(false);
+                    gameController.stepState();
                     if(gameController.stateHasChanged) {
                         gamePlayBanner.refresh();
                         gameController.stateHasChanged = false;
@@ -166,13 +171,25 @@ public class GameActivity extends Activity {
 
     public void handleUnitMove(float x, float y) {
         Territory moveTo = gameController.getTerritoryAtPoint(x, y);
-        if(gameController.getGameState().selectedTerritory.neighbors.contains(moveTo)) {
+        if(gameController.getGameState().selectedTerritory.neighbors.contains(moveTo) && moveTo.owner == gameController.getGameState().selectedTerritory.owner) {
             gameController.moveUnits(gameController.getGameState().selectedTerritory, moveTo);
             gameController.getGameState().selectedTerritory.selectedUnits.removeAllElements();
             gameController.getGameState().selectedTerritory.unselectNeighbors();
             gameController.getGameState().selectedTerritory.select();
             territoryPanel.update(gameController.getGameState().selectedTerritory);
         }
+    }
+
+    public void handleUnitAttack(float x, float y){
+        Territory attack = gameController.getTerritoryAtPoint(x,y);
+        if(gameController.getGameState().selectedTerritory.neighbors.contains(attack) && attack.owner != gameController.getGameState().selectedTerritory.owner) {
+            gameController.attack(gameController.getGameState().selectedTerritory, attack, gameController.getGameState().selectedTerritory.selectedUnits.size());
+            gameController.getGameState().selectedTerritory.selectedUnits.removeAllElements();
+            gameController.getGameState().selectedTerritory.unselectNeighbors();
+            gameController.getGameState().selectedTerritory.select();
+            territoryPanel.update(gameController.getGameState().selectedTerritory);
+        }
+
     }
 
     public void setCheckMark(Boolean show) {

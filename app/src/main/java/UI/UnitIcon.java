@@ -35,11 +35,12 @@ public class UnitIcon extends ImageView {
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(state.currentState == GameState.State.PLAYING ) {
+                boolean attaking = state.currentState == GameState.State.ATTACKING ? true : false;
+                if(state.currentState == GameState.State.ATTACKING || state.currentState == GameState.State.FORTIFYING ) {
                     if(!selected) {
                         if(state.selectedTerritory.selectedUnits.size() == 0) {
                             state.selectedTerritory.unselect();
-                            state.selectedTerritory.selectNeighbors();
+                            state.selectedTerritory.selectNeighbors(attaking);
                         }
                         setBackgroundColor(getResources().getColor(R.color.lightBlue));
                         state.selectedTerritory.selectedUnits.add(state.selectedTerritory.units.get(soldierId));

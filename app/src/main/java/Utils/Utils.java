@@ -31,7 +31,7 @@ public class Utils {
     }
 
     public static PointF translateCoordinatePair(float x, float y, MapGenerationParams.MapSize size) {
-        Log.d("Screen Size", Float.toString(Device.screenWidth) + " " + Float.toString(Device.screenHeight));
+        //Log.d("Screen Size", Float.toString(Device.screenWidth) + " " + Float.toString(Device.screenHeight));
         x = x/Device.screenWidth;
         x = x*size.getWidth();
         y = (Device.screenHeight - y);

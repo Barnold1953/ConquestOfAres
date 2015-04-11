@@ -103,7 +103,7 @@ public class GameEngine {
                 // TODO: This needs MP stuff or AI probably.
                 break;
         }
-        m_gameState.currentState = GameState.State.PLACING_UNITS;
+        m_gameState.currentState = GameState.State.INITIAL_UNIT_PLACEMENT;
     }
 
     /// Sets up all the initial armies
