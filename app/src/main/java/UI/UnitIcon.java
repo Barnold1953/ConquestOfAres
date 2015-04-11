@@ -1,5 +1,4 @@
 package UI;
-import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
@@ -41,7 +40,7 @@ public class UnitIcon extends ImageView {
                             state.selectedTerritory.unselect();
                             state.selectedTerritory.selectNeighbors();
                         }
-                        setBackgroundColor(getResources().getColor(R.color.lightBlue));
+                        setBackgroundColor(getResources().getColor(R.color.darkBlue));
                         state.selectedTerritory.selectedUnits.add(state.selectedTerritory.units.get(soldierId));
                         selected = true;
                     } else {

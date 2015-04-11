@@ -9,7 +9,7 @@
     
     <string-array name="map_sizes">
         <!--<item>Map Size</item>-->
-        <item>Cramped</item>
+        <item>Tiny</item>
         <item>Small</item>
         <item>Medium</item>
         <item>Large</item>

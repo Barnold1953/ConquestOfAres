@@ -11,7 +11,7 @@ import Game.GameSettings;
 public class MapGenerationParams {
 
     public enum MapSize {
-        CRAMPED(540,960),
+        TINY(540,960),
         SMALL(720,1280),
         MEDIUM(900,1600),
         LARGE(1080,1920);

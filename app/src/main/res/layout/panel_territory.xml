@@ -12,7 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:gravity="center_vertical|right">
+        android:gravity="center_vertical|right"
+        android:baselineAligned="false">
 
         <ImageView
             android:clickable="true"
@@ -20,10 +21,9 @@
             android:layout_height="wrap_content"
             android:id="@+id/add_units"
             android:src="@drawable/ic_add_unit"
-            android:background="@color/lightBlue"
-            android:padding="2dp"
             android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"/>
+            android:layout_marginRight="5dp"
+            android:adjustViewBounds="true"/>
 
         <ImageView
             android:clickable="true"
@@ -31,8 +31,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/subtract_units"
             android:src="@drawable/ic_subtract_unit"
-            android:background="@color/lightBlue"
-            android:padding="2dp"
+            android:adjustViewBounds="true"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="10dp"/>
 

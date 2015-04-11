@@ -139,9 +139,9 @@ public class GameActivity extends Activity {
                     setCheckMark(false);
                     gameController.nextTurn();
                     if(gameController.stateHasChanged) {
-                        gamePlayBanner.refresh();
+                        gamePlayBanner.refresh(); // gets new banner
                         gameController.stateHasChanged = false;
-                    }
+                    } else gamePlayBanner.changeContent(); // updates current banner
                 }
                 return true;
             }

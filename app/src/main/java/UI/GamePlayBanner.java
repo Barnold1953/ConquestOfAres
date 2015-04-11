@@ -59,7 +59,6 @@ public class GamePlayBanner extends RelativeLayout {
                 // if the banner is out of the window, refresh content
                 if(isVisible) {
                     isVisible = false;
-                    changeContent();
                 } else {
                     refresh(); // slide back in as soon as content is refreshed
                     isVisible = true;
@@ -78,7 +77,10 @@ public class GamePlayBanner extends RelativeLayout {
 
     public void refresh() {
         if(isVisible) YoYo.with(Techniques.SlideOutUp).duration(500).withListener(animationListener).playOn(this);
-        else YoYo.with(Techniques.SlideInUp).duration(500).withListener(animationListener).playOn(this);
+        else {
+            changeContent();
+            YoYo.with(Techniques.SlideInUp).duration(500).playOn(this);
+        }
     }
 
     public void changeContent() {
@@ -89,7 +91,7 @@ public class GamePlayBanner extends RelativeLayout {
                 counterLabel.setText(Integer.toString(parentActivity.getGameController().getCurrentPlayer().placeableUnits));
                 break;
             case PLAYING:
-                background.setImageResource(R.drawable.game_start_banner);
+                background.setImageResource(R.drawable.attack_banner);
                 counter.setVisibility(GONE);
                 counterLabel.setVisibility(GONE);
             default:
