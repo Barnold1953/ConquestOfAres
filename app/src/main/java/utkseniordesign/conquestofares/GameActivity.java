@@ -124,7 +124,7 @@ public class GameActivity extends Activity {
                     else if(
                         gameState.selectedTerritory.selectedUnits.size() > 0 &&
                         gameState.currentState == GameState.State.FORTIFYING
-                    ) handleUnitMove(coords.x, coords.x);
+                    ) handleUnitMove(coords.x, coords.y);
                     else if(gameState.selectedTerritory.selectedUnits.size() > 0 &&
                             gameState.currentState == GameState.State.ATTACKING
                     ) handleUnitAttack(coords.x, coords.y);
@@ -136,14 +136,16 @@ public class GameActivity extends Activity {
         checkMark.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    if(gameState.selectedTerritory != null ) {
+                    if (gameState.selectedTerritory != null) {
                         gameState.selectedTerritory.unselect();
                         gameState.selectedTerritory = null;
                     }
-                    if(territoryPanel.isVisible()) territoryPanel.toggle();
-                    //setCheckMark(false);
+                    if (territoryPanel.isVisible()) territoryPanel.toggle();
                     gameController.stepState();
-                    if(gameController.stateHasChanged) {
+                    if (gameController.getGameState().currentState == GameState.State.PLACING_UNITS ||
+                        gameController.getGameState().currentState == GameState.State.INITIAL_UNIT_PLACEMENT )
+                        setCheckMark(false);
+                    if (gameController.stateHasChanged) {
                         gamePlayBanner.refresh(); // gets new banner
                         gameController.stateHasChanged = false;
                     } else gamePlayBanner.changeContent(); // updates current banner

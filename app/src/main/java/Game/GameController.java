@@ -54,7 +54,6 @@ public class GameController {
         Debug.logRound(m_gameState);
         if(m_gameState.currentPlayerIndex / m_gameState.players.size() > 0){
             m_gameState.currentState = GameState.State.PLACING_UNITS;
-            stateHasChanged = true;
         }
         m_currentPlayer = m_gameState.players.get(m_gameState.currentPlayerIndex % m_gameState.players.size());
         if(m_gameState.currentState == GameState.State.PLACING_UNITS) {
@@ -71,6 +70,7 @@ public class GameController {
     }
 
     public void stepState(){
+        stateHasChanged = true;
         switch(m_gameState.currentState){
             case PLACING_UNITS:
                 m_gameState.currentState = GameState.State.ATTACKING;
