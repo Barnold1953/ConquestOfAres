@@ -2,9 +2,11 @@ package Game;
 
 import java.nio.ByteBuffer;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import Graphics.TerritoryMesh;
 
+import android.graphics.PointF;
 import android.util.Log;
 
 /**
@@ -21,6 +23,7 @@ public class Territory {
         this.units = b.units;
         this.owner = b.owner;
         this.units = new Vector<Unit>(b.units);
+        this.units = new Vector<Unit>(b.selectedUnits);
         if (b.owner != null) {
             this.owner = new Player(b.owner);
         }
@@ -40,7 +43,8 @@ public class Territory {
     }
 
     public Vector<Territory> neighbors = new Vector<Territory>(); ///< Pointers to neighbor territories
-    public Vector<Unit> units = new Vector<Unit>(); ///< Pointer to residing armies
+    public List<Unit> units = new CopyOnWriteArrayList<>(); ///< Pointer to residing armies
+    public Vector<Unit> selectedUnits = new Vector<>(); ///< Pointer to units selected for movement/attack
     public Player owner = null; ///< Owning player
     public int power = 0; ///< Power of the territory
     public int economy = 0;
@@ -67,6 +71,14 @@ public class Territory {
 
     public void unselect() {
         isSelected = false;
+    }
+
+    public void selectNeighbors() {
+        for( Territory t : neighbors ) t.select();
+    }
+
+    public void unselectNeighbors() {
+        for( Territory t : neighbors ) t.unselect();
     }
 
     public void updateAnimation() {
@@ -96,30 +108,32 @@ public class Territory {
         secondaryColor[2] = b;
     }
 
-    public boolean addUnit(float x, float y, Unit.Type type) {
+    PointF getUnitPlace() {
+        PointF placeCoords = null;
+        Random r = new Random();
+        float spread = 30.0f;
+        int direction = r.nextInt();
+        switch (direction%4){
+            case 0:
+                placeCoords = new PointF(x + r.nextFloat() * spread, y + r.nextFloat() * spread);
+                break;
+            case 1:
+                placeCoords = new PointF(x - r.nextFloat() * spread, y + r.nextFloat() * spread);
+                break;
+            case 2:
+                placeCoords = new PointF(x + r.nextFloat() * spread, y - r.nextFloat() * spread);
+                break;
+            default:
+                placeCoords = new PointF(x - r.nextFloat() * spread, y - r.nextFloat() * spread);
+                break;
+        }
+        return placeCoords;
+    }
+
+    public boolean addUnit(Unit.Type type) {
         if(owner.placeableUnits > 0) {
-            Random r = new Random();
-            float spread = 30.0f;
-            int direction = r.nextInt();
-            Unit unit;
-            switch (direction%4){
-                case 0:
-                    Log.d("addUnit", "case 0");
-                    unit = new Unit(x + r.nextFloat() * spread, y + r.nextFloat() * spread, Unit.Type.soldier);
-                    break;
-                case 1:
-                    Log.d("addUnit", "case 1");
-                    unit = new Unit(x - r.nextFloat() * spread, y + r.nextFloat() * spread, Unit.Type.soldier);
-                    break;
-                case 2:
-                    Log.d("addUnit", "case 2");
-                    unit = new Unit(x + r.nextFloat() * spread, y - r.nextFloat() * spread, Unit.Type.soldier);
-                    break;
-                default:
-                    Log.d("addUnit", "case 3");
-                    unit = new Unit(x - r.nextFloat() * spread, y - r.nextFloat() * spread, Unit.Type.soldier);
-                    break;
-            }
+            PointF placementCoords = getUnitPlace();
+            Unit unit = new Unit(placementCoords.x,placementCoords.y,type);
             units.add(unit);
             owner.placeableUnits--;
             return true;
@@ -127,7 +141,7 @@ public class Territory {
         return false;
     }
 
-    public boolean removeUnits(float x, float y, Unit.Type type) {
+    public boolean removeUnits(Unit.Type type) {
         Unit unit = null;
         for( Unit unitOfType : units ) {
             if(type == unitOfType.type) {
@@ -135,7 +149,7 @@ public class Territory {
             }
         }
         if(unit != null) {
-            units.remove(units.firstElement());
+            units.remove(units.get(0));
             owner.placeableUnits++;
             return true;
         }

@@ -121,10 +121,10 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         float[] slope = new float[2];
 
-        slope[0] = (u.destination[0] - u.location[0]) / 10;
-        slope[1] = (u.destination[1] - u.location[1]) / 10;
-        slope[0] = u.location[0] + slope[0] * u.frame;
-        slope[1] = u.location[1] + slope[1] * u.frame;
+        slope[0] = (u.destination.x - u.location.x) / 10;
+        slope[1] = (u.destination.y - u.location.y) / 10;
+        slope[0] = u.location.x + slope[0] * u.frame;
+        slope[1] = u.location.y + slope[1] * u.frame;
         u.frame++;
         return slope;
     }

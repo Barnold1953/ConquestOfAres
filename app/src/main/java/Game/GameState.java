@@ -27,5 +27,5 @@ public class GameState {
     public Territory selectedTerritory = null; //< Currently selected territory TODO: Use this
     public Random random = new Random(System.currentTimeMillis());
     // TODO: Statistics? Scores?
-    public List<Action> actions;
+    public Vector<Action> actions = new Vector<Action>();
 }

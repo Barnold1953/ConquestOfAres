@@ -1,6 +1,7 @@
 package Game;
 
 import android.content.Context;
+import android.graphics.PointF;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -21,9 +22,10 @@ import utkseniordesign.conquestofares.GameActivity;
 /// Contains the game logic core
 public class GameController {
     private GameState m_gameState = null; ///< Handle to game
-    private GameSettings m_gameSettings = null; ///< Settings TODO(Aaron): pass in good settings in initGame
+    private GameSettings m_gameSettings = null; ///< Settings
     private GameEngine m_gameEngine = new GameEngine(); ///< Initializes the game
     private Player m_currentPlayer = null;
+    public Boolean stateHasChanged = false;
 
     /// Initializes a game by setting up game state and map
     public void initGame(GameState gameState, GameSettings gameSettings) {
@@ -51,6 +53,7 @@ public class GameController {
         Debug.logRound(m_gameState);
         if(m_gameState.currentPlayerIndex / m_gameState.players.size() > 0){
             m_gameState.currentState = GameState.State.PLAYING;
+            stateHasChanged = true;
         }
         m_currentPlayer = m_gameState.players.get(m_gameState.currentPlayerIndex % m_gameState.players.size());
         // Check if we should do AI
@@ -82,7 +85,7 @@ public class GameController {
     }
 
     /// Returns the territory at a specific point
-    Territory getTerritoryAtPoint(float x, float y) {
+    public Territory getTerritoryAtPoint(float x, float y) {
         return MapGenerator.getClosestTerritory(x, y, m_gameState.territories);
     }
 
@@ -105,21 +108,24 @@ public class GameController {
         return !attacker.units.isEmpty();
     }
 
-    void moveUnit(Territory source, Territory destination){
+    public void moveUnits(Territory source, Territory destination){
         Action action = new Action(m_currentPlayer, Action.Category.moveUnit, source, destination);
 
-        Unit unit = source.units.remove(source.units.size()-1);
-        action.sUnitsLost.add(unit);
-        action.dUnitsGained.add(unit);
-        m_gameState.actions.add(action);
+        for(Unit unit : source.selectedUnits ) {
+            action.sUnitsLost.add(unit);
+            action.dUnitsGained.add(unit);
+            m_gameState.actions.add(action);
+            source.units.remove(unit);
+
+            unit.path = new PathFinding().getPath(source, destination);
+            unit.frame = 0;
+            unit.location = new PointF(source.x, source.y);
+            unit.destination = unit.path.get(unit.path.size()-1).getUnitPlace();
+            destination.units.add(unit);
+        }
 
         //addUnit(destination, destination.x, destination.y, unit.type);
 
-        unit.path = new PathFinding().getPath(source, destination);
-        unit.frame = 0;
-        unit.location = new float[] {source.x, source.y};
-        unit.destination = new float[] {unit.path.get(unit.path.size()-1).x, unit.path.get(unit.path.size()-1).y};
-        source.units.add(unit);
         //source.owner.unitsInFlight.add(unit);
     }
 }

@@ -3,6 +3,7 @@ package utkseniordesign.conquestofares;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Point;
+import android.graphics.PointF;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -109,22 +110,19 @@ public class GameActivity extends Activity {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     float coordx = event.getRawX();
                     float coordy = event.getRawY();
-                    Log.d("Coordinates before:",Float.toString(coordx) + " " + Float.toString(coordy));
-                    float[] coords = Utils.translateCoordinatePair(coordx,coordy,gameSettings.getMapGenParams().mapSize);
-                    coordx = coords[0];
-                    coordy = coords[1];
-                    Log.d("Coordinates after:",Float.toString(coordx) + " " + Float.toString(coordy));
-                    Territory oldTerritory = gameState.selectedTerritory;
-                    Territory newTerritory = gameController.onClick(coordx, coordy);
-                    // Check if selected territory changed
-                    if (oldTerritory == newTerritory) {
-                        setShowTerritoryPanel(false);
-                    } else if (oldTerritory == null) {
-                        updateTerritoryMenu(newTerritory);
-                        setShowTerritoryPanel(true);
-                    } else {
-                        updateTerritoryMenu(newTerritory);
-                    }
+
+                    // translate touch event to OpenGL coordinates, and scale to mapSize
+                    PointF coords = Utils.translateCoordinatePair(coordx,coordy,gameSettings.getMapGenParams().mapSize);
+
+                    if(
+                        gameState.selectedTerritory == null ||
+                        gameState.currentState == GameState.State.GAME_START ||
+                        gameState.currentState == GameState.State.PLACING_UNITS  ||
+                        gameState.selectedTerritory.selectedUnits.size() == 0
+                    ) handleTerritorySelect(coords.x, coords.y);
+                    else if(
+                        gameState.selectedTerritory.selectedUnits.size() > 0
+                    ) handleUnitMove(coords.x, coords.x);
                 }
                 return true;
             }
@@ -133,21 +131,47 @@ public class GameActivity extends Activity {
         checkMark.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    if(gameState.selectedTerritory != null ) {
+                        gameState.selectedTerritory.unselect();
+                        gameState.selectedTerritory = null;
+                    }
+                    if(territoryPanel.isVisible()) territoryPanel.toggle();
                     setCheckMark(false);
-                    setShowTerritoryPanel(false);
                     gameController.nextTurn();
+                    if(gameController.stateHasChanged) {
+                        gamePlayBanner.refresh();
+                        gameController.stateHasChanged = false;
+                    }
                 }
                 return true;
             }
         });
     }
 
-    public void setShowTerritoryPanel(Boolean show) {
-        if(show) {
-            // if the panel is in fully hidden or fully shown position, good, otherwise the user jumped the gun, rapid clicking, ignore it
-            territoryPanel.animating = YoYo.with(Techniques.SlideInUp).duration(500).playOn(territoryPanel);
+    public void handleTerritorySelect(float x, float y) {
+        Territory oldTerritory = gameController.getGameState().selectedTerritory;
+        Territory newTerritory = gameController.onClick(x, y);
+        // Check if selected territory changed
+        if (oldTerritory == newTerritory) {
+            oldTerritory.selectedUnits.removeAllElements();
+            territoryPanel.toggle();
+        } else if (oldTerritory == null) {
+            territoryPanel.update(newTerritory);
+            territoryPanel.toggle();
         } else {
-            territoryPanel.animating = YoYo.with(Techniques.SlideOutDown).duration(500).playOn(territoryPanel);
+            territoryPanel.update(newTerritory);
+            oldTerritory.selectedUnits.removeAllElements();
+        }
+    }
+
+    public void handleUnitMove(float x, float y) {
+        Territory moveTo = gameController.getTerritoryAtPoint(x, y);
+        if(gameController.getGameState().selectedTerritory.neighbors.contains(moveTo)) {
+            gameController.moveUnits(gameController.getGameState().selectedTerritory, moveTo);
+            gameController.getGameState().selectedTerritory.selectedUnits.removeAllElements();
+            gameController.getGameState().selectedTerritory.unselectNeighbors();
+            gameController.getGameState().selectedTerritory.select();
+            territoryPanel.update(gameController.getGameState().selectedTerritory);
         }
     }
 
@@ -158,13 +182,6 @@ public class GameActivity extends Activity {
         } else {
             YoYo.with(Techniques.RollOut).duration(500).playOn(checkMark);
         }
-    }
-
-    public void updateTerritoryMenu(Territory territory) {
-        if(territoryPanel.getVisibility()==View.GONE) {
-            territoryPanel.update(territory);
-            territoryPanel.setVisibility(View.VISIBLE);
-        } else territoryPanel.update(territory);
     }
 
     public GamePlayBanner getGamePlayBanner() {
