@@ -56,14 +56,8 @@ public class GamePlayBanner extends RelativeLayout {
 
             @Override
             public void onAnimationEnd(Animator animator) {
-                // if the banner is out of the window, refresh content
-                if(isVisible) {
-                    isVisible = false;
-                    changeContent();
-                } else {
-                    refresh(); // slide back in as soon as content is refreshed
-                    isVisible = true;
-                }
+                isVisible = false;
+                refresh(); // slide back in as soon as content is refreshed
             }
 
             @Override
@@ -77,28 +71,33 @@ public class GamePlayBanner extends RelativeLayout {
     }
 
     public void refresh() {
-        if(isVisible) YoYo.with(Techniques.SlideOutUp).duration(500).withListener(animationListener).playOn(this);
-        else YoYo.with(Techniques.SlideInUp).duration(500).withListener(animationListener).playOn(this);
+        if(isVisible) YoYo.with(Techniques.SlideOutUp).duration(750).withListener(animationListener).playOn(this);
+        else {
+            changeContent();
+            YoYo.with(Techniques.SlideInUp).duration(750).playOn(this);
+            isVisible = true;
+        }
     }
 
     public void changeContent() {
         switch(parentActivity.getGameController().getGameState().currentState) {
-            case PLACING_UNITS:
-                // get positioning information
+            case INITIAL_UNIT_PLACEMENT:
                 background.setImageResource(R.drawable.game_start_banner);
                 counterLabel.setText(Integer.toString(parentActivity.getGameController().getCurrentPlayer().placeableUnits));
                 break;
-            case INITIAL_UNIT_PLACEMENT:
-                // get positioning information
-                background.setImageResource(R.drawable.game_start_banner);
+            case PLACING_UNITS:
+                counter.setVisibility(VISIBLE);
+                counterLabel.setVisibility(VISIBLE);
+                background.setImageResource(R.drawable.reinforce_banner);
                 counterLabel.setText(Integer.toString(parentActivity.getGameController().getCurrentPlayer().placeableUnits));
                 break;
             case ATTACKING:
-                background.setImageResource(R.drawable.game_start_banner);
+                background.setImageResource(R.drawable.attack_banner);
                 counter.setVisibility(GONE);
                 counterLabel.setVisibility(GONE);
                 break;
             case FORTIFYING:
+                background.setImageResource(R.drawable.fortify_banner);
                 break;
             default:
         }

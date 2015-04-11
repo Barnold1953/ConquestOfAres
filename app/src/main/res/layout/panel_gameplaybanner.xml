@@ -5,7 +5,7 @@
                 android:id="@+id/gameplayBanner">
 
     <ImageView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/backgroundImage"
         android:src="@drawable/game_start_banner"

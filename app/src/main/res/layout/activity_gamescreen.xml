@@ -27,8 +27,8 @@
         android:gravity="end"
         android:layout_alignBottom="@+id/glRenderArea">
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="41dp"
+            android:layout_height="38dp"
             android:src="@drawable/ic_check_mark"
             android:layout_margin="2dp"
             android:paddingBottom="5dp"

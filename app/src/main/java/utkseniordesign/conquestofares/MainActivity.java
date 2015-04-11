@@ -35,7 +35,7 @@ public class MainActivity extends ActionBarActivity {
         //Frustratingly, you can't set the indicator color in xml without changing the font color
         //So I was forced to do it programatically
         PagerTabStrip pagerTabStrip = ( PagerTabStrip ) findViewById( R.id.pager_header );
-        pagerTabStrip.setTabIndicatorColor( getResources().getColor( R.color.lightBlue ) );
+        pagerTabStrip.setTabIndicatorColor( getResources().getColor( R.color.darkBlue) );
     }
 
     public class SampleFragmentPagerAdapter extends FragmentPagerAdapter {
