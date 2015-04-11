@@ -12,7 +12,9 @@ import java.nio.FloatBuffer;
 import java.util.Vector;
 
 import Game.Territory;
+import Graphics.GLRenderTarget;
 import Graphics.ShaderHelper;
+import Utils.Utils;
 import utkseniordesign.conquestofares.R;
 
 /**
@@ -28,6 +30,8 @@ public class GpuGenerator {
     private static int m_programHandle = 0;
     private static FloatBuffer m_vertexBuffer;
 
+    private static GLRenderTarget m_renderTarget = new GLRenderTarget();
+
     public static boolean generateMap(MapData md) {
         if (hasGenRequest) return false;
         isDone = false;
@@ -40,7 +44,6 @@ public class GpuGenerator {
     // Call from render thread
     public static void updateGen(Context context) {
     //    if (!hasGenRequest) return;
-        SystemClock.sleep(1000);
         if (m_programHandle == 0) {
             try {
                 m_programHandle = ShaderHelper.compileShader(context, R.string.gen_vert, R.string.gen_frag, "gen");
@@ -68,7 +71,13 @@ public class GpuGenerator {
 
             m_vertexBuffer.put(-1.0f);
             m_vertexBuffer.put(1.0f);
+
+            m_renderTarget.init((int)m_md.width, (int)m_md.height);
         }
+
+      //  if (!m_renderTarget.bind()) {
+      //      Log.d("RenderTarget ", "Failed to bind framebuffer.");
+      //  }
 
         GLES20.glUseProgram(m_programHandle);
 
@@ -90,6 +99,24 @@ public class GpuGenerator {
 
         GLES20.glUseProgram(0);
         GLES20.glFinish();
+
+        ByteBuffer buffer = ByteBuffer.allocateDirect(4 * (int)m_md.width * (int)m_md.height).order(ByteOrder.nativeOrder());
+        GLES20.glReadPixels(0, 0, (int)m_md.width, (int)m_md.height, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, buffer);
+
+        byte[] bytes = new byte[3];
+        bytes[0] = buffer.get(0);
+        bytes[1] = buffer.get(1);
+        bytes[2] = buffer.get(2);
+        float[] fls = Utils.byteColorToFloat(bytes);
+
+        Log.d("test", Float.toString(fls[0]) + " " + Float.toString(fls[1]) + " " + Float.toString(fls[2]));
+
+    //    m_renderTarget.unBind();
+
+        int error = GLES20.glGetError();
+        if (error != GLES20.GL_NO_ERROR) {
+            Log.d("GpuGenerator", "Error " + Integer.toString(error));
+        }
 
         hasGenRequest = false;
         isDone = true;

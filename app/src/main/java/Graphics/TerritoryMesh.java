@@ -109,7 +109,6 @@ public class TerritoryMesh {
         m_texBuffer.position(0);
         GLES20.glEnableVertexAttribArray(m_texCoordHandle);
         GLES20.glVertexAttribPointer(m_texCoordHandle, 2, GLES20.GL_FLOAT, false, 0, m_texBuffer);
-
         GLES20.glUniformMatrix4fv(m_mvpHandle, 1, false, vpMatrix, 0);
         if (t.owner != null) {
             float[] colr = Utils.byteColorToFloat(t.owner.color);
@@ -120,9 +119,8 @@ public class TerritoryMesh {
         GLES20.glUniform3f(m_sColorHandle, t.secondaryColor[0], t.secondaryColor[1], t.secondaryColor[2]);
 
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture);
-        GLES20.glUniform1f(m_textureHandle, 0);
+        GLES20.glUniform1i(m_textureHandle, 0);
         GLES20.glUniform1f(m_blendHandle, t.mixWeight);
-
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
 
         GLES20.glUseProgram(0);
