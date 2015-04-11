@@ -76,12 +76,12 @@ public class Territory {
     public void selectNeighbors(boolean attacking) {
         for( Territory t : neighbors ) {
             if(attacking){
-                if(t.owner != owner){
+                if(t.owner != owner && t.owner != null){
                     t.select();
                 }
             }
             else{
-                if(t.owner == owner){
+                if(t.owner == owner && t.owner != null){
                     t.select();
                 }
             }

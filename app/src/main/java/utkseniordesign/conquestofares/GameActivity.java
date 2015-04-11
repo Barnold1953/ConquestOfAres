@@ -170,6 +170,7 @@ public class GameActivity extends Activity {
     }
 
     public void handleUnitMove(float x, float y) {
+        Log.d("GameActivity", "HandleUnitMove called");
         Territory moveTo = gameController.getTerritoryAtPoint(x, y);
         if(gameController.getGameState().selectedTerritory.neighbors.contains(moveTo) && moveTo.owner == gameController.getGameState().selectedTerritory.owner) {
             gameController.moveUnits(gameController.getGameState().selectedTerritory, moveTo);
@@ -182,7 +183,7 @@ public class GameActivity extends Activity {
 
     public void handleUnitAttack(float x, float y){
         Territory attack = gameController.getTerritoryAtPoint(x,y);
-        if(gameController.getGameState().selectedTerritory.neighbors.contains(attack) && attack.owner != gameController.getGameState().selectedTerritory.owner) {
+        if(gameController.getGameState().selectedTerritory.neighbors.contains(attack) && attack.owner != gameController.getGameState().selectedTerritory.owner && attack.owner != null) {
             gameController.attack(gameController.getGameState().selectedTerritory, attack, gameController.getGameState().selectedTerritory.selectedUnits.size());
             gameController.getGameState().selectedTerritory.selectedUnits.removeAllElements();
             gameController.getGameState().selectedTerritory.unselectNeighbors();

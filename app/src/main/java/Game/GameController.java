@@ -57,6 +57,9 @@ public class GameController {
             stateHasChanged = true;
         }
         m_currentPlayer = m_gameState.players.get(m_gameState.currentPlayerIndex % m_gameState.players.size());
+        if(m_gameState.currentState == GameState.State.PLACING_UNITS) {
+            m_currentPlayer.placeableUnits = m_currentPlayer.territories.size() / 2;
+        }
         // Check if we should do AI
         if (m_currentPlayer.isAI) {
             // TODO: Do AI stuff
@@ -127,9 +130,13 @@ public class GameController {
             }
         }
         if(defender.units.isEmpty() && numAttackers > 0){
+            Player p = defender.owner;
             defender.owner.removeTerritory(defender);
             attacker.owner.addTerritory(defender);
             moveUnits(attacker, defender);
+            if(p.territories.isEmpty()){
+                m_gameState.players.remove(p);
+            }
         }
 
         return !attacker.units.isEmpty();
@@ -145,22 +152,19 @@ public class GameController {
             source.units.remove(unit);
 
             if(source.neighbors.contains(destination)){
-                unit.path = new Vector<>();
-                unit.path.add(destination);
+                unit.destination = new PointF(destination.x,destination.y);
             }
             else {
                 unit.path = new PathFinding().getPath(source, destination);
+                unit.destination = new PointF(unit.path.get(unit.path.size()-1).x,unit.path.get(unit.path.size()-1).y);
             }
             unit.frame = 0;
             unit.location = new PointF(source.x, source.y);
-            if(unit.path != null) {
-                unit.destination = unit.path.size() > 0 ? unit.path.get(unit.path.size() - 1).getUnitPlace() : new PointF(destination.x, destination.y);
-            }
-            else{
-                unit.destination = new PointF(destination.x,destination.y);
-            }
+
             destination.units.add(unit);
         }
+
+        source.selectedUnits.clear();
 
         //addUnit(destination, destination.x, destination.y, unit.type);
 
