@@ -17,8 +17,14 @@ public class Debug {
             case PLACING_UNITS:
                 Log.d("Debug", "Current State is PLACING_UNITS");
                 break;
-            case PLAYING:
-                Log.d("Debug", "Current State is PLAYING");
+            case INITIAL_UNIT_PLACEMENT:
+                Log.d("Debug", "Current State is INITIAL_UNIT_PLACEMENT");
+                break;
+            case FORTIFYING:
+                Log.d("Debug", "Current State is FORTIFYING");
+                break;
+            case ATTACKING:
+                Log.d("Debug", "Current State is ATTACKING");
                 break;
         }
     }

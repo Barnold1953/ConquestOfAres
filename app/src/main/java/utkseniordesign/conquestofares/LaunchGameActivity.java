@@ -72,7 +72,7 @@ public class LaunchGameActivity extends Activity {
     {
         //Get Resources
         Resources resources = getResources();
-        int lightBlue = resources.getColor( R.color.lightBlue );
+        int lightBlue = resources.getColor( R.color.darkBlue);
         int offWhite = resources.getColor( R.color.offWhite );
         int darkGrey = resources.getColor( R.color.darkGrey );
         int white = resources.getColor( R.color.white );

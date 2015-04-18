@@ -9,7 +9,7 @@
     
     <string-array name="map_sizes">
         <!--<item>Map Size</item>-->
-        <item>Cramped</item>
+        <item>Tiny</item>
         <item>Small</item>
         <item>Medium</item>
         <item>Large</item>
@@ -104,6 +104,7 @@
                 void main() {\n
                   vec4 tex = texture2D(unTexture, fTexCoords);\n
                   gl_FragColor = tex * vec4(mix(unColor, unSColor, unBlend), 1.0);\n
+                  //gl_FragColor = mix(tex,vec4(0,0,0,tex.a), .1);\n
                 }\n
     </string>
     <string name="color.vert">

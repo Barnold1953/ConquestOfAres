@@ -3,13 +3,17 @@ package UI;
 import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
+import com.nineoldandroids.animation.Animator;
 
 import Game.GameState;
 import Game.Player;
@@ -30,7 +34,8 @@ public class TerritoryPanel extends LinearLayout {
     ImageView addUnitButton = null;
     ImageView subtractUnitButton = null;
     Boolean ownerButtonsVisible = false;
-    public YoYo.YoYoString animating = null;
+    Boolean panelVisible = false;
+    Animator.AnimatorListener animationListener = null;
 
     public TerritoryPanel(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -46,28 +51,54 @@ public class TerritoryPanel extends LinearLayout {
 
     public void setListeners() {
         final GameState.State state = parentActivity.getGameController().getGameState().currentState;
+        animationListener = new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+                if (getVisibility() == GONE && !panelVisible) {
+                    setVisibility(VISIBLE);
+                }
+            }
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                if (getVisibility() == VISIBLE && !panelVisible) {
+                    panelVisible = true;
+                } else {
+                    setVisibility(GONE);
+                    panelVisible = false;
+                }
+            }
+            @Override public void onAnimationCancel(Animator animator) {
+                // if the animation is canceled, go back to invisible
+                if( getVisibility() == VISIBLE) {
+                    setVisibility(GONE);
+                }
+            }
+            @Override public void onAnimationRepeat(Animator animator) {}
+        };
         addUnitButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Player currentPlayer = parentActivity.getGameController().getCurrentPlayer();
-                if (!currentTerritory.addUnit(currentTerritory.x, currentTerritory.y, Unit.Type.soldier)) {
+                if (!currentTerritory.addUnit(Unit.Type.soldier)) {
                     YoYo.with(Techniques.Shake).duration(500).playOn(parentActivity.getGamePlayBanner().counterLabel);
-                } else if(currentTerritory.owner.placeableUnits == 0 && state == GameState.State.PLACING_UNITS) { parentActivity.setCheckMark(true); }
-                parentActivity.getGamePlayBanner().changeContent(parentActivity.getGameController().getGameState());
+                } else if(currentTerritory.owner.placeableUnits == 0 && (state == GameState.State.PLACING_UNITS || state == GameState.State.INITIAL_UNIT_PLACEMENT)) { parentActivity.setCheckMark(true); }
+                parentActivity.getGamePlayBanner().changeContent();
                 update(currentTerritory);
             }
         });
         subtractUnitButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Player currentPlayer = parentActivity.getGameController().getCurrentPlayer();
-                if(!currentTerritory.removeUnits(0, 0, Unit.Type.soldier)) {
+                if(!currentTerritory.removeUnits(Unit.Type.soldier)) {
                     YoYo.with(Techniques.Shake).duration(500).playOn(emptyIndicator);
-                } else if(currentTerritory.owner.placeableUnits == 1 || state == GameState.State.PLACING_UNITS) { parentActivity.setCheckMark(false); }
-                parentActivity.getGamePlayBanner().changeContent(parentActivity.getGameController().getGameState());
+                } else if(currentTerritory.owner.placeableUnits == 1 && (state == GameState.State.PLACING_UNITS || state == GameState.State.INITIAL_UNIT_PLACEMENT)) { parentActivity.setCheckMark(false); }
+                parentActivity.getGamePlayBanner().changeContent();
                 update(currentTerritory);
             }
         });
+    }
+
+    public Boolean isVisible() {
+        return panelVisible;
     }
 
     private void populateMilitaryPanel() {
@@ -75,20 +106,21 @@ public class TerritoryPanel extends LinearLayout {
             militaryPanel.addView(emptyIndicator);
         }
         else {
-            for (Unit unit : currentTerritory.units) {
-                ImageView soldierIcon = new ImageView(getContext());
-                soldierIcon.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
-                soldierIcon.setPadding(2,1,2,1);
-                soldierIcon.setBackgroundColor(getResources().getColor(R.color.offWhite));
-                soldierIcon.setImageResource(R.drawable.soldier);
-                soldierIcon.setAdjustViewBounds(true);
-                militaryPanel.addView(soldierIcon);
-            }
+            for (int i = 0; i < currentTerritory.units.size(); i++)
+                militaryPanel.addView(new UnitIcon(getContext(), parentActivity.getGameController().getGameState(), i));
         }
     }
 
     public void setMilitaryPanel(View v) {
         militaryPanel = (LinearLayout)v;
+    }
+
+    public void toggle() {
+        if(getVisibility()==GONE) {
+            YoYo.with(Techniques.SlideInUp).withListener(animationListener).duration(500).playOn(this);
+        } else {
+            YoYo.with(Techniques.SlideOutDown).withListener(animationListener).duration(500).playOn(this);
+        }
     }
 
     public void update(Territory territory) {
