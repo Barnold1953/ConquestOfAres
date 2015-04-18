@@ -17,6 +17,7 @@ import Game.Territory;
 import Game.Unit;
 import Generation.GpuGenerator;
 import Generation.MapData;
+import Generation.MapGenerator;
 import Utils.PreciseTimer;
 import utkseniordesign.conquestofares.R;
 
@@ -30,6 +31,8 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     Camera camera;
     MapData mapData;
     GameState gameState = null;
+    int m_viewportW = 0;
+    int m_viewportH = 0;
     int frame, previousUnitCount = 0;
     double[] fTime = new double[100];
 
@@ -163,11 +166,11 @@ public class CoARenderer implements GLSurfaceView.Renderer {
                         ((float)t.textureHeight / gameState.mapData.height) * 2.0f,
                         context);
             }
-            gameState.mapData.territoryGraphMesh.finish(context);
 
             Log.d("Line", "Got here");
             gameState.mapData.isDoneGenerating = false;
         }
+
         // Make sprites
         SpriteBatchSystem.clear();
 
@@ -186,18 +189,20 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         previousUnitCount = unitCount;
         // Redraw background color
-        GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-        //GLES20.glClearDepthf(1.0f);
+        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
-        //GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+        // Update generation
+        if (GpuGenerator.hasGenRequest) {
+            GpuGenerator.updateGen(context);
+            MapGenerator.finishGeneration((int)gameState.mapData.width, (int)gameState.mapData.height);
+            GLES20.glViewport(0, 0, m_viewportW, m_viewportH);
+        }
 
         //programHandle = ShaderHelper.getShader("simple");
         for (Territory t: gameState.mapData.territories) {
             t.updateAnimation();
             if (t.mesh != null) t.mesh.render(t, t.texture, camera.getVPMatrix());
         }
-
-        if (showLines) gameState.mapData.territoryGraphMesh.renderLines(camera.getVPMatrix());
 
         Enumeration vEnum = SpriteBatchSystem.sprites.elements();
         //programHandle = ShaderHelper.getShader("animate");
@@ -210,7 +215,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
             dHelper.draw(camera, s.vBuf, s.cBuf, s.tBuf, s.texture, GeometryHelper.getVerticesCount(name), "simple");
         }
-        GpuGenerator.updateGen(context);
+
 
         fTime[frame % 100] = timer.stop();
         frame++;
@@ -228,7 +233,8 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceChanged(GL10 unused, int width, int height) {
         GLES20.glViewport(0, 0, width, height);
-
+        m_viewportW = width;
+        m_viewportH = height;
         // Set the projection matrix
         if (IS_3D) {
             camera.setSurface(width, height, 0.1f, 10000.0f);

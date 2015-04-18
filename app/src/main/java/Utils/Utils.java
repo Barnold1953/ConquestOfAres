@@ -25,6 +25,10 @@ public class Utils {
         return newC;
     }
 
+    public static float byteColorToFloat(byte color) {
+        return (((int)(color) + 256) % 256) / 255.0f;
+    }
+
     public static float[] translateCoordinatePair(float x, float y, MapGenerationParams.MapSize size) {
         Log.d("Screen Size", Float.toString(Device.screenWidth) + " " + Float.toString(Device.screenHeight));
         x = x/Device.screenWidth;

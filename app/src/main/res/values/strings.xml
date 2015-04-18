@@ -258,7 +258,6 @@ void main() {\n
             dx = abs(pos.x - unTPositions[i].x);\n
             dy = abs(pos.y - unTPositions[i].y);\n
             dx = min(dx, unDims.x - dx);\n
-            dy = min(dy, unDims.y - dy);\n
         } else {\n
             dx = pos.x - unTPositions[i].x;\n
             dy = pos.y - unTPositions[i].y;\n
@@ -269,8 +268,8 @@ void main() {\n
             closestIndex = i;\n
         }\n
     }\n
-        float c = float(closestIndex) / 31.0;\n
-        gl_FragColor = vec4(c, 1.0, 0.5, 1.0);\n
+        float c = float(closestIndex);\n
+        gl_FragColor = vec4(c / 255.0, 0.0, 0.0, 1.0);\n
 }\n
     </string>
 </resources>

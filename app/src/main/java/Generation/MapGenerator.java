@@ -40,8 +40,6 @@ public class MapGenerator {
         // random.setSeed(p.seed);
         generateTerritories(Utils.fastFloor(mapData.width), Utils.fastFloor(mapData.height), 100);
 
-        // TODO(Ben): Segment heightmap into territories
-        mapData.isDoneGenerating = true;
         return mapData;
     }
 
@@ -179,11 +177,20 @@ public class MapGenerator {
         }
 
         gpuGen.generateMap(mapData);
+    }
+
+    public static void finishGeneration(int width, int height) {
 
         float c;
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int tIndex = getClosestTerritoryIndex((float)x, (float)y, mapData.territories);
+             //   int bIndex = getClosestTerritoryIndex((float)x, (float)y, mapData.territories);
+                int tIndex = mapData.territoryIndices[y][x];
+
+              //  if (bIndex != tIndex) {
+              //      Log.d("AHHH ", Integer.toString(bIndex) + " " + Integer.toString(tIndex));
+             //   }
+
                 Territory t = mapData.territories.get(tIndex);
                 if (x < t.textureX) {
                     t.textureX = x;
@@ -195,13 +202,18 @@ public class MapGenerator {
                 } else if (y > t.maxY) {
                     t.maxY = y;
                 }
-                mapData.territoryIndices[y][x] = tIndex;
             }
         }
 
         // Generate all the textures for the territories
         for (int i = 0; i < mapData.territories.size(); i++) {
             Territory t = mapData.territories.get(i);
+            if (t.textureX == 999999999) {
+                t.textureX = 0;
+                t.textureY = 0;
+                t.textureWidth = 1;
+                t.textureHeight = 1;
+            }
             t.index = i;
             t.textureWidth = t.maxX - t.textureX;
             t.textureHeight = t.maxY - t.textureY;
@@ -274,24 +286,7 @@ public class MapGenerator {
             }
         }
 
-        // Add graph lines
-        float r, g, b;
-        mapData.territoryGraphMesh = new ColorMesh();
-        for (Territory t1 : mapData.territories) {
-            for (Territory t2 : t1.neighbors) {
-                if (t1.terrainType == Territory.TerrainType.Ocean || t2.terrainType == Territory.TerrainType.Ocean) {
-                    r = 0;
-                    g = 1.0f;
-                    b = 1.0f;
-                } else {
-                    r = 1.0f;
-                    g = 0.0f;
-                    b = 0.0f;
-                }
-                mapData.territoryGraphMesh.addVertex((t1.x / width) * 2.0f - 1.0f, (t1.y / height) * 2.0f - 1.0f, 0.0f, r, g, b);
-                mapData.territoryGraphMesh.addVertex((t2.x / width) * 2.0f - 1.0f, (t2.y / height) * 2.0f - 1.0f, 0.0f, r, g, b);
-            }
-        }
+        mapData.isDoneGenerating = true;
     }
 
     public static Territory getClosestTerritory(float x, float y, Vector<Territory> territories) {

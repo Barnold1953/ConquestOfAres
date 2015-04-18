@@ -43,7 +43,6 @@ public class GpuGenerator {
 
     // Call from render thread
     public static void updateGen(Context context) {
-    //    if (!hasGenRequest) return;
         if (m_programHandle == 0) {
             try {
                 m_programHandle = ShaderHelper.compileShader(context, R.string.gen_vert, R.string.gen_frag, "gen");
@@ -75,9 +74,7 @@ public class GpuGenerator {
             m_renderTarget.init((int)m_md.width, (int)m_md.height);
         }
 
-      //  if (!m_renderTarget.bind()) {
-      //      Log.d("RenderTarget ", "Failed to bind framebuffer.");
-      //  }
+        m_renderTarget.bind();
 
         GLES20.glUseProgram(m_programHandle);
 
@@ -88,7 +85,7 @@ public class GpuGenerator {
         // Uniforms
         GLES20.glUniform2f(GLES20.glGetUniformLocation(m_programHandle, "unDims"), (float)m_md.width, (float)m_md.height);
         GLES20.glUniform1i(GLES20.glGetUniformLocation(m_programHandle, "unNumT"), m_md.territories.size());
-        GLES20.glUniform1i(GLES20.glGetUniformLocation(m_programHandle, "unHorizontalWrap"), 0);
+        GLES20.glUniform1i(GLES20.glGetUniformLocation(m_programHandle, "unHorizontalWrap"), m_md.params.horizontalWrap ? 0 : 1);
         Log.d("t ", Integer.toString(m_md.territories.size()));
         for (int i = 0; i < m_md.territories.size(); i++) {
             Territory t = m_md.territories.get(i);
@@ -103,22 +100,26 @@ public class GpuGenerator {
         ByteBuffer buffer = ByteBuffer.allocateDirect(4 * (int)m_md.width * (int)m_md.height).order(ByteOrder.nativeOrder());
         GLES20.glReadPixels(0, 0, (int)m_md.width, (int)m_md.height, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, buffer);
 
-        byte[] bytes = new byte[3];
-        bytes[0] = buffer.get(0);
-        bytes[1] = buffer.get(1);
-        bytes[2] = buffer.get(2);
-        float[] fls = Utils.byteColorToFloat(bytes);
-
-        Log.d("test", Float.toString(fls[0]) + " " + Float.toString(fls[1]) + " " + Float.toString(fls[2]));
-
-    //    m_renderTarget.unBind();
-
         int error = GLES20.glGetError();
         if (error != GLES20.GL_NO_ERROR) {
             Log.d("GpuGenerator", "Error " + Integer.toString(error));
         }
 
+        for (int y = 0; y < m_md.height; y++) {
+            for (int x = 0; x < m_md.width; x++) {
+                m_md.territoryIndices[(int)m_md.height - y - 1][x] = Math.round(Utils.byteColorToFloat(buffer.get((((int)m_md.height - y - 1) * (int)m_md.width + x) * 4)) * 255.0f);
+                if (m_md.territoryIndices[(int)m_md.height - y - 1][x] >= m_md.territories.size()) {
+                    m_md.territoryIndices[(int)m_md.height - y - 1][x] = m_md.territories.size() - 1;
+                }
+            }
+        }
+
         hasGenRequest = false;
         isDone = true;
+
+        m_renderTarget.unBind();
+
+       // GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+      //  GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
     }
 }
