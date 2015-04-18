@@ -3,6 +3,7 @@ package Graphics;
 /**
  * Created by Nathan on 3/25/2015.
  */
+import android.graphics.PointF;
 import android.util.Log;
 
 import java.nio.ByteBuffer;
@@ -100,7 +101,27 @@ public class GeometryHelper {
             bg.colors = new byte[18 * totalUnits];
         }
 
-        float[] newV = new float[] {quad.x,quad.y+quad.height,quad.z,quad.x,quad.y,quad.z,quad.x+quad.width,quad.y,quad.z,quad.x+quad.width,quad.y,quad.z,quad.x+quad.width,quad.y+quad.height,quad.z,quad.x,quad.y+quad.height,quad.z};
+        float[] newV = new float[] {quad.x,quad.y+quad.height,quad.z,
+                                    quad.x,quad.y,quad.z,
+                                    quad.x+quad.width,quad.y,quad.z,
+                                    quad.x+quad.width,quad.y,quad.z,
+                                    quad.x+quad.width,quad.y+quad.height,quad.z,
+                                    quad.x,quad.y+quad.height,quad.z};
+
+
+        if(quad.angle != 0) {
+            PointF center = new PointF((quad.width / 2 + quad.x), (quad.height / 2 + quad.y));
+            PointF local = new PointF();
+            PointF rotate = new PointF();
+            for (int i = 0; i < newV.length; i += 3) {
+                local.x = newV[i] - center.x;
+                local.y = newV[i + 1] - center.y;
+                rotate.x = (float) (local.x * Math.cos(quad.angle) - local.y * Math.sin(quad.angle));
+                rotate.y = (float) (local.x * Math.sin(quad.angle) + local.y * Math.cos(quad.angle));
+                newV[i] = center.x + rotate.x;
+                newV[i + 1] = center.y + rotate.y;
+            }
+        }
 
         byte[] temp = new byte[18];
         for(int i = 0; i < temp.length; i++){

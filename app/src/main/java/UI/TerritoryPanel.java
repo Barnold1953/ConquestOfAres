@@ -128,7 +128,9 @@ public class TerritoryPanel extends LinearLayout {
             militaryPanel = (LinearLayout)findViewById(R.id.militaryPanel);
         }
         currentTerritory = territory;
-        if(territory.owner != parentActivity.getGameController().getCurrentPlayer())
+        if(territory.owner != parentActivity.getGameController().getCurrentPlayer()
+                || parentActivity.getGameController().getGameState().currentState != GameState.State.INITIAL_UNIT_PLACEMENT
+                && parentActivity.getGameController().getGameState().currentState != GameState.State.PLACING_UNITS)
         {
             if(ownerButtonsVisible) {
                 // if they're visible, but they shouldn't be, hide them smoothly

@@ -112,6 +112,9 @@ public class GameController {
     }
 
     public boolean attack(Territory attacker, Territory defender, int numAttackers){
+        if(numAttackers == attacker.units.size()){
+            return false;
+        }
         Action action = new Action(m_currentPlayer, Action.Category.attack, attacker, defender);
 
         while(defender.units.size() > 0 && numAttackers > 0){
@@ -136,6 +139,9 @@ public class GameController {
             moveUnits(attacker, defender);
             if(p.territories.isEmpty()){
                 m_gameState.players.remove(p);
+                if(m_gameState.players.size() == 1){
+                    Log.d("WINNER", "Player " + m_gameState.players.get(0).name + " has won!");
+                }
             }
         }
 
@@ -143,16 +149,19 @@ public class GameController {
     }
 
     public void moveUnits(Territory source, Territory destination){
+        if(source.selectedUnits.size() == source.units.size()){
+            return;
+        }
         Action action = new Action(m_currentPlayer, Action.Category.moveUnit, source, destination);
 
         for(Unit unit : source.selectedUnits ) {
             action.sUnitsLost.add(unit);
             action.dUnitsGained.add(unit);
-            m_gameState.actions.add(action);
             source.units.remove(unit);
 
             if(source.neighbors.contains(destination)){
-                unit.destination = new PointF(destination.x,destination.y);
+                unit.destination = destination.getUnitPlace();
+                //unit.destination = new PointF(destination.x,destination.y);
             }
             else {
                 unit.path = new PathFinding().getPath(source, destination);
@@ -163,6 +172,8 @@ public class GameController {
 
             destination.units.add(unit);
         }
+
+        m_gameState.actions.add(action);
 
         source.selectedUnits.clear();
 

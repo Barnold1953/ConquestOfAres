@@ -1,5 +1,6 @@
 package Graphics;
 
+import android.graphics.PointF;
 import android.util.Log;
 
 import java.nio.Buffer;
@@ -14,6 +15,17 @@ import Game.Unit;
  * Created by Nathan on 1/12/2015.
  */
 public class SpriteBatchSystem {
+    static float dotProduct(PointF p1, PointF p2){
+        return p1.x * p2.x + p1.y * p2.y;
+    }
+
+    static PointF normalize(PointF p){
+        double total = Math.sqrt(p.x*p.x+p.y*p.y);
+        p.x /= total;
+        p.y /= total;
+        return p;
+    }
+
     public enum BufferType{
         Vertices, TextureCoordinates, Colors
     }
@@ -55,11 +67,26 @@ public class SpriteBatchSystem {
         return s;
     }
 
-    public static void addUnit(Unit.Type type, float x, float y, byte[] color){
+    public static void addUnit(Unit u, float x, float y, byte[] color){
         Quadrilateral quad = new Quadrilateral();
-        switch (type){
+        switch (u.type){
             case soldier:
-                quad = Quadrilateral.getQuad(quad, x, y, 0, .1f, .1f, color);
+                if(u.destination == u.location) {
+                    quad = Quadrilateral.getQuad(quad, x, y, 0, .1f, .1f, color);
+                }
+                else{
+                    double angle;
+                    float yDiff, xDiff;
+                    yDiff = u.destination.y - u.location.y;
+                    xDiff = u.destination.x - u.location.x;
+                    PointF p = new PointF(0.0f, 1.0f);
+                    PointF p1 = new PointF(xDiff, yDiff);
+                    p1 = normalize(p1);
+                    float dp = dotProduct(p, p1);
+                    angle = Math.acos(dp);
+                    if(xDiff > 0.0f) angle = -angle;
+                    quad = Quadrilateral.getQuad(quad, x, y, 0, .1f, .1f, color, angle);
+                }
                 addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
         }
     }

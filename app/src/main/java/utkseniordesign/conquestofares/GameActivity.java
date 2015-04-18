@@ -1,13 +1,16 @@
 package utkseniordesign.conquestofares;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.opengl.GLSurfaceView;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -41,6 +44,7 @@ public class GameActivity extends Activity {
     private CoARenderer coaRenderer;
     private GameSettings gameSettings;
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_gamescreen );
@@ -63,7 +67,9 @@ public class GameActivity extends Activity {
         mGLSurfaceView = ( GLSurfaceView ) findViewById( R.id.glRenderArea );
         mGLSurfaceView.setEGLContextClientVersion(2);
         mGLSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
-        coaRenderer = new CoARenderer(this);
+        Point size = new Point();
+        getWindowManager().getDefaultDisplay().getSize(size);
+        coaRenderer = new CoARenderer(this, size.x, size.y);
         gameController = new GameController();
 
         mGLSurfaceView.setRenderer(coaRenderer);
