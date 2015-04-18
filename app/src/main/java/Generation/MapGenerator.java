@@ -223,6 +223,9 @@ public class MapGenerator {
                                     t.neighbors.add(nextTerritory);
                                 }
                                 isEdge = true;
+                            } else if (x + 1 < width - 1) {
+                                // For thicker borders
+                                if (mapData.territoryIndices[y][x + 2] != i) isEdge = true;
                             }
                         }
                         if (x > 0) {
@@ -233,6 +236,9 @@ public class MapGenerator {
                                     t.neighbors.add(nextTerritory);
                                 }
                                 isEdge = true;
+                            } else if (x - 1 > 0) {
+                                // For thicker borders
+                                if (mapData.territoryIndices[y][x - 2] != i) isEdge = true;
                             }
                         }
                         if (y < height - 1) {
@@ -243,6 +249,9 @@ public class MapGenerator {
                                     t.neighbors.add(nextTerritory);
                                 }
                                 isEdge = true;
+                            } else if (y + 1 < height - 1) {
+                                // For thicker borders
+                                if (mapData.territoryIndices[y + 2][x] != i) isEdge = true;
                             }
                         }
                         if (y > 0) {
@@ -253,12 +262,15 @@ public class MapGenerator {
                                     t.neighbors.add(nextTerritory);
                                 }
                                 isEdge = true;
+                            } else if (y - 1 > 0) {
+                                // For thicker borders
+                                if (mapData.territoryIndices[y - 2][x] != i) isEdge = true;
                             }
                         }
                         if (isEdge) {
-                            t.pixelBuffer.put((byte) 0);
-                            t.pixelBuffer.put((byte) 0);
-                            t.pixelBuffer.put((byte) 0);
+                            t.pixelBuffer.put((byte) 168);
+                            t.pixelBuffer.put((byte) 168);
+                            t.pixelBuffer.put((byte) 168);
                         } else {
                             t.pixelBuffer.put((byte) 255);
                             t.pixelBuffer.put((byte) 255);
