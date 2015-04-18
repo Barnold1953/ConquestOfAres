@@ -25,7 +25,8 @@ public class GameSettings implements Parcelable {
 
     boolean m_isMultiplayer = false; ///< True when multiplayer mode is active
     int m_numPlayers = 0; ///< Number of players in the game
-    int m_numAI = 1; ///< Number of AI players in the game
+    int m_startingUnits = 35;
+    int m_numAI = 0; ///< Number of AI players in the game
     double m_territoriesForVictory = -1; ///< Percent of territories needed for victory. -1 means all
     int m_maxTurnLength = -1; ///< Max turn length in minutes. -1 means no limit
     TerritoryDistributionMode m_territoryDistMode = TerritoryDistributionMode.RANDOM; ///< How to distribute territory
@@ -82,6 +83,7 @@ public class GameSettings implements Parcelable {
         out.writeByte((byte) (m_isMultiplayer ? 1 : 0));
         out.writeByte((byte) (m_mapGenParams.horizontalWrap ? 1 : 0));
         out.writeInt(m_numPlayers);
+        out.writeInt(m_startingUnits);
         out.writeDouble(m_territoriesForVictory);
         out.writeInt(m_maxTurnLength);
         out.writeString(m_territoryDistMode.toString());
@@ -110,6 +112,7 @@ public class GameSettings implements Parcelable {
         m_isMultiplayer = source.readByte() != 0;
         m_mapGenParams.horizontalWrap = source.readByte() != 0;
         m_numPlayers = source.readInt();
+        m_startingUnits = source.readInt();
         m_territoriesForVictory = source.readDouble();
         m_maxTurnLength = source.readInt();
         m_territoryDistMode = TerritoryDistributionMode.valueOf(source.readString());

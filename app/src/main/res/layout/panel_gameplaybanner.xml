@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UI.GamePlayBanner xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/gameplayBanner">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/backgroundImage"
+        android:src="@drawable/game_start_banner"
+        android:adjustViewBounds="true"/>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="20dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/counter"
+            android:src="@drawable/img_unit_counter"
+            android:layout_alignParentTop="false"
+            android:layout_alignParentRight="false"
+            android:layout_alignParentEnd="false"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/counterLabel"
+            android:textSize="35sp"
+            android:layout_alignParentTop="false"
+            android:layout_alignParentEnd="false"
+            android:layout_centerInParent="true"
+            android:paddingBottom="15dp"
+            />
+
+    </RelativeLayout>
+
+</UI.GamePlayBanner>

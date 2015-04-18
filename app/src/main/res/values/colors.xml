@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="lightBlue">#60b0ca</color>
+    <color name="darkBlue">#162a5e</color>
     <color name="offWhite">#ececec</color>
-    <color name="lightGrey">#e7e7e7</color>
-    <color name="silver">#e1e1e1</color>
-    <color name="darkGrey">#9c9c9c</color>
+    <color name="lightGrey">#e1e1e1</color>
+    <color name="silver">#d9d9d9</color>
+    <color name="darkGrey">#8a8a8a</color>
     <color name="white">#ffffff</color>
     <color name="transparentBlack">#5000</color>
     <color name="transparent">#0000</color>

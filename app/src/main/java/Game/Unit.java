@@ -1,5 +1,7 @@
 package Game;
 
+import android.graphics.PointF;
+
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -16,17 +18,15 @@ public class Unit {
 
     public Unit(float x, float y, Type t){
         hasMoved = true;
-        location[0] = x;
-        location[1] = y;
-        destination[0] = x;
-        destination[0] = y;
+        location = new PointF(x,y);
+        destination = new PointF(x,y);
         type = t;
     }
 
     public Type type;
-    public float[] location = new float[2];
-    public float[] destination = new float[2];
-    public Vector<Territory> path;
+    public PointF location = null;
+    public PointF destination = null;
+    public Vector<Territory> path = null;
     public int frame;
     // when health reaches 0, soldier is removed from army.units
     public float health = 100.0f;
@@ -34,4 +34,15 @@ public class Unit {
     public float armor;
     // damage will increase or decrease based on the type of units fighting
     public float damage;
+
+    public void destinationStep(){// calculates the location
+        frame = 0;
+        location = destination;
+        if(path != null && !path.isEmpty()) {
+            path.remove(path.size()-1);
+            if(!path.isEmpty()){
+                destination = new PointF(path.get(path.size()-1).x, path.get(path.size()-1).y);
+            }
+        }
+    }
 }

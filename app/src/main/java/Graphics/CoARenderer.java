@@ -13,6 +13,7 @@ import android.util.Log;
 
 import Game.GameState;
 import Game.Player;
+import Game.Territory;
 import Game.Unit;
 import Generation.MapData;
 import Utils.PreciseTimer;
@@ -24,7 +25,6 @@ import utkseniordesign.conquestofares.R;
 
 public class CoARenderer implements GLSurfaceView.Renderer {
     int programHandle;
-    int mapShader;
     Context context;
     Camera camera;
     MapData mapData;
@@ -88,8 +88,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
             //dHelper.setProgHandles(programHandle, "animate");
             programHandle = ShaderHelper.compileShader(context, R.string.simple_vert, R.string.texture_frag, "simple");
             dHelper.setProgHandles(programHandle, "simple");
-            mapShader = ShaderHelper.compileShader(context, R.string.simple_vert, R.string.map_frag, "map");
-            dHelper.setProgHandles(programHandle, "map");
         }
         catch (IOException e){
             Log.d("Shader", "Error occurred during compilation");
@@ -97,7 +95,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         TextureHelper.imageToTexture(context, R.drawable.texture1, "test1");
         //TextureHelper.imageToTexture(context, R.drawable.character1walk, "soldier");
-        TextureHelper.imageToTexture(context, R.drawable.man_frames_top, "soldier");
+        TextureHelper.imageToTexture(context, R.drawable.man_run, "soldier");
 
         //gHelper.addToBatch(quad, "master");
         /*quad = Quadrilateral.getQuad(quad, 0,0,0,1,1,ftmp);
@@ -116,32 +114,71 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         GLES20.glDepthMask( true );
     }
 
+    float[] getSlope(Unit u){
+        if(u.frame == 10){
+            u.destinationStep();
+        }
+
+        float[] slope = new float[2];
+
+        slope[0] = (u.destination.x - u.location.x) / 10;
+        slope[1] = (u.destination.y - u.location.y) / 10;
+        slope[0] = u.location.x + slope[0] * u.frame;
+        slope[1] = u.location.y + slope[1] * u.frame;
+        u.frame++;
+        return slope;
+    }
+
+    void renderUnits(Territory territory){
+        Player currentPlayer = gameState.players.get(gameState.currentPlayerIndex%gameState.players.size());
+        if(gameState.currentState == GameState.State.INITIAL_UNIT_PLACEMENT){
+            if(territory.owner == currentPlayer){
+                for (Unit u : territory.units) {
+                    float[] slope = getSlope(u);
+                    SpriteBatchSystem.addUnit(u.type, (slope[0]/gameState.mapData.width) * 2 - 1 - (.1f / 2), (slope[1]/gameState.mapData.height) * 2 - 1 - (.1f / 2), territory.owner.color);
+                }
+            }
+        }
+        else{
+            for (Unit u : territory.units) {
+                float[] slope = getSlope(u);
+                SpriteBatchSystem.addUnit(u.type, (slope[0]/gameState.mapData.width) * 2 - 1 - (.1f / 2), (slope[1]/gameState.mapData.height) * 2 - 1 - (.1f / 2), territory.owner.color);
+            }
+        }
+    }
+
     @Override
     public void onDrawFrame(GL10 unused) {
        // Upload mapData texture
         PreciseTimer timer = new PreciseTimer();
-        if (gameState != null && gameState.mapData.texture == 0) {
-           gameState.mapData.texture = TextureHelper.dataToTexture(gameState.mapData.pixelBuffer,
-                    "vortest",
-                    gameState.mapData.width,
-                    gameState.mapData.height);
-           gameState.mapData.territoryGraphMesh.finish(context);
+        if (gameState != null && gameState.mapData.isDoneGenerating) {
+            for (Territory t : gameState.territories) {
+                t.texture = TextureHelper.dataToTexture(t.pixelBuffer, "t" + t.index, t.textureWidth, t.textureHeight);
+                t.pixelBuffer = null;
+                t.mesh = new TerritoryMesh();
+                t.mesh.init(((float)t.textureX / gameState.mapData.width) * 2.0f - 1.0f,
+                        ((float)t.textureY / gameState.mapData.height) * 2.0f - 1.0f,
+                        ((float)t.textureWidth / gameState.mapData.width) * 2.0f,
+                        ((float)t.textureHeight / gameState.mapData.height) * 2.0f,
+                        context);
+            }
+            gameState.mapData.territoryGraphMesh.finish(context);
+
             Log.d("Line", "Got here");
+            gameState.mapData.isDoneGenerating = false;
         }
         // Make sprites
         SpriteBatchSystem.clear();
 
         int unitCount = 0;
-        for(Player p : gameState.players){
-            unitCount += p.units.capacity();
+        for(Territory t : gameState.territories){
+            unitCount += t.units.size();
         }
 
         SpriteBatchSystem.Initialize(unitCount);
 
-        for (Player p : gameState.players) {
-            for (Unit u : p.units) {
-                SpriteBatchSystem.addUnit(u.type, (u.location[0]/gameState.mapData.width) * 2 - 1 - (.1f / 2), (u.location[1]/gameState.mapData.height) * 2 - 1 - (.1f / 2), p.color);
-            }
+        for (Territory t : gameState.territories) {
+            renderUnits(t);
         }
 
         GeometryHelper.allocateBuffs(previousUnitCount);
@@ -155,7 +192,10 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         //programHandle = ShaderHelper.getShader("simple");
 
-        dHelper.draw(camera, GeometryHelper.getVertBuff("master"), GeometryHelper.getColorBuff("master"), GeometryHelper.getTextBuff("master"), TextureHelper.getTexture("vortest"), GeometryHelper.getVerticesCount("master"), "map");
+        for (Territory t: gameState.mapData.territories) {
+            t.updateAnimation();
+            if (t.mesh != null) t.mesh.render(t, t.texture, camera.getVPMatrix());
+        }
 
         if (showLines) gameState.mapData.territoryGraphMesh.renderLines(camera.getVPMatrix());
 
@@ -173,6 +213,9 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         fTime[frame % 100] = timer.stop();
         frame++;
+        if(frame >= 100000000){
+            frame = 0;
+        }
         /*GLES20.glFinish();
         if(frame % 100 == 0 && frame / 100 > 0) {
             Double avgTime = 0.0;

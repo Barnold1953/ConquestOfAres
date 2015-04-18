@@ -10,7 +10,7 @@ import Generation.MapGenerator;
 public class PathFinding {
     private Territory findMin(Territory territory){
         Territory t = territory.neighbors.get(0);
-        for(int i = 1; i < territory.neighbors.capacity(); i++){
+        for(int i = 1; i < territory.neighbors.size(); i++){
             t = t.distance < territory.neighbors.get(i).distance ? t : territory.neighbors.get(i);
         }
         return t;
@@ -24,13 +24,13 @@ public class PathFinding {
 
     private void setNeighbors(Territory territory){
         territory.visited = true;
-        for(int i = 0; i < territory.neighbors.capacity(); i++){
+        for(int i = 0; i < territory.neighbors.size(); i++){
             Territory t = territory.neighbors.get(i);
             if(territory.owner == t.owner){
                 double dist = getDistance(territory, t) + territory.distance;
                 t.distance = dist < t.distance ? dist : t.distance;
             }
-            if(t.visited == false){
+            if(!t.visited){
                 setNeighbors(t);
             }
         }
@@ -41,7 +41,7 @@ public class PathFinding {
         Vector<Territory> visited = new Vector<>();
         Vector<Territory> path = new Vector<>();
 
-        for(int i = 0; i < MapGenerator.mapData.territories.capacity(); i++){
+        for(int i = 0; i < MapGenerator.mapData.territories.size(); i++){
             Territory territory = MapGenerator.mapData.territories.get(i);
             territory.distance = 1000000;
             territory.visited = false;

@@ -10,17 +10,22 @@ import Generation.MapData;
 public class GameState {
 
     public enum State {
+        GAME_START,
+        SELECTING_TERRITORIES,
+        INITIAL_UNIT_PLACEMENT,
         PLACING_UNITS,
-        PLAYING
+        ATTACKING,
+        FORTIFYING
     }
 
     public int currentPlayerIndex = -1; ///< Index of the current player into players TODO: Use this
-    State currentState;
+    public int assignedTerritories = 0;
+    public State currentState = null;
     public Vector<Player> players = new Vector<Player>(); ///< List of all players TODO: Use this
     public Vector<Territory> territories = new Vector<Territory>(); ///< List of all territories
     public MapData mapData; ///< Map specific data
     public Territory selectedTerritory = null; //< Currently selected territory TODO: Use this
     public Random random = new Random(System.currentTimeMillis());
     // TODO: Statistics? Scores?
-    public List<Action> actions;
+    public Vector<Action> actions = new Vector<Action>();
 }

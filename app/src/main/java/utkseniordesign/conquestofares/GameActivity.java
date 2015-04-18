@@ -2,62 +2,62 @@ package utkseniordesign.conquestofares;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.opengl.GLES20;
+import android.graphics.Point;
+import android.graphics.PointF;
 import android.opengl.GLSurfaceView;
-import android.opengl.GLUtils;
 import android.os.Bundle;
-
 import android.util.DisplayMetrics;
 import android.util.Log;
-
-import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.FrameLayout;
+
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-
-import java.util.HashMap;
 
 import Game.GameController;
 import Game.GameState;
-import Generation.MapGenerationParams;
+import Game.Territory;
 import Game.GameSettings;
 import Graphics.CoARenderer;
-import UI.UserInterfaceHelper;
+import UI.GamePlayBanner;
+import UI.TerritoryPanel;
+import Utils.Device;
+import Utils.Utils;
+
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 
 public class GameActivity extends Activity {
-
-    TextView [] toggleButtons;
-    Boolean devPanelShown = false;
+    TerritoryPanel territoryPanel = null;
+    GamePlayBanner gamePlayBanner = null;
+    ImageView checkMark = null;
+    RelativeLayout mainView = null;
 
     private GLSurfaceView mGLSurfaceView;
-    private GameState gameState;
     private GameController gameController;
     private CoARenderer coaRenderer;
     private GameSettings gameSettings;
 
     protected void onCreate( Bundle savedInstanceState ) {
-        toggleButtons = new TextView[3];
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_gamescreen );
+        mainView = (RelativeLayout) findViewById(R.id.gameScreen);
+        territoryPanel = (TerritoryPanel)findViewById(R.id.territoryLayout);
+        gamePlayBanner = (GamePlayBanner)findViewById(R.id.gameplayBanner);
 
         // Get Game Settings, everything except MapGenParams
-
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-        Log.d("Display width: ", Integer.toString(metrics.widthPixels));
-        Log.d("Display height: ", Integer.toString(metrics.heightPixels));
-
-        /* COMMENT THIS OUT IF GAME ACTIVITY IS YOUR STARTUP ACTIVITY */
         Intent intent = getIntent();
         if( intent != null ) {
             gameSettings = (GameSettings) intent.getParcelableExtra("Settings");
         } else {
             gameSettings = new GameSettings();
         }
+
+        // Initlialize device
+        Utils.getScreenDimensions(this);
 
         // Initialize the glSurfaceView
         mGLSurfaceView = ( GLSurfaceView ) findViewById( R.id.glRenderArea );
@@ -69,9 +69,11 @@ public class GameActivity extends Activity {
         mGLSurfaceView.setRenderer(coaRenderer);
 
         // Init the game
-        GameState gameState = new GameState();
+        final GameState gameState = new GameState();
         gameController.initGame(gameState, gameSettings);
         coaRenderer.setGameState(gameState);
+
+        createScreen();
     }
 
     @Override
@@ -90,52 +92,124 @@ public class GameActivity extends Activity {
         mGLSurfaceView.onPause();
     }
 
-    public void toggleDevPanel(View v) {
-        LinearLayout parent = (LinearLayout)v.getParent();
-        if(parent != null) {
-            if (!devPanelShown) {
-                devPanelShown = true;
-                parent.setBackgroundColor(getResources().getColor(R.color.transparentBlack));
-                createPanelTextViews();
-                for (int i = 0; i < 3; i++) parent.addView(toggleButtons[i]);
-            } else {
-                devPanelShown = false;
-                parent.setBackgroundColor(getResources().getColor(R.color.transparent));
-                for (int i = 0; i < 3; i++) parent.removeView(toggleButtons[i]);
+    public void createScreen() {
+        gamePlayBanner.setUpPanel(this);
+        territoryPanel.setUpPanel(this);
+        checkMark = (ImageView) findViewById(R.id.checkMark);
+        setListeners();
+    }
+
+    public void setListeners() {
+        final GameState gameState = gameController.getGameState();
+        // Get game screen touch listener
+        mGLSurfaceView.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                //Log.d("Listener", "(" + event.getX() + ", " + event.getY() + ")");
+                // Territory territory = gameController.onClick(event.getX(), event.getY());
+
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    float coordx = event.getRawX();
+                    float coordy = event.getRawY();
+
+                    // translate touch event to OpenGL coordinates, and scale to mapSize
+                    PointF coords = Utils.translateCoordinatePair(coordx,coordy,gameSettings.getMapGenParams().mapSize);
+
+                    if(
+                        gameState.selectedTerritory == null ||
+                        gameState.currentState == GameState.State.GAME_START ||
+                        gameState.currentState == GameState.State.PLACING_UNITS  ||
+                        gameState.currentState == GameState.State.INITIAL_UNIT_PLACEMENT ||
+                        gameState.selectedTerritory.selectedUnits.size() == 0
+                    ) handleTerritorySelect(coords.x, coords.y);
+                    else if(
+                        gameState.selectedTerritory.selectedUnits.size() > 0 &&
+                        gameState.currentState == GameState.State.FORTIFYING
+                    ) handleUnitMove(coords.x, coords.y);
+                    else if(gameState.selectedTerritory.selectedUnits.size() > 0 &&
+                            gameState.currentState == GameState.State.ATTACKING
+                    ) handleUnitAttack(coords.x, coords.y);
+                }
+                return true;
             }
+        });
+
+        checkMark.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    if (gameState.selectedTerritory != null) {
+                        gameState.selectedTerritory.unselect();
+                        gameState.selectedTerritory = null;
+                    }
+                    if (territoryPanel.isVisible()) territoryPanel.toggle();
+                    gameController.stepState();
+                    if (gameController.getGameState().currentState == GameState.State.PLACING_UNITS ||
+                        gameController.getGameState().currentState == GameState.State.INITIAL_UNIT_PLACEMENT )
+                        setCheckMark(false);
+                    if (gameController.stateHasChanged) {
+                        gamePlayBanner.refresh(); // gets new banner
+                        gameController.stateHasChanged = false;
+                    } else gamePlayBanner.changeContent(); // updates current banner
+                }
+                return true;
+            }
+        });
+    }
+
+    public void handleTerritorySelect(float x, float y) {
+        Territory oldTerritory = gameController.getGameState().selectedTerritory;
+        Territory newTerritory = gameController.onClick(x, y);
+        // Check if selected territory changed
+        if (oldTerritory == newTerritory) {
+            oldTerritory.selectedUnits.removeAllElements();
+            territoryPanel.toggle();
+        } else if (oldTerritory == null) {
+            territoryPanel.update(newTerritory);
+            territoryPanel.toggle();
+        } else {
+            territoryPanel.update(newTerritory);
+            oldTerritory.selectedUnits.removeAllElements();
         }
     }
 
-    private void createPanelTextViews() {
-        toggleButtons = new TextView[3];
-        for( int i = 0; i < 3; i++ ) {
-            toggleButtons[i] = new TextView(this);
-            toggleButtons[i].setPadding(40,10,40,0);
-            toggleButtons[i].setTextSize(20);
-            toggleButtons[i].setTextColor(getResources().getColor(R.color.white));
+    public void handleUnitMove(float x, float y) {
+        Log.d("GameActivity", "HandleUnitMove called");
+        Territory moveTo = gameController.getTerritoryAtPoint(x, y);
+        if(gameController.getGameState().selectedTerritory.neighbors.contains(moveTo) && moveTo.owner == gameController.getGameState().selectedTerritory.owner) {
+            gameController.moveUnits(gameController.getGameState().selectedTerritory, moveTo);
+            gameController.getGameState().selectedTerritory.selectedUnits.removeAllElements();
+            gameController.getGameState().selectedTerritory.unselectNeighbors();
+            gameController.getGameState().selectedTerritory.select();
+            territoryPanel.update(gameController.getGameState().selectedTerritory);
+        }
+    }
+
+    public void handleUnitAttack(float x, float y){
+        Territory attack = gameController.getTerritoryAtPoint(x,y);
+        if(gameController.getGameState().selectedTerritory.neighbors.contains(attack) && attack.owner != gameController.getGameState().selectedTerritory.owner && attack.owner != null) {
+            gameController.attack(gameController.getGameState().selectedTerritory, attack, gameController.getGameState().selectedTerritory.selectedUnits.size());
+            gameController.getGameState().selectedTerritory.selectedUnits.removeAllElements();
+            gameController.getGameState().selectedTerritory.unselectNeighbors();
+            gameController.getGameState().selectedTerritory.select();
+            territoryPanel.update(gameController.getGameState().selectedTerritory);
         }
 
-        toggleButtons[0].setText("Graph");
-        toggleButtons[0].setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                coaRenderer.toggleLines();
-            }
-        });
-        toggleButtons[1].setText("Terrain");
-        toggleButtons[1].setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                coaRenderer.toggleTerrain();
-            }
-        });
-        toggleButtons[2].setText("Owners");
-        toggleButtons[2].setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+    }
 
-            }
-        });
+    public void setCheckMark(Boolean show) {
+        if(show) {
+            if(checkMark.getVisibility()==View.GONE) checkMark.setVisibility(View.VISIBLE);
+            YoYo.with(Techniques.RollIn).duration(500).playOn(checkMark);
+        } else {
+            YoYo.with(Techniques.RollOut).duration(500).playOn(checkMark);
+        }
+    }
+
+    public GamePlayBanner getGamePlayBanner() {
+        return gamePlayBanner;
+    }
+
+    public GameController getGameController() {
+        return gameController;
     }
 
     @Override
