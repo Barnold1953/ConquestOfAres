@@ -10,10 +10,10 @@ package Generation;
  * Created by brb55_000 on 3/2/2015.
  */
 public class MapData {
+    public MapData() {};
     /// Returns
     public boolean isDoneGenerating = false;
     public Vector<Territory> territories = null; ///< Generated territories. Gets set by generator
-
     public int[][] territoryIndices = null;
     public ColorMesh territoryGraphMesh;
     public MapGenerationParams params;

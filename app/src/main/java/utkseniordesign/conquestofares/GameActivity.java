@@ -133,7 +133,7 @@ public class GameActivity extends googleClientApiActivity {
                     float coordy = event.getRawY();
 
                     // translate touch event to OpenGL coordinates, and scale to mapSize
-                    PointF coords = Utils.translateCoordinatePair(coordx,coordy,gameSettings.getMapGenParams().mapSize);
+                    PointF coords = Utils.translateCoordinatePair(coordx,coordy,gameController.getGameState().mapData.params.mapSize);
 
                     if(
                         gameState.selectedTerritory == null ||

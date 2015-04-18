@@ -21,6 +21,8 @@ public class Player {
     // TODO: Statistics?
     // TODO: Networking stuff
 
+    public Player() {} //stub contstructor for json reconstruction
+
     public Player(int initialUnits) {
         placeableUnits = initialUnits;
         isAI = false;

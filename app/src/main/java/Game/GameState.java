@@ -1,5 +1,6 @@
 package Game;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import java.io.Serializable;
@@ -14,7 +15,8 @@ import Generation.MapData;
 
 @JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
 public class GameState {
-
+    GameState() {} //stub constructor for jason reconstruction
+    @JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
     public enum State {
         NOT_MY_TURN,
         GAME_START,
@@ -35,8 +37,7 @@ public class GameState {
     transient public MapData mapData; ///< Map specific data
     transient public Territory selectedTerritory = null; //< Currently selected territory TODO: Use this
     transient public Random random = new Random(System.currentTimeMillis());
-    // TODO: Statistics? Scores?
-    public Vector<Action> actions = new Vector<Action>();
+    transient public Vector<Action> actions = new Vector<Action>();
     public Boolean isSetup = false; ///< Specifies whether initial territory choosing/unti placement is complete.
     public GameSettings gameSettings = null;
 }

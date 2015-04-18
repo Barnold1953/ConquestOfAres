@@ -1,40 +1,19 @@
 package Game;
 
-import android.app.Activity;
 import android.content.Context;
-import android.graphics.Point;
 import android.graphics.PointF;
-import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
-import com.google.android.gms.games.Players;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
-import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-import java.util.*;
 
 import Generation.MapData;
-import Generation.MapGenerator;
 import Generation.MapGenerationParams;
-import Graphics.Quadrilateral;
-import Graphics.SpriteBatchSystem;
-import Utils.Device;
-import utkseniordesign.conquestofares.GameActivity;
+import Generation.MapGenerator;
 import utkseniordesign.conquestofares.googleClientApiActivity;
 
 /**
@@ -85,7 +64,7 @@ public class GameController {
             String json = new String(match.getData(),"UTF-8");
             m_gameState = objectMapper.readValue(json, GameState.class);
         } catch(Exception e) {
-            e.getMessage();
+            Log.i("Json writing", e.getMessage());
         }
 
         // get map data
@@ -96,35 +75,40 @@ public class GameController {
         } catch (FileNotFoundException fnfound) {
             m_gameState.mapData = (new MapGenerator()).generateMap(m_gameState.gameSettings.getMapGenParams());
         } catch (Exception e) {
-            e.getMessage();
+            Log.i("Json writing", e.getMessage());
         }
+
+        // other extraneous assigments
+        m_currentPlayer = m_gameState.players.get(m_gameState.currentPlayerIndex);
+        MapGenerator.mapData = m_gameState.mapData;
+
     }
 
     public void writeState(Boolean newPlayer) {
         ObjectMapper objectMapper = new ObjectMapper();
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream out = null;
-        byte[] bytesToWrite = null;
 
         // write map to system file
         FileOutputStream fs;
+        String json = "";
         try {
-            String json = objectMapper.writeValueAsString(m_gameState.mapData);
+            json = objectMapper.writeValueAsString(m_gameState.mapData);
             fs = gameActivity.openFileOutput("MapData" + match.getMatchId(), Context.MODE_PRIVATE);
             fs.write(json.getBytes());
         } catch(Exception e) {
-            e.getMessage();
+            Log.d("Map Writing", e.getMessage());
         }
 
+        longInfo(json);
+
         // write game state to cloud
-        String json = "";
+        json = "";
         try {
             json = objectMapper.writeValueAsString(m_gameState);
         } catch(Exception e) {
-            Log.d("State Writing",e.getMessage());
+            Log.d("State Writing", e.getMessage());
         }
 
-        Log.d("State Writing",json);
+        longInfo(json);
 
         // if this is actually the end of a turn
         if(newPlayer) {
@@ -217,7 +201,6 @@ public class GameController {
 
     public boolean attack(Territory attacker, Territory defender, int numAttackers){
         Action action = new Action(m_currentPlayer, Action.Category.attack, attacker, defender);
-
         while(defender.units.size() > 0 && numAttackers > 0){
             // I figure we can change the chance of winning based on the type of unit it is, like tanks are weak to airplanes, airplanes are weak to soldiers, and soldiers are weak to tanks
             // kind of like a rock-paper-scissors dynamic
@@ -273,5 +256,14 @@ public class GameController {
         //addUnit(destination, destination.x, destination.y, unit.type);
 
         //source.owner.unitsInFlight.add(unit);
+    }
+
+    // used for logging large amounts of google play data
+    public static void longInfo(String str) {
+        if(str.length() > 4000) {
+            Log.i("Json", str.substring(0, 4000));
+            longInfo(str.substring(4000));
+        } else
+            Log.i("Json", str);
     }
 }

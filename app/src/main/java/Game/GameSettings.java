@@ -3,6 +3,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import java.io.Serializable;
@@ -17,6 +18,7 @@ enum TerritoryDistributionMode {
     ROUND_ROBIN
 }
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GameSettings
         implements Parcelable {
 

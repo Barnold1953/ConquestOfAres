@@ -16,6 +16,8 @@ public class Unit {
         soldier, tank, airplane
     }
 
+    public Unit() {}; //stub constructor for Json parsing
+
     public Unit(float x, float y, Type t){
         hasMoved = true;
         location = new PointF(x,y);
