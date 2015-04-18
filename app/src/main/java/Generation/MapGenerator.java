@@ -291,34 +291,12 @@ public class MapGenerator {
         }
     }
 
-    public static Territory getClosestTerritory(float x, float y, Vector<Territory> territories) {
-        return territories.get(getClosestTerritoryIndex(x, y, territories));
+    public static Territory getClosestTerritory(float x, float y, MapData mapData) {
+        return mapData.territories.get(getClosestTerritoryIndex(x, y, mapData));
     }
 
-    private static int getClosestTerritoryIndex(float x, float y, Vector<Territory> territories) {
-        int closestIndex = 0;
-        float closestDist = 99999999999.9f;
-        float dx, dy;
-
-        x += (float)octaveNoise2D(x, y, MODULATE_PERSISTENCE, MODULATE_FREQUENCY, MODULATE_OCTAVES) * MODULATE_SCALE;
-        y += (float)octaveNoise2D(x + 2048.0, y + 2048.0, MODULATE_PERSISTENCE, MODULATE_FREQUENCY, MODULATE_OCTAVES) * MODULATE_SCALE;
-        for (int i = 0; i < territories.size(); i++) {
-            if (mapData.params.horizontalWrap) {
-                dx = Math.abs(x - territories.get(i).x);
-                dy = Math.abs(y - territories.get(i).y);
-                dx = Math.min(dx, mapData.width - dx);
-                dy = Math.min(dy, mapData.height - dy);
-            } else {
-                dx = x - territories.get(i).x;
-                dy = y - territories.get(i).y;
-            }
-            float dist = dx * dx + dy * dy;
-            if (dist < closestDist) {
-                closestDist = dist;
-                closestIndex = i;
-            }
-        }
-        return closestIndex;
+    private static int getClosestTerritoryIndex(float x, float y, MapData mapData) {
+        return mapData.territoryIndices[(int)Math.round(y)][(int)Math.round(x)];
     }
 
     private static double octaveNoise2D(double x, double y, double persistence, double frequency, int octaves) {
