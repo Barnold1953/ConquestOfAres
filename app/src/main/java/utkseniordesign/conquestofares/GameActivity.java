@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.opengl.GLSurfaceView;
+import android.os.BadParcelableException;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -22,6 +23,9 @@ import Game.GameState;
 import Game.Territory;
 import Game.GameSettings;
 import Graphics.CoARenderer;
+import Graphics.DrawHelper;
+import Graphics.GeometryHelper;
+import Graphics.TextureHelper;
 import UI.GamePlayBanner;
 import UI.TerritoryPanel;
 import Utils.Device;
@@ -29,8 +33,12 @@ import Utils.Utils;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.games.Games;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer;
 
-public class GameActivity extends Activity {
+public class GameActivity extends googleClientApiActivity {
     TerritoryPanel territoryPanel = null;
     GamePlayBanner gamePlayBanner = null;
     ImageView checkMark = null;
@@ -50,11 +58,13 @@ public class GameActivity extends Activity {
 
         // Get Game Settings, everything except MapGenParams
         Intent intent = getIntent();
-        if( intent != null ) {
-            gameSettings = (GameSettings) intent.getParcelableExtra("Settings");
-        } else {
-            gameSettings = new GameSettings();
+        try{
+            gameSettings = intent.getParcelableExtra("Settings");
+        } catch(BadParcelableException e) {
+            // do nothing, this just means that the game wasn't passed settings
+            // probably because it's an already started match
         }
+        TurnBasedMatch match = intent.getParcelableExtra("Match");
 
         // Initlialize device
         Utils.getScreenDimensions(this);
@@ -63,15 +73,12 @@ public class GameActivity extends Activity {
         mGLSurfaceView = ( GLSurfaceView ) findViewById( R.id.glRenderArea );
         mGLSurfaceView.setEGLContextClientVersion(2);
         mGLSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
+        mGLSurfaceView.setPreserveEGLContextOnPause(true);
         coaRenderer = new CoARenderer(this);
-        gameController = new GameController();
+        gameController = new GameController(this, match, gameSettings);
 
         mGLSurfaceView.setRenderer(coaRenderer);
-
-        // Init the game
-        final GameState gameState = new GameState();
-        gameController.initGame(gameState, gameSettings);
-        coaRenderer.setGameState(gameState);
+        coaRenderer.setGameState(gameController.getGameState());
 
         createScreen();
     }
@@ -82,6 +89,17 @@ public class GameActivity extends Activity {
         // The activity must call the GL surface view's onResume() on activity onResume().
         super.onResume();
         mGLSurfaceView.onResume();
+
+        if(gameController.getMatch().getStatus() == TurnBasedMatch.MATCH_STATUS_ACTIVE) {
+            if(!gameController.hasState()) {
+                gameController.readState();
+                if(!gameController.getGameState().isSetup) {
+                    gameController.getGameState().currentState = GameState.State.INITIAL_UNIT_PLACEMENT;
+                } else gameController.getGameState().currentState = GameState.State.PLACING_UNITS;
+            }
+            if(gameController.getMatch().getTurnStatus() != TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN)
+                gameController.getGameState().currentState = GameState.State.NOT_MY_TURN;
+        }
     }
 
     @Override
@@ -90,6 +108,9 @@ public class GameActivity extends Activity {
         // The activity must call the GL surface view's onPause() on activity onPause().
         super.onPause();
         mGLSurfaceView.onPause();
+
+        // if it's just a pause, write the state with the current player
+        gameController.writeState(false);
     }
 
     public void createScreen() {
@@ -145,10 +166,7 @@ public class GameActivity extends Activity {
                     if (gameController.getGameState().currentState == GameState.State.PLACING_UNITS ||
                         gameController.getGameState().currentState == GameState.State.INITIAL_UNIT_PLACEMENT )
                         setCheckMark(false);
-                    if (gameController.stateHasChanged) {
-                        gamePlayBanner.refresh(); // gets new banner
-                        gameController.stateHasChanged = false;
-                    } else gamePlayBanner.changeContent(); // updates current banner
+                    gamePlayBanner.refresh();
                 }
                 return true;
             }

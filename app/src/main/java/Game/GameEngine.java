@@ -14,29 +14,26 @@ import Utils.PreciseTimer;
 public class GameEngine {
     public MapGenerator mapGenerator = new MapGenerator(); ///< Generates the map
     private GameState m_gameState = null; ///< Handle to game
-    private GameSettings m_gameSettings = null; ///< Settings
-    private GameController m_gameController = null;
 
     private byte[][] playerColors = new byte[6][3];
 
     /// Initializes a game by setting up game state and map
-    public void initGame(GameState gameState, GameSettings gameSettings, GameController gameController) {
+    public void initGame(GameState gameState) {
         initPlayerColors();
 
         // Set handles so we don't have to pass shit around everywhere
         m_gameState = gameState;
-        m_gameSettings = gameSettings;
-        m_gameController = gameController;
         // Generate the map
         PreciseTimer timer = new PreciseTimer();
-        MapData mapData = mapGenerator.generateMap(gameSettings.getMapGenParams());
+        MapData mapData = mapGenerator.generateMap(m_gameState.gameSettings.getMapGenParams());
 
         Log.d("*TIME generateMap:", Double.toString(timer.stop()));
 
         m_gameState.territories = mapData.territories;
         m_gameState.mapData = mapData;
+        m_gameState.numPlayers = m_gameState.gameSettings.m_numPlayers;
         // Initialize players
-        initPlayers(m_gameSettings.getNumPlayers(), m_gameSettings.getNumAI());
+        initPlayers(m_gameState.gameSettings.getNumPlayers(), m_gameState.gameSettings.getNumAI());
         // Assign territories
         assignTerritories();
 
@@ -66,15 +63,13 @@ public class GameEngine {
 
     private void initPlayers(int numPlayers, int numAI) {
        for (int i = 0; i < numPlayers; i++) {
-           Player p = new Player("Player " + (i+1),m_gameSettings);
+           Player p = new Player(m_gameState.initialUnits);
            if (i < numAI) {
                p.isAI = true;
            }
            p.color[0] = playerColors[i][0];
            p.color[1] = playerColors[i][1];
            p.color[2] = playerColors[i][2];
-           p.placeableUnits = 10;
-           p.name = "Player " + Integer.toString(i + 1);
            m_gameState.players.add(p);
        }
     }
@@ -86,7 +81,7 @@ public class GameEngine {
         //gameState.territories = gameSettings.mapGenParams.territories;
 
         // Assign territories to players
-        switch (m_gameSettings.getTerritoryDistMode()) {
+        switch (m_gameState.gameSettings.getTerritoryDistMode()) {
             case RANDOM:
                 int j = 0;
                 for (int i = 0; i < m_gameState.territories.size(); i++) {

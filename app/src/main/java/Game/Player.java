@@ -1,11 +1,17 @@
 package Game;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * Created by brb55_000 on 2/6/2015.
  */
+
+@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
 public class Player {
-    public String name; ///< Player name for display
+
     public ArrayList<Territory> territories = new ArrayList<Territory>(); ///< List of all armies.
     public Vector<Unit> units = new Vector<Unit>();
     public Vector<Unit> unitsInFlight = new Vector<>();
@@ -15,14 +21,12 @@ public class Player {
     // TODO: Statistics?
     // TODO: Networking stuff
 
-    public Player(String name, GameSettings settings) {
-        this.name = name;
-        placeableUnits = settings.m_startingUnits;
+    public Player(int initialUnits) {
+        placeableUnits = initialUnits;
         isAI = false;
     }
 
     public Player(Player b) {
-        name = new String(b.name);
         units = new Vector<Unit>(b.units);
         placeableUnits = b.placeableUnits;
         isAI = b.isAI;

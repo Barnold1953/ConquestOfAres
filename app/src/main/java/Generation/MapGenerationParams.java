@@ -1,4 +1,5 @@
 package Generation;
+import java.io.Serializable;
 import java.util.*;
 import Game.Territory;
 import Game.GameSettings;

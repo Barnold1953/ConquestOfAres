@@ -2,6 +2,11 @@ package Game;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+import java.io.Serializable;
+
 import Generation.MapGenerationParams;
 /**
  * Created by brb55_000 on 2/6/2015.
@@ -12,7 +17,9 @@ enum TerritoryDistributionMode {
     ROUND_ROBIN
 }
 
-public class GameSettings implements Parcelable {
+public class GameSettings
+        implements Parcelable {
+
     public enum GameSettingErrors {
         NUM_PLAYERS_UNSET,
         MAP_WRAP_UNSET,

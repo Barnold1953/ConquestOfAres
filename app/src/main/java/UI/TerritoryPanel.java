@@ -33,7 +33,7 @@ public class TerritoryPanel extends LinearLayout {
     LinearLayout militaryPanel = null;
     ImageView addUnitButton = null;
     ImageView subtractUnitButton = null;
-    Boolean ownerButtonsVisible = false;
+    Boolean unitPlacementButtonsVisible = false;
     Boolean panelVisible = false;
     Animator.AnimatorListener animationListener = null;
 
@@ -128,9 +128,10 @@ public class TerritoryPanel extends LinearLayout {
             militaryPanel = (LinearLayout)findViewById(R.id.militaryPanel);
         }
         currentTerritory = territory;
+        Log.d("Current PLayer", Integer.toString(parentActivity.getGameController().getGameState().currentPlayerIndex));
         if(territory.owner != parentActivity.getGameController().getCurrentPlayer())
         {
-            if(ownerButtonsVisible) {
+            if(unitPlacementButtonsVisible) {
                 // if they're visible, but they shouldn't be, hide them smoothly
                 YoYo.with(Techniques.SlideOutDown).duration(500).playOn(addUnitButton);
                 YoYo.with(Techniques.SlideOutDown).duration(500).playOn(subtractUnitButton);
@@ -139,13 +140,13 @@ public class TerritoryPanel extends LinearLayout {
                 YoYo.with(Techniques.SlideOutDown).duration(0).playOn(addUnitButton);
                 YoYo.with(Techniques.SlideOutDown).duration(0).playOn(subtractUnitButton);
             }
-            ownerButtonsVisible = false;
+            unitPlacementButtonsVisible = false;
         } else {
-            if(!ownerButtonsVisible) {
+            if(!unitPlacementButtonsVisible) {
                 YoYo.with(Techniques.SlideInUp).duration(500).playOn(addUnitButton);
                 YoYo.with(Techniques.SlideInUp).duration(500).playOn(subtractUnitButton);
             }
-            ownerButtonsVisible = true;
+            unitPlacementButtonsVisible = true;
         }
         // TODO: Optimize so I just add new views, rather than removing them all and reading
         militaryPanel.removeAllViews();

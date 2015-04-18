@@ -1,5 +1,6 @@
 package Game;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -9,9 +10,14 @@ import Graphics.TerritoryMesh;
 import android.graphics.PointF;
 import android.util.Log;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 /**
  * Created by brb55_000 on 2/6/2015.
  */
+
+@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
 public class Territory {
 
     public Territory() {
@@ -200,6 +206,6 @@ public class Territory {
     public int maxX = 0; ///< Used in map generation only
     public int maxY = 0; ///< Used in map generation only
     public int index = -1;
-    public ByteBuffer pixelBuffer = null;
-    public TerritoryMesh mesh = null;
+    transient public ByteBuffer pixelBuffer = null;
+    transient public TerritoryMesh mesh = null;
 }

@@ -99,6 +99,11 @@ public class GamePlayBanner extends RelativeLayout {
             case FORTIFYING:
                 background.setImageResource(R.drawable.fortify_banner);
                 break;
+            case NOT_MY_TURN:
+                background.setImageResource(R.drawable.waiting_banner);
+                counter.setVisibility(GONE);
+                counterLabel.setVisibility(GONE);
+                break;
             default:
         }
     }

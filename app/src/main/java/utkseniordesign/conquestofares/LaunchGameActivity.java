@@ -8,14 +8,31 @@ package utkseniordesign.conquestofares;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.util.Log;
 import android.view.View;
 import android.widget.Spinner;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.games.Games;
+import com.google.android.gms.games.multiplayer.Multiplayer;
+import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer;
+
+import java.util.ArrayList;
 import Game.GameSettings;
 import UI.UserInterfaceHelper;
 
-public class LaunchGameActivity extends Activity {
+public class LaunchGameActivity extends googleClientApiActivity {
+
+    final static int RC_SELECT_PLAYERS = 10000;
+    GameSettings gameSettings = new GameSettings();
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -92,7 +109,6 @@ public class LaunchGameActivity extends Activity {
 
     private GameSettings getSettings()
     {
-        GameSettings gameSettings = new GameSettings();
         String numPlayers = UserInterfaceHelper.getSelectedToggleButton(findViewById(R.id.PlayerCountToggle));
         String horizontalWrap = ((Spinner)findViewById(R.id.horizontalWrapSpinner)).getSelectedItem().toString();
         String territoriesForVictory = ((Spinner)findViewById(R.id.victoryConditionSpinner)).getSelectedItem().toString();
@@ -135,12 +151,44 @@ public class LaunchGameActivity extends Activity {
 
     public void startNewGame( View v )
     {
-        GameSettings settings = getSettings();
-        if(settings != null) {
-            Intent intent = new Intent(this, GameActivity.class);
-            intent.putExtra("Settings", settings);
-            startActivity(intent);
+        gameSettings = getSettings();
+        Intent intent =
+                Games.TurnBasedMultiplayer.getSelectOpponentsIntent(getClient(), 1, gameSettings.getNumPlayers()-1);
+        startActivityForResult(intent, RC_SELECT_PLAYERS);
+    }
+
+    @Override
+    public void onActivityResult(int request, int response, Intent data) {
+        super.onActivityResult(request,response,data);
+        if(request == RC_SELECT_PLAYERS) {
+            if(response != Activity.RESULT_OK) {
+                //user canceled
+                Log.d("Play Services","Match status not ok!");
+                return;
+            }
+
+            // get invitees list
+            final ArrayList<String> invitees =
+                    data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS);
+
+            // get automatch stuff
+            Bundle automatchCriteria = null;
+            int minAutoMatchedPLayers = data.getIntExtra(Multiplayer.EXTRA_MIN_AUTOMATCH_PLAYERS,0);
+            int maxAutoMatchedPLayers = data.getIntExtra(Multiplayer.EXTRA_MAX_AUTOMATCH_PLAYERS,0);
+            if(minAutoMatchedPLayers > 0) {
+                automatchCriteria = RoomConfig.createAutoMatchCriteria(minAutoMatchedPLayers, maxAutoMatchedPLayers, 0);
+            }
+
+            TurnBasedMatchConfig turnBasedMatchConfig = TurnBasedMatchConfig.builder()
+                    .addInvitedPlayers(invitees)
+                    .setAutoMatchCriteria(automatchCriteria)
+                    .build();
+
+            Games.TurnBasedMultiplayer
+                    .createMatch(getClient(),turnBasedMatchConfig)
+                    .setResultCallback(new MatchInitiatedCallback(this));
         }
+
     }
 
     @Override
@@ -148,5 +196,32 @@ public class LaunchGameActivity extends Activity {
         super.onDestroy();
     }
 
+    private class MatchInitiatedCallback implements
+            ResultCallback<TurnBasedMultiplayer.InitiateMatchResult> {
+
+        LaunchGameActivity gameActivity = null;
+
+        public MatchInitiatedCallback(LaunchGameActivity activity) {
+            super();
+            gameActivity = activity;
+        }
+        @Override
+        public void onResult(TurnBasedMultiplayer.InitiateMatchResult result) {
+            Status status = result.getStatus();
+            if(!status.isSuccess()) {
+                Log.i("Match status: ", Integer.toString(status.getStatusCode()));
+                return;
+            }
+
+            TurnBasedMatch match = result.getMatch();
+
+            if(gameSettings != null) {
+                Intent gameIntent = new Intent(gameActivity, GameActivity.class);
+                gameIntent.putExtra("Settings",gameSettings);
+                gameIntent.putExtra("Match",match);
+                startActivity(gameIntent);
+            }
+        }
+    }
 
 }
