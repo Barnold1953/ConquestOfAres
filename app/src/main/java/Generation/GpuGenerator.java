@@ -107,7 +107,8 @@ public class GpuGenerator {
 
         for (int y = 0; y < m_md.height; y++) {
             for (int x = 0; x < m_md.width; x++) {
-                m_md.territoryIndices[(int)m_md.height - y - 1][x] = Math.round(Utils.byteColorToFloat(buffer.get((((int)m_md.height - y - 1) * (int)m_md.width + x) * 4)) * 255.0f);
+                int territoryIndex = Math.round(Utils.byteColorToFloat(buffer.get((((int)m_md.height - y - 1) * (int)m_md.width + x) * 4)) * 255.0f);
+                m_md.territoryIndices[(int)m_md.height - y - 1][x] = territoryIndex;
                 if (m_md.territoryIndices[(int)m_md.height - y - 1][x] >= m_md.territories.size()) {
                     m_md.territoryIndices[(int)m_md.height - y - 1][x] = m_md.territories.size() - 1;
                 }
