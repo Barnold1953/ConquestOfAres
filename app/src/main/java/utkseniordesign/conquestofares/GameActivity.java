@@ -23,6 +23,7 @@ import Game.Territory;
 import Game.GameSettings;
 import Graphics.CoARenderer;
 import UI.GamePlayBanner;
+import UI.GameTouchListener;
 import UI.TerritoryPanel;
 import Utils.Device;
 import Utils.Utils;
@@ -102,37 +103,7 @@ public class GameActivity extends Activity {
     public void setListeners() {
         final GameState gameState = gameController.getGameState();
         // Get game screen touch listener
-        mGLSurfaceView.setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                //Log.d("Listener", "(" + event.getX() + ", " + event.getY() + ")");
-                // Territory territory = gameController.onClick(event.getX(), event.getY());
-
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    float coordx = event.getRawX();
-                    float coordy = event.getRawY();
-
-                    // translate touch event to OpenGL coordinates, and scale to mapSize
-                    PointF coords = Utils.translateCoordinatePair(coordx,coordy,gameSettings.getMapGenParams().mapSize);
-
-                    if(
-                        gameState.selectedTerritory == null ||
-                        gameState.currentState == GameState.State.GAME_START ||
-                        gameState.currentState == GameState.State.PLACING_UNITS  ||
-                        gameState.currentState == GameState.State.INITIAL_UNIT_PLACEMENT ||
-                        gameState.selectedTerritory.selectedUnits.size() == 0
-                    ) handleTerritorySelect(coords.x, coords.y);
-                    else if(
-                        gameState.selectedTerritory.selectedUnits.size() > 0 &&
-                        gameState.currentState == GameState.State.FORTIFYING
-                    ) handleUnitMove(coords.x, coords.y);
-                    else if(gameState.selectedTerritory.selectedUnits.size() > 0 &&
-                            gameState.currentState == GameState.State.ATTACKING
-                    ) handleUnitAttack(coords.x, coords.y);
-                }
-                return true;
-            }
-        });
-
+        mGLSurfaceView.setOnTouchListener(new GameTouchListener(this, gameController));
         checkMark.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
