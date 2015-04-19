@@ -15,7 +15,6 @@ public class MapData {
     public Vector<Territory> territories = null; ///< Generated territories. Gets set by generator
 
     public int[][] territoryIndices = null;
-    public ColorMesh territoryGraphMesh;
     public MapGenerationParams params;
     public float width;
     public float height;
