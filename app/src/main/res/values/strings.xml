@@ -129,4 +129,148 @@
                   gl_FragColor = color;\n
                 }\n
     </string>
+     <string name="gen.vert">
+                in vec2 vPosition;\n
+                out vec2 fPos;\n
+                void main() {\n
+                    fPos = (vPosition.xy + 1.0) * 0.5;\n
+                    gl_Position = vec4(vPosition, 0, 1);\n
+                }\n
+    </string>
+    <string name="gen.frag">
+in vec2 fPos;\n
+\n
+vec3 mod289(vec3 x) {\n
+  return x - floor(x * (1.0 / 289.0)) * 289.0;\n
+}\n
+\n
+vec4 mod289(vec4 x) {\n
+  return x - floor(x * (1.0 / 289.0)) * 289.0;\n
+}\n
+\n
+vec4 permute(vec4 x) {\n
+     return mod289(((x*34.0)+1.0)*x);\n
+}\n
+\n
+vec4 taylorInvSqrt(vec4 r)\n
+{\n
+  return 1.79284291400159 - 0.85373472095314 * r;\n
+}\n
+\n
+float snoise(vec3 v)\n
+{ \n
+  const vec2  C = vec2(1.0/6.0, 1.0/3.0);\n
+  const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);\n
+\n
+  vec3 i = floor(v + dot(v, C.yyy) );\n
+  vec3 x0 = v - i + dot(i, C.xxx) ;\n
+\n
+  vec3 g = step(x0.yzx, x0.xyz);\n
+  vec3 l = 1.0 - g;\n
+  vec3 i1 = min( g.xyz, l.zxy );\n
+  vec3 i2 = max( g.xyz, l.zxy );\n
+\n
+  vec3 x1 = x0 - i1 + C.xxx;\n
+  vec3 x2 = x0 - i2 + C.yyy; \n
+  vec3 x3 = x0 - D.yyy; \n
+\n
+  i = mod289(i); \n
+  vec4 p = permute( permute( permute( \n
+             i.z + vec4(0.0, i1.z, i2.z, 1.0 ))\n
+           + i.y + vec4(0.0, i1.y, i2.y, 1.0 )) \n
+           + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));\n
+  float n_ = 0.142857142857;\n
+  vec3  ns = n_ * D.wyz - D.xzx;\n
+\n
+  vec4 j = p - 49.0 * floor(p * ns.z * ns.z); \n
+\n
+  vec4 x_ = floor(j * ns.z);\n
+  vec4 y_ = floor(j - 7.0 * x_ ); \n
+\n
+  vec4 x = x_ *ns.x + ns.yyyy;\n
+  vec4 y = y_ *ns.x + ns.yyyy;\n
+  vec4 h = 1.0 - abs(x) - abs(y);\n
+\n
+  vec4 b0 = vec4( x.xy, y.xy );\n
+  vec4 b1 = vec4( x.zw, y.zw );\n
+\n
+  vec4 s0 = floor(b0)*2.0 + 1.0;\n
+  vec4 s1 = floor(b1)*2.0 + 1.0;\n
+  vec4 sh = -step(h, vec4(0.0));\n
+\n
+  vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;\n
+  vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;\n
+\n
+  vec3 p0 = vec3(a0.xy,h.x);\n
+  vec3 p1 = vec3(a0.zw,h.y);\n
+  vec3 p2 = vec3(a1.xy,h.z);\n
+  vec3 p3 = vec3(a1.zw,h.w);\n
+\n
+  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));\n
+  p0 *= norm.x;\n
+  p1 *= norm.y;\n
+  p2 *= norm.z;\n
+  p3 *= norm.w;\n
+  vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);\n
+  m = m * m;\n
+  return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );\n
+}\n
+\n
+        float octaveNoise(vec3 p, float persistence, float frequency, int octaves) {\n
+            float total = 0.0;\n
+            float amplitude = 1.0;\n
+            float maxAmplitude = 0.0;\n
+\n
+            for (int i = 0; i &lt; octaves; i++) {\n
+                total += snoise(p * frequency) * amplitude;\n
+                frequency *= 2.0;\n
+                maxAmplitude += amplitude;\n
+                amplitude *= persistence;\n
+            }\n
+            return total / maxAmplitude;\n
+        }\n
+uniform float unSeed = 0.0;\n
+uniform vec2 unPos = vec2(0.0, 0.0);\n
+uniform vec2 unDims;\n
+        uniform vec2 unTPositions[256];\n
+        uniform int unNumT;
+        uniform int unHorizontalWrap;\n
+        \n
+float MODULATE_SCALE = 32.0;\n
+float MODULATE_PERSISTENCE = 0.8;\n
+float MODULATE_FREQUENCY = 0.01;\n
+int MODULATE_OCTAVES = 5;\n
+        \n
+void main() {\n
+  vec3 pos;\n
+  pos.x = unPos.x + fPos.x * unDims.x;\n
+  pos.y = unPos.y + fPos.y * unDims.y;\n
+  pos.z = unSeed;\n
+    \n
+    int closestIndex = 0;\n
+    float closestDist = 99999999999.9;\n
+    float dx, dy;\n
+    \n
+    dx = octaveNoise(pos, MODULATE_PERSISTENCE, MODULATE_FREQUENCY, MODULATE_OCTAVES) * MODULATE_SCALE;\n
+    dy = octaveNoise(pos + 2048.0, MODULATE_PERSISTENCE, MODULATE_FREQUENCY, MODULATE_OCTAVES) * MODULATE_SCALE;\n
+    pos += vec2(dx, dy);\n
+    for (int i = 0; i &lt; unNumT; i++) {\n
+        if (unHorizontalWrap &gt; 0) {\n
+            dx = abs(pos.x - unTPositions[i].x);\n
+            dy = abs(pos.y - unTPositions[i].y);\n
+            dx = min(dx, unDims.x - dx);\n
+        } else {\n
+            dx = pos.x - unTPositions[i].x;\n
+            dy = pos.y - unTPositions[i].y;\n
+        }\n
+        float dist = dx * dx + dy * dy;\n
+        if (dist &lt; closestDist) {\n
+            closestDist = dist;\n
+            closestIndex = i;\n
+        }\n
+    }\n
+        float c = float(closestIndex);\n
+        gl_FragColor = vec4(c / 255.0, 0.0, 0.0, 1.0);\n
+}\n
+    </string>
 </resources>

@@ -26,12 +26,17 @@ public class Utils {
         return newC;
     }
 
+    public static float byteColorToFloat(byte color) {
+        return (((int)(color) + 256) % 256) / 255.0f;
+    }
+
     public static int convertToDP(int dps) {
         return (int) (dps * Device.density + 0.5f);
     }
 
     public static PointF translateCoordinatePair(float x, float y, MapGenerationParams.MapSize size) {
-        //Log.d("Screen Size", Float.toString(Device.screenWidth) + " " + Float.toString(Device.screenHeight));
+        Log.d("Screen Size", Float.toString(Device.screenWidth) + " " + Float.toString(Device.screenHeight));
+
         x = x/Device.screenWidth;
         x = x*size.getWidth();
         y = (Device.screenHeight - y);
