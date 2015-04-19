@@ -130,15 +130,15 @@
                 }\n
     </string>
      <string name="gen.vert">
-                in vec2 vPosition;\n
-                out vec2 fPos;\n
+                attribute vec2 vPosition;\n
+                varying vec2 fPos;\n
                 void main() {\n
                     fPos = (vPosition.xy + 1.0) * 0.5;\n
                     gl_Position = vec4(vPosition, 0, 1);\n
                 }\n
     </string>
     <string name="gen.frag">
-in vec2 fPos;\n
+varying vec2 fPos;\n
 \n
 vec3 mod289(vec3 x) {\n
   return x - floor(x * (1.0 / 289.0)) * 289.0;\n
