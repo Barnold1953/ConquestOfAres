@@ -83,6 +83,8 @@ public class GpuGenerator {
         GLES20.glVertexAttribPointer(GLES20.glGetAttribLocation(m_programHandle, "vPosition"), 2, GLES20.GL_FLOAT, false, 0, m_vertexBuffer);
 
         // Uniforms
+        GLES20.glUniform1f(GLES20.glGetUniformLocation(m_programHandle, "unSeed"), 0.0f);
+        GLES20.glUniform2f(GLES20.glGetUniformLocation(m_programHandle, "unPos"), (float)0.0f, (float)0.0f);
         GLES20.glUniform2f(GLES20.glGetUniformLocation(m_programHandle, "unDims"), (float)m_md.width, (float)m_md.height);
         GLES20.glUniform1i(GLES20.glGetUniformLocation(m_programHandle, "unNumT"), m_md.territories.size());
         GLES20.glUniform1i(GLES20.glGetUniformLocation(m_programHandle, "unHorizontalWrap"), m_md.params.horizontalWrap ? 0 : 1);

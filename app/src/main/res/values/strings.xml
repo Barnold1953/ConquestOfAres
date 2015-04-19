@@ -229,8 +229,8 @@ float snoise(vec3 v)\n
             }\n
             return total / maxAmplitude;\n
         }\n
-uniform float unSeed = 0.0;\n
-uniform vec2 unPos = vec2(0.0, 0.0);\n
+uniform float unSeed;\n
+uniform vec2 unPos;\n
 uniform vec2 unDims;\n
         uniform vec2 unTPositions[256];\n
         uniform int unNumT;
