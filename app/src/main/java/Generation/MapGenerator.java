@@ -306,7 +306,13 @@ public class MapGenerator {
     }
 
     private static int getClosestTerritoryIndex(float x, float y, MapData mapData) {
-        return mapData.territoryIndices[(int)Math.round(y)][(int)Math.round(x)];
+        int ix = Math.round(x);
+        int iy = Math.round(y);
+        if (ix < 0) ix = 0;
+        if (ix > (int)mapData.width - 1) ix = (int)mapData.width - 1;
+        if (iy < 0) iy = 0;
+        if (iy > (int)mapData.height - 1) iy = (int)mapData.height - 1;
+        return mapData.territoryIndices[iy][ix];
     }
 
     private static double octaveNoise2D(double x, double y, double persistence, double frequency, int octaves) {
