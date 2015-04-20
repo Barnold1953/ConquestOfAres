@@ -36,9 +36,8 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     GameState gameState = null;
     int m_viewportW = 0;
     int m_viewportH = 0;
-    int frame;
+
     int previousAttackCount = 0, previousIdleCount = 0, previousMoveCount = 0;
-    double[] fTime = new double[100];
     int width, height;
     LinkedList<Laser> lasers = new LinkedList<Laser>();
 
@@ -96,7 +95,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
-        frame = 0;
         // Set the background frame color
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
@@ -205,7 +203,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     @Override
     public void onDrawFrame(GL10 unused) {
        // Upload mapData texture
-        PreciseTimer timer = new PreciseTimer();
         if (gameState != null && gameState.mapData.isDoneGenerating) {
             for (Territory t : gameState.territories) {
                 t.texture = TextureHelper.dataToTexture(t.pixelBuffer, "t" + t.index, t.textureWidth, t.textureHeight);
@@ -310,11 +307,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         }
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
 
-        fTime[frame % 100] = timer.stop();
-        frame++;
-        if(frame >= 100000000){
-            frame = 0;
-        }
         /*GLES20.glFinish();
         if(frame % 100 == 0 && frame / 100 > 0) {
             Double avgTime = 0.0;
