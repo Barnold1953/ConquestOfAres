@@ -83,10 +83,11 @@ public class SpriteBatch {
 
     // Renders to the screen
     public void render(Camera camera) {
+        // Bind shader
         GLES20.glUseProgram(ShaderHelper.getShader("simple"));
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-
+        // Upload uniforms
         GLES20.glUniform1i(m_textureHandle, 0);
         GLES20.glUniformMatrix4fv(m_MVPMatrixHandle, 1, false, camera.getVPMatrix(), 0);
 
@@ -94,22 +95,27 @@ public class SpriteBatch {
         GLES20.glEnableVertexAttribArray(m_colorHandle);
         GLES20.glEnableVertexAttribArray(m_TCoordHandle);
 
+        // Bind the VBO
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, m_vbo.get(0));
+        // Loop through each batch
         for (RenderBatch b : m_renderBatches) {
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, b.texture);
 
+            // Set attribute pointers
             GLES20.glVertexAttribPointer(m_positionHandle, 2, GLES20.GL_FLOAT, false, BYTES_PER_VERTEX, 0);
             GLES20.glVertexAttribPointer(m_TCoordHandle, 2, GLES20.GL_FLOAT, false, BYTES_PER_VERTEX, 8);
             GLES20.glVertexAttribPointer(m_colorHandle, 3, GLES20.GL_BYTE, true, BYTES_PER_VERTEX, 16);
-
+            // Render the batch with offset and numVertices
             GLES20.glDrawArrays(GLES20.GL_TRIANGLES, b.offset, b.numVertices);
         }
+
         GLES20.glDisableVertexAttribArray(m_positionHandle);
         GLES20.glDisableVertexAttribArray(m_colorHandle);
         GLES20.glDisableVertexAttribArray(m_TCoordHandle);
 
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
+        GLES20.glUseProgram(0);
         // Error checking
         int error = GLES20.glGetError();
         if (error != GLES20.GL_NO_ERROR) {
@@ -155,21 +161,20 @@ public class SpriteBatch {
             }
 
             // Get origin relative points
-            float tlX = -g.w * 0.5f, tlY = g.h * 0.5f; // Top left
-            float blX = -g.w * 0.5f, blY = -g.h * 0.5f; // Bottom left
-            float brX = g.w * 0.5f, brY = -g.h * 0.5f; // Bottom right
-            float trX = g.w * 0.5f, trY = g.h * 0.5f; // Top right
+            float tloX = -g.w * 0.5f, tloY = g.h * 0.5f; // Top left
+            float bloX = -g.w * 0.5f, bloY = -g.h * 0.5f; // Bottom left
+            float broX = g.w * 0.5f, broY = -g.h * 0.5f; // Bottom right
+            float troX = g.w * 0.5f, troY = g.h * 0.5f; // Top right
             // Handle rotation
-            if (g.angle != 0) {
-                tlX = rotateX(tlX, tlY, g.angle);
-                tlY = rotateY(tlX, tlY, g.angle);
-                blX = rotateX(blX, blY, g.angle);
-                blY = rotateY(blX, blY, g.angle);
-                brX = rotateX(brX, brY, g.angle);
-                brY = rotateY(brX, brY, g.angle);
-                trX = rotateX(trX, trY, g.angle);
-                trY = rotateY(trX, trY, g.angle);
-            }
+            float tlX = rotateX(tloX, tloY, g.angle);
+            float tlY = rotateY(tloX, tloY, g.angle);
+            float blX = rotateX(bloX, bloY, g.angle);
+            float blY = rotateY(bloX, bloY, g.angle);
+            float brX = rotateX(broX, broY, g.angle);
+            float brY = rotateY(broX, broY, g.angle);
+            float trX = rotateX(troX, troY, g.angle);
+            float trY = rotateY(troX, troY, g.angle);
+
 
             // Add the 6 vertices
             m_buffer.putFloat(g.x + tlX);

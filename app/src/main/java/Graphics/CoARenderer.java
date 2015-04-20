@@ -121,67 +121,9 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         GLES20.glDepthMask( true );
     }
 
-    // Updates position of unit and returns angle
-    float updateUnitPosition(Unit u){
-        final float SPEED = 2.0f;
-        if (u.destination == u.location) return 0.0f;
-
-        // Calculate normal vector towards destination
-        float dx = u.destination.x - u.location.x;
-        float dy = u.destination.y - u.location.y;
-        float length = (float)Math.sqrt(dx * dx + dy * dy);
-        // Don't want to divide by 0
-        if (length == 0.0f) {
-            u.location.x = u.destination.x;
-            u.location.y = u.destination.y;
-            return 0.0f;
-        }
-        // Normalize
-        dx = dx / length;
-        dy = dy / length;
-
-        // Update position
-        u.location.x += dx * SPEED;
-        if (dx < 0 && u.location.x < u.destination.x) {
-            u.location.x = u.destination.x;
-        } else if (dx > 0 && u.location.x > u.destination.x){
-            u.location.x = u.destination.x;
-        }
-        u.location.y += dy * SPEED;
-        if (dy < 0 && u.location.y < u.destination.y) {
-            u.location.y = u.destination.y;
-        } else if (dy > 0 && u.location.y > u.destination.y){
-            u.location.y = u.destination.y;
-        }
-
-        // Return angle off of the horizontal
-        float angle = (float)Math.acos(dy);
-        if (dx > 0.0f) angle = -angle;
-        return angle;
-    }
-
-    void drawUnits(Territory territory) {
-        Player currentPlayer = gameState.players.get(gameState.currentPlayerIndex%gameState.players.size());
-        if(gameState.currentState == GameState.State.INITIAL_UNIT_PLACEMENT && territory.owner != currentPlayer) return;
-
-        synchronized (territory.units) {
-            for (Unit u : territory.units) {
-                // Update movement
-                float angle = updateUnitPosition(u);
-                // Get texture coordinates
-                SpriteSheetDimensions dims = new SpriteSheetDimensions("soldier_move", frame / 5);
-                // Render the texture
-                m_unitSpriteBatch.draw(TextureHelper.getTexture("soldier_move"),
-                        (u.location.x / gameState.mapData.width) * 2.0f - 1.0f,
-                        (u.location.y / gameState.mapData.height) * 2.0f - 1.0f,
-                        0.1f, 0.1f, dims.u, dims.v, dims.uw, dims.vw, angle, territory.owner.color);
-            }
-        }
-    }
-
     @Override
     public void onDrawFrame(GL10 unused) {
-       // Upload mapData texture
+        // Upload mapData texture
         PreciseTimer timer = new PreciseTimer();
         if (gameState != null && gameState.mapData.isDoneGenerating) {
             for (Territory t : gameState.territories) {
@@ -240,6 +182,73 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         if(frame >= 100000000){
             frame = 0;
         }
+    }
+
+    // Updates position of unit and returns angle
+    float updateUnitPosition(Unit u){
+        final float SPEED = 2.0f;
+        if (u.destination == u.location) return 0.0f;
+
+        // Calculate normal vector towards destination
+        float dx = u.destination.x - u.location.x;
+        float dy = u.destination.y - u.location.y;
+        float length = (float)Math.sqrt(dx * dx + dy * dy);
+        // Don't want to divide by 0
+        if (length == 0.0f) {
+            u.location.x = u.destination.x;
+            u.location.y = u.destination.y;
+            return 0.0f;
+        }
+        // Normalize
+        dx = dx / length;
+        dy = dy / length;
+
+        // Update position
+        u.location.x += dx * SPEED;
+        if (dx < 0 && u.location.x < u.destination.x) {
+            u.location.x = u.destination.x;
+        } else if (dx > 0 && u.location.x > u.destination.x){
+            u.location.x = u.destination.x;
+        }
+        u.location.y += dy * SPEED;
+        if (dy < 0 && u.location.y < u.destination.y) {
+            u.location.y = u.destination.y;
+        } else if (dy > 0 && u.location.y > u.destination.y){
+            u.location.y = u.destination.y;
+        }
+
+        // Return angle off of the horizontal
+        float angle = (float)Math.acos(dy);
+        if (dx > 0.0f) angle = -angle;
+        return angle;
+    }
+
+    void drawUnits() {
+        Player currentPlayer = gameState.players.get(gameState.currentPlayerIndex%gameState.players.size());
+
+        m_unitSpriteBatch.begin();
+        for (Territory t : gameState.territories) {
+            // If we are placing units, only show current player units
+            if (gameState.currentState == GameState.State.INITIAL_UNIT_PLACEMENT && t.owner != currentPlayer)
+                continue;
+
+            synchronized (t.units) {
+                for (Unit u : t.units) {
+                    // Update movement
+                    float angle = updateUnitPosition(u);
+                    // Get texture coordinates
+                    SpriteSheetDimensions dims = new SpriteSheetDimensions("soldier_move", frame / 5);
+                    // Render the texture
+                    m_unitSpriteBatch.draw(TextureHelper.getTexture("soldier_move"),
+                            (u.location.x / gameState.mapData.width) * 2.0f - 1.0f,
+                            (u.location.y / gameState.mapData.height) * 2.0f - 1.0f,
+                            0.1f, 0.1f, dims.u, dims.v, dims.uw, dims.vw, angle, t.owner.color);
+                }
+            }
+        }
+        // Actually render to the screen
+        m_unitSpriteBatch.end();
+        m_unitSpriteBatch.render(camera);
     }
 
     @Override

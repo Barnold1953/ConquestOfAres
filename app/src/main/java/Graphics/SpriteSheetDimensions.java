@@ -37,9 +37,8 @@ public class SpriteSheetDimensions {
 
         // Texture coordinates
         uw = frameWidth / width;
-        vw = frameHeight / height;
+        vw = -frameHeight / height;
         u = frameX * uw;
-        v = frameY * vw;
+        v = frameY * vw + vw;
     }
-    //public static float soldierWidth = 512, soldierHeight = 512, soldierFrameWidth = 103, soldierFrameHeight = 103;
 }
