@@ -43,7 +43,7 @@ public class Territory {
     }
 
     public Vector<Territory> neighbors = new Vector<Territory>(); ///< Pointers to neighbor territories
-    public List<Unit> units = new CopyOnWriteArrayList<>(); ///< Pointer to residing armies
+    public List<Unit> units = new ArrayList<>(); ///< Pointer to residing armies
     public Vector<Unit> selectedUnits = new Vector<>(); ///< Pointer to units selected for movement/attack
     public Player owner = null; ///< Owning player
     public int power = 0; ///< Power of the territory

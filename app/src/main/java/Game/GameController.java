@@ -117,18 +117,16 @@ public class GameController {
         return MapGenerator.getClosestTerritory(x, y, m_gameState.mapData);
     }
 
-    public boolean attack(Territory attacker, Territory defender, int numAttackers, CoARenderer renderer){
-        if(numAttackers == attacker.units.size()){
-            return false;
-        }
+    public boolean attack(Territory attacker, Territory defender, CoARenderer renderer){
+
         Action action = new Action(m_currentPlayer, Action.Category.attack, attacker, defender);
 
-        while(defender.units.size() > 0 && numAttackers > 0){
+        while(defender.units.size() > 0 && attacker.units.size() > 0){
             // I figure we can change the chance of winning based on the type of unit it is, like tanks are weak to airplanes, airplanes are weak to soldiers, and soldiers are weak to tanks
             // kind of like a rock-paper-scissors dynamic
 
             // Random firing animation
-            for (int i = 0; i < numAttackers / 2 + 1; i++) {
+            for (int i = 0; i < attacker.units.size() / 2 + 1; i++) {
                 // Attacker fire
                 int randomSrc = m_gameState.random.nextInt(attacker.selectedUnits.size());
                 int randomDst = m_gameState.random.nextInt(defender.units.size());
@@ -149,18 +147,19 @@ public class GameController {
             }
 
             if(m_gameState.random.nextInt(2) == 0){
-                action.sUnitsLost.add(attacker.units.get(attacker.units.size()-1));
-                numAttackers--;
-                attacker.selectedUnits.remove(attacker.selectedUnits.size()-1);
-                attacker.units.remove(attacker.units.size()-1);
+                Unit u = attacker.selectedUnits.get(attacker.selectedUnits.size()-1);
+                action.sUnitsLost.add(u);
+                attacker.selectedUnits.remove(u);
+                attacker.units.remove(u);
             }
             else{
-                action.dUnitsLost.add(defender.units.get(defender.units.size()-1));
-                defender.units.remove(defender.units.size()-1);
+                Unit u = defender.units.get(defender.units.size()-1);
+                action.dUnitsLost.add(u);
+                defender.units.remove(u);
             }
             SystemClock.sleep(100);
         }
-        if(defender.units.isEmpty() && numAttackers > 0){
+        if(defender.units.isEmpty() && !attacker.selectedUnits.isEmpty()){
             Player p = defender.owner;
             defender.owner.removeTerritory(defender);
             attacker.owner.addTerritory(defender);
@@ -182,28 +181,24 @@ public class GameController {
         }
         Action action = new Action(m_currentPlayer, Action.Category.moveUnit, source, destination);
 
-        for(Unit unit : source.selectedUnits ) {
-            action.sUnitsLost.add(unit);
-            action.dUnitsGained.add(unit);
-            source.units.remove(unit);
+        synchronized (destination.units) {
+            synchronized (source.units) {
+                for (Unit unit : source.selectedUnits) {
+                    action.sUnitsLost.add(unit);
+                    action.dUnitsGained.add(unit);
 
-            if(source.neighbors.contains(destination)){
-                unit.destination = destination.getUnitPlace();
-                //unit.destination = new PointF(destination.x,destination.y);
-            }
-            else {
-                unit.path = new PathFinding().getPath(source, destination);
-                unit.destination = new PointF(unit.path.get(unit.path.size()-1).x,unit.path.get(unit.path.size()-1).y);
-            }
-            unit.frame = 0;
-            unit.location = new PointF(source.x, source.y);
+                    unit.destination = destination.getUnitPlace();
 
-            destination.units.add(unit);
+                    source.units.remove(unit);
+                    destination.units.add(unit);
+                }
+            }
         }
+        source.selectedUnits.clear();
 
         m_gameState.actions.add(action);
 
-        source.selectedUnits.clear();
+
 
         //addUnit(destination, destination.x, destination.y, unit.type);
 

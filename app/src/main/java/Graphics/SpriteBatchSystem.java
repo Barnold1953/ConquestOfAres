@@ -73,15 +73,17 @@ public class SpriteBatchSystem {
             case soldier_move:
                 double angle;
                 float yDiff, xDiff;
-                yDiff = u.destination.y - u.location.y;
-                xDiff = u.destination.x - u.location.x;
-                PointF p = new PointF(0.0f, 1.0f);
-                PointF p1 = new PointF(xDiff, yDiff);
-                p1 = normalize(p1);
-                float dp = dotProduct(p, p1);
-                angle = Math.acos(dp);
-                if(xDiff > 0.0f) angle = -angle;
-                u.angle = angle;
+                if (u.destination != u.location) {
+                    yDiff = u.destination.y - u.location.y;
+                    xDiff = u.destination.x - u.location.x;
+                    PointF p = new PointF(0.0f, 1.0f);
+                    PointF p1 = new PointF(xDiff, yDiff);
+                    p1 = normalize(p1);
+                    float dp = dotProduct(p, p1);
+                    angle = Math.acos(dp);
+                    if(xDiff > 0.0f) angle = -angle;
+                    u.angle = angle;
+                }
                 quad = Quadrilateral.getQuad(quad, x, y, 0, .1f, .1f, color, u.angle);
                 addSprite("soldier_move", quad, TextureHelper.getTexture("soldier_move"));
                 break;

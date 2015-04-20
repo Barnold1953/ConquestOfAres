@@ -23,7 +23,6 @@ public class Unit {
         destination = new PointF(x,y);
         destination = location;
         type = t;
-        frame = 0;
         angle = 0;
 
         wrapFrame = new Point(-1,-1);
@@ -34,7 +33,6 @@ public class Unit {
     public PointF destination = null;
     public Point wrapFrame;
     public Vector<Territory> path = null;
-    public int frame;
     public int speed = 100;
     public int turnRate = 5;
     public double angle;
@@ -44,18 +42,4 @@ public class Unit {
     public float armor;
     // damage will increase or decrease based on the type of units fighting
     public float damage;
-
-    public void destinationStep(){// calculates the location
-        frame = 0;
-        wrapFrame = new Point(-1,-1);
-        location = destination;
-        if(path != null && !path.isEmpty()) {
-            path.remove(path.size()-1);
-            if(!path.isEmpty()){
-                destination = path.get(path.size()-1).getUnitPlace();
-                type = Type.soldier_move;
-                //destination = new PointF(path.get(path.size()-1).x, path.get(path.size()-1).y);
-            }
-        }
-    }
 }

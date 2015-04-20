@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -20,7 +18,6 @@ import Game.Player;
 import Game.Territory;
 import Game.Unit;
 import Generation.GpuGenerator;
-import Generation.MapData;
 import Generation.MapGenerator;
 import Utils.PreciseTimer;
 import utkseniordesign.conquestofares.R;
@@ -36,7 +33,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     GameState gameState = null;
     int m_viewportW = 0;
     int m_viewportH = 0;
-
+    int frame;
     int previousAttackCount = 0, previousIdleCount = 0, previousMoveCount = 0;
     int width, height;
     LinkedList<Laser> lasers = new LinkedList<Laser>();
@@ -95,6 +92,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
+        frame = 0;
         // Set the background frame color
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
@@ -126,76 +124,53 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         GLES20.glDepthMask( true );
     }
 
-    float[] getSlope(Unit u){
-        if(u.frame == u.speed){
-            u.destinationStep();
+    // Updates position of unit
+    void updateUnitPosition(Unit u){
+        final float SPEED = 1.0f;
+        if (u.destination == u.location) return;
+
+        // Calculate normal vector towards destination
+        float dx = u.destination.x - u.location.x;
+        float dy = u.destination.y - u.location.y;
+        float length = (float)Math.sqrt(dx * dx + dy * dy);
+        // Normalize
+        dx = dx / length;
+        dy = dy / length;
+
+        // Update position
+        u.location.x += dx * SPEED;
+        if (dx < 0 && u.location.x < u.destination.x) {
+            u.location.x = u.destination.x;
+        } else if (u.location.x > u.destination.x){
+            u.location.x = u.destination.x;
+        }
+        u.location.y += dy * SPEED;
+        if (dy < 0 && u.location.y < u.destination.y) {
+            u.location.y = u.destination.y;
+        } else if (u.location.y > u.destination.y){
+            u.location.y = u.destination.y;
         }
 
-        float[] slope = new float[2];
-
-        if(Math.abs(u.destination.x - u.location.x) > width / 3){
-            slope[0] = -(u.destination.x - u.location.x) / u.speed;
-            if(u.wrapFrame.x == -1){
-                for(int i = 0; i < u.speed; i++){
-                    if(u.location.x + slope[0] * i > width){
-                        u.wrapFrame.x = i;
-                        break;
-                    }
-                }
-            }
-            if(u.wrapFrame.x <= u.frame){
-                slope[0] = width - (u.location.x + slope[0] * u.wrapFrame.x) + u.location.x + slope[0] * u.frame;
-            }
-            else{
-                slope[0] = u.location.x + slope[0] * u.frame;
-            }
-        }
-        else{
-            slope[0] = (u.destination.x - u.location.x) / u.speed;
-            slope[0] = u.location.x + slope[0] * u.frame;
-        }
-
-        if(Math.abs(u.destination.y - u.location.y) > height / 3){
-            Log.d("slope", "vertical wrap");
-            slope[1] = -(u.destination.y - u.location.y) / u.speed;
-            if(u.wrapFrame.y == -1){
-                for(int i = 0; i < u.speed; i++){
-                    if(u.location.y + slope[1] * i > height){
-                        u.wrapFrame.y = i;
-                        break;
-                    }
-                }
-            }
-            if(u.wrapFrame.y <= u.frame){
-                slope[1] = height - (u.location.y + slope[1] * u.wrapFrame.y) + u.location.y + slope[1] * u.frame;
-            }
-            else{
-                slope[1] = u.location.y + slope[1] * u.frame;
-            }
-        }
-        else{
-            slope[1] = (u.destination.y - u.location.y) / u.speed;
-            slope[1] = u.location.y + slope[1] * u.frame;
-        }
-
-        u.frame++;
-        return slope;
     }
 
     void renderUnits(Territory territory){
         Player currentPlayer = gameState.players.get(gameState.currentPlayerIndex%gameState.players.size());
         if(gameState.currentState == GameState.State.INITIAL_UNIT_PLACEMENT){
             if(territory.owner == currentPlayer){
-                for (Unit u : territory.units) {
-                    float[] slope = getSlope(u);
-                    SpriteBatchSystem.addUnit(u, (slope[0]/gameState.mapData.width) * 2 - 1 - (.1f / 2), (slope[1]/gameState.mapData.height) * 2 - 1 - (.1f / 2), territory.owner.color);
+                synchronized (territory.units) {
+                    for (Unit u : territory.units) {
+                        updateUnitPosition(u);
+                        SpriteBatchSystem.addUnit(u, (u.location.x / gameState.mapData.width) * 2 - 1 - (.1f / 2), (u.location.y / gameState.mapData.height) * 2 - 1 - (.1f / 2), territory.owner.color);
+                    }
                 }
             }
         }
         else{
-            for (Unit u : territory.units) {
-                float[] slope = getSlope(u);
-                SpriteBatchSystem.addUnit(u, (slope[0]/gameState.mapData.width) * 2 - 1 - (.1f / 2), (slope[1]/gameState.mapData.height) * 2 - 1 - (.1f / 2), territory.owner.color);
+            synchronized (territory.units) {
+                for (Unit u : territory.units) {
+                    updateUnitPosition(u);
+                    SpriteBatchSystem.addUnit(u, (u.location.x / gameState.mapData.width) * 2 - 1 - (.1f / 2), (u.location.y / gameState.mapData.height) * 2 - 1 - (.1f / 2), territory.owner.color);
+                }
             }
         }
     }
@@ -203,6 +178,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     @Override
     public void onDrawFrame(GL10 unused) {
        // Upload mapData texture
+        PreciseTimer timer = new PreciseTimer();
         if (gameState != null && gameState.mapData.isDoneGenerating) {
             for (Territory t : gameState.territories) {
                 t.texture = TextureHelper.dataToTexture(t.pixelBuffer, "t" + t.index, t.textureWidth, t.textureHeight);
@@ -215,42 +191,41 @@ public class CoARenderer implements GLSurfaceView.Renderer {
                         context);
             }
 
-            Log.d("Line", "Got here");
             gameState.mapData.isDoneGenerating = false;
         }
 
-        // Make sprites
-        SpriteBatchSystem.clear();
-
         int idleCount = 0, moveCount = 0, attackCount = 0;
         for(Territory t : gameState.territories){
-            for(Unit u : t.units) {
-                switch (u.type){
-                    case soldier_attack:
-                        attackCount++;
-                        break;
-                    case soldier_idle:
-                        if(u.destination != u.location){
-                            moveCount++;
-                            u.type = Unit.Type.soldier_move;
-                        }
-                        else {
-                            idleCount++;
-                        }
-                        break;
-                    case soldier_move:
-                        if(u.destination == u.location){
-                            u.type = Unit.Type.soldier_idle;
-                            idleCount++;
-                        }
-                        else {
-                            moveCount++;
-                        }
-                        break;
+            synchronized (t.units) {
+                for (Unit u : t.units) {
+                    moveCount++;
+                    switch (u.type) {
+                        case soldier_attack:
+                            attackCount++;
+                            break;
+                        case soldier_idle:
+                            if (u.destination != u.location) {
+                                moveCount++;
+                                u.type = Unit.Type.soldier_move;
+                            } else {
+                                idleCount++;
+                            }
+                            break;
+                        case soldier_move:
+                            if (u.destination == u.location) {
+                                u.type = Unit.Type.soldier_idle;
+                                idleCount++;
+                            } else {
+                                moveCount++;
+                            }
+                            break;
+                    }
                 }
             }
         }
 
+        // Make sprites
+        SpriteBatchSystem.clear();
         SpriteBatchSystem.Initialize(attackCount, idleCount, moveCount);
 
         for (Territory t : gameState.territories) {
@@ -272,15 +247,13 @@ public class CoARenderer implements GLSurfaceView.Renderer {
             GLES20.glViewport(0, 0, m_viewportW, m_viewportH);
         }
 
-        //programHandle = ShaderHelper.getShader("simple");
         for (Territory t: gameState.mapData.territories) {
             t.updateAnimation();
             if (t.mesh != null) t.mesh.render(t, t.texture, camera.getVPMatrix());
         }
 
         Enumeration vEnum = SpriteBatchSystem.sprites.elements();
-        //programHandle = ShaderHelper.getShader("animate");
-        //GLES20.glUseProgram(programHandle);
+
         while(vEnum.hasMoreElements()){
             String name = vEnum.nextElement().toString();
             SpriteBatchSystem.sprite s = SpriteBatchSystem.getSprite(name);
@@ -307,15 +280,10 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         }
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
 
-        /*GLES20.glFinish();
-        if(frame % 100 == 0 && frame / 100 > 0) {
-            Double avgTime = 0.0;
-            for (int i = 0; i < 100; i++) {
-                avgTime += fTime[i];
-            }
-            avgTime /= 100.0;
-            Log.d("*TIME render:", avgTime.toString() + " Units: " + unitCount);
-        }*/
+        frame++;
+        if(frame >= 100000000){
+            frame = 0;
+        }
     }
 
     @Override

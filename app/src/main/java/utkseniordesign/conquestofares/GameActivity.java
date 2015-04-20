@@ -180,23 +180,25 @@ public class GameActivity extends Activity {
     public void handleUnitMove(float x, float y) {
         Log.d("GameActivity", "HandleUnitMove called");
         Territory moveTo = gameController.getTerritoryAtPoint(x, y);
-        if(gameController.getGameState().selectedTerritory.neighbors.contains(moveTo) && moveTo.owner == gameController.getGameState().selectedTerritory.owner) {
+        Territory selectedTerritory = gameController.getGameState().selectedTerritory;
+        if(selectedTerritory.neighbors.contains(moveTo) && moveTo.owner == selectedTerritory.owner) {
             gameController.moveUnits(gameController.getGameState().selectedTerritory, moveTo);
-            gameController.getGameState().selectedTerritory.selectedUnits.removeAllElements();
-            gameController.getGameState().selectedTerritory.unselectNeighbors();
-            gameController.getGameState().selectedTerritory.select();
-            territoryPanel.update(gameController.getGameState().selectedTerritory);
+            selectedTerritory.selectedUnits.removeAllElements();
+            selectedTerritory.unselectNeighbors();
+            selectedTerritory.select();
+            territoryPanel.update(selectedTerritory);
         }
     }
 
     public void handleUnitAttack(float x, float y){
         Territory attack = gameController.getTerritoryAtPoint(x,y);
-        if(gameController.getGameState().selectedTerritory.neighbors.contains(attack) && attack.owner != gameController.getGameState().selectedTerritory.owner && attack.owner != null) {
-            gameController.attack(gameController.getGameState().selectedTerritory, attack, gameController.getGameState().selectedTerritory.selectedUnits.size(), coaRenderer);
-            gameController.getGameState().selectedTerritory.selectedUnits.removeAllElements();
-            gameController.getGameState().selectedTerritory.unselectNeighbors();
-            gameController.getGameState().selectedTerritory.select();
-            territoryPanel.update(gameController.getGameState().selectedTerritory);
+        Territory selectedTerritory = gameController.getGameState().selectedTerritory;
+        if(selectedTerritory.neighbors.contains(attack) && attack.owner != selectedTerritory.owner && attack.owner != null) {
+            gameController.attack(selectedTerritory, attack, coaRenderer);
+            selectedTerritory.selectedUnits.removeAllElements();
+            selectedTerritory.unselectNeighbors();
+            selectedTerritory.select();
+            territoryPanel.update(selectedTerritory);
         }
 
     }
