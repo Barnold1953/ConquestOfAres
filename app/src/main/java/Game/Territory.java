@@ -22,7 +22,6 @@ public class Territory {
         for (Territory t : b.neighbors) {
             this.neighbors.add(t);
         }
-        this.units = b.units;
         for (Unit u : b.units) {
             this.units.add(u);
         }
