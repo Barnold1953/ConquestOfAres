@@ -121,7 +121,7 @@ public class Territory {
 
     PointF getUnitPlace() {
         PointF placeCoords = null;
-        Random r = new Random();
+        Random r = new Random(new Date().getTime() + units.size());
         float spread = 30.0f;
         int direction = r.nextInt();
         switch (direction%4){
@@ -145,6 +145,7 @@ public class Territory {
         if(owner.placeableUnits > 0) {
             PointF placementCoords = getUnitPlace();
             Unit unit = new Unit(placementCoords.x,placementCoords.y,type);
+            //unit.destinationStep();
             units.add(unit);
             owner.placeableUnits--;
             return true;

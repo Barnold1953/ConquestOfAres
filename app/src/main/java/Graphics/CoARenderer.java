@@ -2,6 +2,10 @@ package Graphics;
 
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Vector;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -29,12 +33,13 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     int programHandle;
     Context context;
     Camera camera;
-    MapData mapData;
     GameState gameState = null;
     int m_viewportW = 0;
     int m_viewportH = 0;
     int frame, previousUnitCount = 0;
     double[] fTime = new double[100];
+    int width, height;
+    LinkedList<Laser> lasers = new LinkedList<Laser>();
 
     DrawHelper dHelper;
 
@@ -65,11 +70,22 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
     }
 
-    public CoARenderer(Context c) {
+    public void addLaser(float sx, float sy, float dx, float dy, float r, float g, float b) {
+        synchronized (lasers) {
+            Laser l = new Laser();
+            l.mesh.addVertex(sx / gameState.mapData.width * 2.0f - 1.0f, sy / gameState.mapData.height * 2.0f - 1.0f, 0.0f, r, g, b);
+            l.mesh.addVertex(dx / gameState.mapData.width * 2.0f - 1.0f, dy / gameState.mapData.height * 2.0f - 1.0f, 0.0f, r, g, b);
+            lasers.add(l);
+        }
+    }
+
+    public CoARenderer(Context c, int w, int h) {
         context = c;
 
         camera = new Camera();
         dHelper = new DrawHelper(camera);
+        width = w;
+        height = h;
 
         // Set the view matrix
         if (IS_3D) {
@@ -101,15 +117,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         //TextureHelper.imageToTexture(context, R.drawable.character1walk, "soldier");
         TextureHelper.imageToTexture(context, R.drawable.man_run, "soldier");
 
-        //gHelper.addToBatch(quad, "master");
-        /*quad = Quadrilateral.getQuad(quad, 0,0,0,1,1,ftmp);
-        SpriteBatchSystem.addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
-        quad = Quadrilateral.getQuad(quad, -1,0,0,1,1,ftmp);
-        SpriteBatchSystem.addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
-        quad = Quadrilateral.getQuad(quad, -1,-1,0,1,1,ftmp);
-        SpriteBatchSystem.addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
-        quad = Quadrilateral.getQuad(quad, 0,-1,0,1,1,ftmp);
-        SpriteBatchSystem.addSprite("soldier", quad, TextureHelper.getTexture("soldier"));*/
         Log.d("Setup", "Geometry buffers initialized and filled.");
 
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
@@ -119,16 +126,62 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     }
 
     float[] getSlope(Unit u){
-        if(u.frame == 10){
+        if(u.frame == u.speed){
             u.destinationStep();
         }
 
         float[] slope = new float[2];
 
-        slope[0] = (u.destination.x - u.location.x) / 10;
-        slope[1] = (u.destination.y - u.location.y) / 10;
-        slope[0] = u.location.x + slope[0] * u.frame;
-        slope[1] = u.location.y + slope[1] * u.frame;
+        /*if(u.destination != u.location){
+            Log.d("slope", "destination: (" + u.destination.x + ", " + u.destination.y + ") location: (" + u.location.x + ", " + u.location.y + ")");
+            Log.d("slope", "width: " + width + ", height: " + height);
+        }*/
+        if(Math.abs(u.destination.x - u.location.x) > width / 3){
+            //Log.d("slope", "horizontal wrap");
+            slope[0] = -(u.destination.x - u.location.x) / u.speed;
+            if(u.wrapFrame.x == -1){
+                for(int i = 0; i < u.speed; i++){
+                    if(u.location.x + slope[0] * i > width){
+                        u.wrapFrame.x = i;
+                        break;
+                    }
+                }
+            }
+            if(u.wrapFrame.x <= u.frame){
+                slope[0] = width - (u.location.x + slope[0] * u.wrapFrame.x) + u.location.x + slope[0] * u.frame;
+            }
+            else{
+                slope[0] = u.location.x + slope[0] * u.frame;
+            }
+        }
+        else{
+            slope[0] = (u.destination.x - u.location.x) / u.speed;
+            slope[0] = u.location.x + slope[0] * u.frame;
+        }
+
+        if(Math.abs(u.destination.y - u.location.y) > height / 3){
+            Log.d("slope", "vertical wrap");
+            slope[1] = -(u.destination.y - u.location.y) / u.speed;
+            if(u.wrapFrame.y == -1){
+                for(int i = 0; i < u.speed; i++){
+                    if(u.location.y + slope[1] * i > height){
+                        u.wrapFrame.y = i;
+                        break;
+                    }
+                }
+            }
+            if(u.wrapFrame.y <= u.frame){
+                slope[1] = height - (u.location.y + slope[1] * u.wrapFrame.y) + u.location.y + slope[1] * u.frame;
+            }
+            else{
+                slope[1] = u.location.y + slope[1] * u.frame;
+            }
+        }
+        else{
+            slope[1] = (u.destination.y - u.location.y) / u.speed;
+            slope[1] = u.location.y + slope[1] * u.frame;
+        }
+
         u.frame++;
         return slope;
     }
@@ -139,14 +192,14 @@ public class CoARenderer implements GLSurfaceView.Renderer {
             if(territory.owner == currentPlayer){
                 for (Unit u : territory.units) {
                     float[] slope = getSlope(u);
-                    SpriteBatchSystem.addUnit(u.type, (slope[0]/gameState.mapData.width) * 2 - 1 - (.1f / 2), (slope[1]/gameState.mapData.height) * 2 - 1 - (.1f / 2), territory.owner.color);
+                    SpriteBatchSystem.addUnit(u, (slope[0]/gameState.mapData.width) * 2 - 1 - (.1f / 2), (slope[1]/gameState.mapData.height) * 2 - 1 - (.1f / 2), territory.owner.color);
                 }
             }
         }
         else{
             for (Unit u : territory.units) {
                 float[] slope = getSlope(u);
-                SpriteBatchSystem.addUnit(u.type, (slope[0]/gameState.mapData.width) * 2 - 1 - (.1f / 2), (slope[1]/gameState.mapData.height) * 2 - 1 - (.1f / 2), territory.owner.color);
+                SpriteBatchSystem.addUnit(u, (slope[0]/gameState.mapData.width) * 2 - 1 - (.1f / 2), (slope[1]/gameState.mapData.height) * 2 - 1 - (.1f / 2), territory.owner.color);
             }
         }
     }
@@ -216,6 +269,22 @@ public class CoARenderer implements GLSurfaceView.Renderer {
             dHelper.draw(camera, s.vBuf, s.cBuf, s.tBuf, s.texture, GeometryHelper.getVerticesCount(name), "simple");
         }
 
+        // Render the lasers
+        GLES20.glDisable(GLES20.GL_DEPTH_TEST);
+        synchronized (lasers) {
+            for (Iterator<Laser> iterator = lasers.iterator(); iterator.hasNext();) {
+                Laser l = iterator.next();
+                if (l.needsFinish) {
+                    l.needsFinish = false;
+                    l.mesh.finish(context);
+                }
+                if (l.render(camera.getVPMatrix())) {
+                    iterator.remove();
+                }
+
+            }
+        }
+        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
 
         fTime[frame % 100] = timer.stop();
         frame++;

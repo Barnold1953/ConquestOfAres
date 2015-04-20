@@ -3,6 +3,7 @@ package Game;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -11,6 +12,7 @@ import java.util.*;
 import Generation.MapData;
 import Generation.MapGenerator;
 import Generation.MapGenerationParams;
+import Graphics.CoARenderer;
 import Graphics.Quadrilateral;
 import Graphics.SpriteBatchSystem;
 import Utils.Device;
@@ -26,6 +28,9 @@ public class GameController {
     private GameSettings m_gameSettings = null; ///< Settings
     private GameEngine m_gameEngine = new GameEngine(); ///< Initializes the game
     private Player m_currentPlayer = null;
+    private boolean m_isAttacking = false;
+    private Territory m_defender;
+    private Territory m_attacker;
     public Boolean stateHasChanged = false;
 
     /// Initializes a game by setting up game state and map
@@ -111,14 +116,38 @@ public class GameController {
         return MapGenerator.getClosestTerritory(x, y, m_gameState.mapData);
     }
 
-    public boolean attack(Territory attacker, Territory defender, int numAttackers){
+    public boolean attack(Territory attacker, Territory defender, int numAttackers, CoARenderer renderer){
+        if(numAttackers == attacker.units.size()){
+            return false;
+        }
         Action action = new Action(m_currentPlayer, Action.Category.attack, attacker, defender);
 
         while(defender.units.size() > 0 && numAttackers > 0){
             // I figure we can change the chance of winning based on the type of unit it is, like tanks are weak to airplanes, airplanes are weak to soldiers, and soldiers are weak to tanks
             // kind of like a rock-paper-scissors dynamic
 
-            if(m_gameState.random.nextInt() % 2 == 0){
+            // Random firing animation
+            for (int i = 0; i < numAttackers / 2 + 1; i++) {
+                // Attacker fire
+                int randomSrc = m_gameState.random.nextInt(attacker.selectedUnits.size());
+                int randomDst = m_gameState.random.nextInt(defender.units.size());
+                Unit src1 = attacker.selectedUnits.get(randomSrc);
+                Unit dst1 = defender.units.get(randomDst);
+                renderer.addLaser(src1.location.x, src1.location.y, dst1.location.x, dst1.location.y,
+                        attacker.owner.fColor[0], attacker.owner.fColor[1], attacker.owner.fColor[2]);
+                SystemClock.sleep(5);
+
+                // Defender fire
+                randomSrc = m_gameState.random.nextInt(defender.units.size());
+                randomDst = m_gameState.random.nextInt(attacker.selectedUnits.size());
+                Unit src2 = defender.units.get(randomSrc);
+                Unit dst2 = attacker.selectedUnits.get(randomDst);
+                renderer.addLaser(src2.location.x, src2.location.y, dst2.location.x, dst2.location.y,
+                        defender.owner.fColor[0], defender.owner.fColor[1], defender.owner.fColor[2]);
+                SystemClock.sleep(5);
+            }
+
+            if(m_gameState.random.nextInt(2) == 0){
                 action.sUnitsLost.add(attacker.units.get(attacker.units.size()-1));
                 numAttackers--;
                 attacker.selectedUnits.remove(attacker.selectedUnits.size()-1);
@@ -128,6 +157,7 @@ public class GameController {
                 action.dUnitsLost.add(defender.units.get(defender.units.size()-1));
                 defender.units.remove(defender.units.size()-1);
             }
+            SystemClock.sleep(100);
         }
         if(defender.units.isEmpty() && numAttackers > 0){
             Player p = defender.owner;
@@ -136,6 +166,9 @@ public class GameController {
             moveUnits(attacker, defender);
             if(p.territories.isEmpty()){
                 m_gameState.players.remove(p);
+                if(m_gameState.players.size() == 1){
+                    Log.d("WINNER", "Player " + m_gameState.players.get(0).name + " has won!");
+                }
             }
         }
 
@@ -143,16 +176,19 @@ public class GameController {
     }
 
     public void moveUnits(Territory source, Territory destination){
+        if(source.selectedUnits.size() == source.units.size()){
+            return;
+        }
         Action action = new Action(m_currentPlayer, Action.Category.moveUnit, source, destination);
 
         for(Unit unit : source.selectedUnits ) {
             action.sUnitsLost.add(unit);
             action.dUnitsGained.add(unit);
-            m_gameState.actions.add(action);
             source.units.remove(unit);
 
             if(source.neighbors.contains(destination)){
-                unit.destination = new PointF(destination.x,destination.y);
+                unit.destination = destination.getUnitPlace();
+                //unit.destination = new PointF(destination.x,destination.y);
             }
             else {
                 unit.path = new PathFinding().getPath(source, destination);
@@ -163,6 +199,8 @@ public class GameController {
 
             destination.units.add(unit);
         }
+
+        m_gameState.actions.add(action);
 
         source.selectedUnits.clear();
 

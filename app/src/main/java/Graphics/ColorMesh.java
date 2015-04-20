@@ -30,6 +30,7 @@ public class ColorMesh {
     private static int m_positionHandle;
     private static int m_colorHandle;
     private static int m_mvpHandle;
+    private static int m_alphaHandle;
     private static int m_programHandle = 0;
 
     /// Adds a vertex to the mesh. Make sure capacity is set
@@ -55,6 +56,7 @@ public class ColorMesh {
                 m_positionHandle = GLES20.glGetAttribLocation(m_programHandle, "vPosition");
                 m_colorHandle = GLES20.glGetAttribLocation(m_programHandle, "vColor");
                 m_mvpHandle = GLES20.glGetUniformLocation(m_programHandle, "uMVPMatrix");
+                m_alphaHandle = GLES20.glGetUniformLocation(m_programHandle, "unAlpha");
             } catch (IOException e) {
                 Log.d("Shader", "Error occurred during compilation");
             }
@@ -73,7 +75,7 @@ public class ColorMesh {
         }
     }
 
-    public void renderLines(float[] vpMatrix) {
+    public void renderLines(float[] vpMatrix, float width, float alpha) {
         GLES20.glUseProgram(m_programHandle);
 
         m_vertexBuffer.position(0);
@@ -85,13 +87,15 @@ public class ColorMesh {
         GLES20.glVertexAttribPointer(m_colorHandle, 3, GLES20.GL_FLOAT, false, 0, m_colorBuffer);
 
         GLES20.glUniformMatrix4fv(m_mvpHandle, 1, false, vpMatrix, 0);
+        GLES20.glUniform1f(m_alphaHandle, alpha);
 
-        GLES20.glLineWidth(10.0f);
+        GLES20.glLineWidth(width);
         //if (m_numIndices > 0) {
            // GLES20.glDrawElements(GLES20.GL_LINES, m_numIndices, GLES20.GL_UNSIGNED_SHORT, 0);
         //} else {
             GLES20.glDrawArrays(GLES20.GL_LINES, 0, vertexVec.size() / 3);
         //}
+        GLES20.glUseProgram(0);
     }
 
     public void renderTriangles(float[] vpMatrix) {

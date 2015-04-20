@@ -91,6 +91,7 @@ public class ShaderHelper {
                 GLES20.glGetProgramiv(programHandle, GLES20.GL_LINK_STATUS, linkStatus, 0);
 
                 if (linkStatus[0] == 0) {
+                    Log.d("Linker", "Could not link program: " + GLES20.glGetProgramInfoLog(programHandle));
                     GLES20.glDeleteProgram(programHandle);
                     programHandle = 0;
                 }
