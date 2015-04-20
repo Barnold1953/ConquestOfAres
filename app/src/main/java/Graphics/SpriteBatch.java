@@ -56,13 +56,17 @@ public class SpriteBatch {
         m_renderBatches.clear();
     }
 
-    // Draws a glyph
-    public void draw(int texture, float x, float y, float w, float h, byte color[]) {
+    // Registers a glyph
+    public void draw(int texture, float x, float y, float w, float h, float u, float v, float uw, float vw, byte color[]) {
         SpriteBatchGlyph glyph = new SpriteBatchGlyph();
         glyph.x = x;
         glyph.y = y;
         glyph.w = w;
         glyph.h = h;
+        glyph.u = u;
+        glyph.v = v;
+        glyph.uw = uw;
+        glyph.vw = vw;
         glyph.r = color[0];
         glyph.g = color[1];
         glyph.b = color[2];
@@ -74,7 +78,7 @@ public class SpriteBatch {
         createRenderBatches();
     }
 
-    // Renders to the sreen
+    // Renders to the screen
     public void render(Camera camera) {
         GLES20.glUseProgram(ShaderHelper.getShader("simple"));
 
@@ -95,7 +99,7 @@ public class SpriteBatch {
             GLES20.glVertexAttribPointer(m_TCoordHandle, 2, GLES20.GL_FLOAT, false, BYTES_PER_VERTEX, 8);
             GLES20.glVertexAttribPointer(m_colorHandle, 3, GLES20.GL_BYTE, false, BYTES_PER_VERTEX, 16);
 
-            GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, b.numVertices);
+            GLES20.glDrawArrays(GLES20.GL_TRIANGLES, b.offset, b.numVertices);
         }
         GLES20.glDisableVertexAttribArray(m_positionHandle);
         GLES20.glDisableVertexAttribArray(m_colorHandle);
@@ -145,7 +149,7 @@ public class SpriteBatch {
             m_buffer.putFloat(g.x);
             m_buffer.putFloat(g.y + g.h);
             m_buffer.putFloat(g.u);
-            m_buffer.putFloat(g.v);
+            m_buffer.putFloat(g.v + g.vw);
             m_buffer.put(g.r);
             m_buffer.put(g.g);
             m_buffer.put(g.b);
@@ -162,7 +166,7 @@ public class SpriteBatch {
 
             m_buffer.putFloat(g.x + g.w);
             m_buffer.putFloat(g.y);
-            m_buffer.putFloat(g.u);
+            m_buffer.putFloat(g.u + g.uw);
             m_buffer.putFloat(g.v);
             m_buffer.put(g.r);
             m_buffer.put(g.g);
@@ -171,7 +175,7 @@ public class SpriteBatch {
 
             m_buffer.putFloat(g.x + g.w);
             m_buffer.putFloat(g.y);
-            m_buffer.putFloat(g.u);
+            m_buffer.putFloat(g.u + g.uw);
             m_buffer.putFloat(g.v);
             m_buffer.put(g.r);
             m_buffer.put(g.g);
@@ -180,8 +184,8 @@ public class SpriteBatch {
 
             m_buffer.putFloat(g.x + g.w);
             m_buffer.putFloat(g.y + g.h);
-            m_buffer.putFloat(g.u);
-            m_buffer.putFloat(g.v);
+            m_buffer.putFloat(g.u + g.uw);
+            m_buffer.putFloat(g.v + g.vw);
             m_buffer.put(g.r);
             m_buffer.put(g.g);
             m_buffer.put(g.b);
@@ -190,7 +194,7 @@ public class SpriteBatch {
             m_buffer.putFloat(g.x);
             m_buffer.putFloat(g.y + g.h);
             m_buffer.putFloat(g.u);
-            m_buffer.putFloat(g.v);
+            m_buffer.putFloat(g.v + g.vw);
             m_buffer.put(g.r);
             m_buffer.put(g.g);
             m_buffer.put(g.b);

@@ -11,6 +11,8 @@ public class SpriteBatchGlyph {
     float h;
     float u;
     float v;
+    float uw;
+    float vw;
     byte r;
     byte g;
     byte b;
