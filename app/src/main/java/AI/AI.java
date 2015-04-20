@@ -1,7 +1,10 @@
 package AI;
 
+import Game.Action;
 import Game.GameState;
 import Game.Territory;
+import Game.Player;
+import Game.Unit;
 
 import java.util.*;
 
@@ -10,47 +13,107 @@ import java.util.*;
  */
 public class AI {
     GameState s = null;
-    //sorted list of priority actions
-    List<WeightedAction> reactions;
+    protected List<WeightedAction> weightedReactions = new ArrayList<WeightedAction>();
+    //list of priority actions
+    protected List<Action> attackReactions = new ArrayList<Action>();
+    protected List<Action> movementReactions = new ArrayList<Action>();
+    protected List<Action> placementReactions = new ArrayList<Action>();
+
+    protected List<Territory> weakSelfTerritories = new ArrayList<Territory>();
+    protected List<Territory> weakEnemyTerritories = new ArrayList<Territory>();
+
+    Player AIPlayer = s.players.get(s.currentPlayerIndex);
+    List<Territory> AITerritories = AIPlayer.territories;
 
     public AI(GameState s){
         this.s = s;
     }
 
-    public ArrayList<WeightedAction> generateAssignments(){
-        Vector<Territory> neighbors = s.selectedTerritory.neighbors;
-        ArrayList<WeightedAction> possibleActions = new ArrayList<WeightedAction>();
-
-        return possibleActions;
+    protected void generateAttackAssignments(){
+        for(Territory t : AITerritories){
+            evaluateWeakness(t);
+            if(isWeakEnemyTerritory(t))
+                attackReactions.add(new Action(AIPlayer, Action.Category.ATTACK, t, n));
+        }
     }
 
-    protected void generateAttackAssignments(Vector<Territory> neighbors){
-        for(Territory n : neighbors){
-            if(n.owner != s.players.get(s.currentPlayerIndex)){
-
+    protected void generateMovementAssignments(){
+        for(Territory t : AITerritories){
+            for(Territory n : t.neighbors){
+                movementReactions.add(new Action(AIPlayer, Action.Category.MOVE_UNIT, t, n));
             }
         }
     }
 
-    protected void generateMovementAssignments(Vector<Territory> t){
-
-    }
-
-    protected void generatePlacementAssignments(Vector<Territory> t) {
-
+    protected void generatePlacementAssignments() {
+        for(Territory t : AITerritories){
+            if(isWeakOwnedTerritory(t)){
+                placementReactions.add(new Action(AIPlayer, Action.Category.ADD_UNIT, null, t));
+            }
+        }
     }
 
     public void assignWeights(){
-        ArrayList<WeightedAction> reactions = generateAssignments();
+        //assign weights to movementReactions
+        for(Action a : attackReactions) {
+            for (Action m : movementReactions) {
+                for (Action p : placementReactions) {
+                    int anticipatedGameStateWeight = rateGameState(generateAnticipatedGameState(a, m, p));
+                    weightedReactions.add(new WeightedAction(a, m, p, anticipatedGameStateWeight));
+                }
+            }
+        }
     }
 
-    public void sortReactions(){
-        Collections.sort(reactions, new GameActionComparator());
+    protected void evaluateWeakness(Territory t){
+        int selfUnits = t.units.size();
+        int enemyUnits = 0;
+
+        for(Territory n : t.neighbors){
+            if(n.owner != s.players.get(s.currentPlayerIndex))
+                enemyUnits += n.units.size();
+        }
+
+        double weaknessRatio = enemyUnits / selfUnits;
+        t.weakness = weaknessRatio;
+    }
+
+    protected Boolean isWeakEnemyTerritory(Territory t) {
+        return (t.weakness < 1.0);
+    }
+
+    protected Boolean isWeakOwnedTerritory(Territory t){
+        return (t.weakness > 1.0);
     }
 
     public void reset(){
         this.s = null;
-        reactions.clear();
-        reactions = null;
+        attackReactions.clear();
+        movementReactions.clear();
+        movementReactions = null;
+        attackReactions = null;
+    }
+
+    protected GameState generateAnticipatedGameState(Action a, Action m, Action p){
+        GameState anticipatedState = s;
+
+        //modify state with possible movement actions
+
+        //modify state with possible attack actions
+
+        //modify state with possible placement action
+        
+
+        return anticipatedState;
+    }
+
+    protected int rateGameState(GameState s){
+       int gameStateRating = 0;
+
+       return gameStateRating;
+    }
+
+    public void distributePlayerResources(Player p){
+        //distribute player resources after one quits
     }
 }

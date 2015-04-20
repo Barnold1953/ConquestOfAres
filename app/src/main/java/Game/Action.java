@@ -8,7 +8,7 @@ import java.util.Vector;
  */
 public class Action {
     public enum Category{
-        moveUnit, attack, addUnit
+        MOVE_UNIT, ATTACK, ADD_UNIT
     }
     Player player;
     Category category;

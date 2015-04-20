@@ -1,5 +1,6 @@
 package Game;
 
+
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.PointF;
@@ -15,6 +16,9 @@ import Graphics.Quadrilateral;
 import Graphics.SpriteBatchSystem;
 import Utils.Device;
 import utkseniordesign.conquestofares.GameActivity;
+
+import Generation.MapGenerator;
+
 
 /**
  * Created by brb55_000 on 2/6/2015.
@@ -111,8 +115,9 @@ public class GameController {
         return MapGenerator.getClosestTerritory(x, y, m_gameState.territories);
     }
 
+
     public boolean attack(Territory attacker, Territory defender, int numAttackers){
-        Action action = new Action(m_currentPlayer, Action.Category.attack, attacker, defender);
+        Action action = new Action(m_currentPlayer, Action.Category.ATTACK, attacker, defender);
 
         while(defender.units.size() > 0 && numAttackers > 0){
             // I figure we can change the chance of winning based on the type of unit it is, like tanks are weak to airplanes, airplanes are weak to soldiers, and soldiers are weak to tanks
@@ -143,7 +148,8 @@ public class GameController {
     }
 
     public void moveUnits(Territory source, Territory destination){
-        Action action = new Action(m_currentPlayer, Action.Category.moveUnit, source, destination);
+        Action action = new Action(m_currentPlayer, Action.Category.MOVE_UNIT, source, destination);
+
 
         for(Unit unit : source.selectedUnits ) {
             action.sUnitsLost.add(unit);

@@ -190,6 +190,7 @@ public class Territory {
         }*/
     }
 
+    public double weakness;
     public double distance;///< used for PathFinding
     public boolean visited;///< used for PathFinding
     public int texture = 0;
