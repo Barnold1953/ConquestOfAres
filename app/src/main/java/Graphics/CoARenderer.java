@@ -99,8 +99,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         Log.d("Setup", "Surface created.");
         try {
-            //programHandle = ShaderHelper.compileShader(context, R.string.simple_vert, R.string.animate_frag, "animate");
-            //dHelper.setProgHandles(programHandle, "animate");
             programHandle = ShaderHelper.compileShader(context, R.string.simple_vert, R.string.texture_frag, "simple");
         }
         catch (IOException e){
@@ -108,7 +106,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         }
 
         TextureHelper.imageToTexture(context, R.drawable.texture1, "test1");
-        //TextureHelper.imageToTexture(context, R.drawable.character1walk, "soldier");
         TextureHelper.imageToTexture(context, R.drawable.man_run, "soldier_move");
         TextureHelper.imageToTexture(context, R.drawable.man_idle, "soldier_idle");
         TextureHelper.imageToTexture(context, R.drawable.man_shoot, "soldier_attack");
@@ -123,46 +120,83 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 unused) {
-        // Upload mapData texture
-        PreciseTimer timer = new PreciseTimer();
-        if (gameState != null && gameState.mapData.isDoneGenerating) {
-            for (Territory t : gameState.territories) {
-                t.texture = TextureHelper.dataToTexture(t.pixelBuffer, "t" + t.index, t.textureWidth, t.textureHeight);
-                t.pixelBuffer = null;
-                t.mesh = new TerritoryMesh();
-                t.mesh.init(((float)t.textureX / gameState.mapData.width) * 2.0f - 1.0f,
-                        ((float)t.textureY / gameState.mapData.height) * 2.0f - 1.0f,
-                        ((float)t.textureWidth / gameState.mapData.width) * 2.0f,
-                        ((float)t.textureHeight / gameState.mapData.height) * 2.0f,
-                        context);
-            }
 
-            gameState.mapData.isDoneGenerating = false;
+        // Upload mapData texture (Happens once)
+        if (gameState != null && gameState.mapData.isDoneGenerating) {
+            finishTerritories();
         }
 
-        // Redraw background color
+        // Clear color and depth buffers
         GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
+
         // Update GPU generation
         if (GpuGenerator.hasGenRequest) {
             GpuGenerator.updateGen(context);
             MapGenerator.finishGeneration((int)gameState.mapData.width, (int)gameState.mapData.height);
             GLES20.glViewport(0, 0, m_viewportW, m_viewportH);
         }
+
         // Render territories
         for (Territory t: gameState.mapData.territories) {
             t.updateAnimation();
             if (t.mesh != null) t.mesh.render(t, t.texture, camera.getVPMatrix());
         }
         // Draw sprites
-        m_unitSpriteBatch.begin();
-        for (Territory t : gameState.territories) {
-            drawUnits(t);
-        }
-        m_unitSpriteBatch.end();
-        m_unitSpriteBatch.render(camera);
+        drawUnits();
 
         // Render the lasers
+        drawLasers();
+
+        // Count frames for animation purposes
+        frame++;
+        if(frame >= 100000000){
+            frame = 0;
+        }
+    }
+
+    @Override
+    public void onSurfaceChanged(GL10 unused, int width, int height) {
+        GLES20.glViewport(0, 0, width, height);
+        m_viewportW = width;
+        m_viewportH = height;
+        // Set the projection matrix
+        if (IS_3D) {
+            camera.setSurface(width, height, 0.1f, 10000.0f);
+        } else {
+            camera.ortho(1, 1);
+        }
+    }
+
+    private void drawUnits() {
+        Player currentPlayer = gameState.players.get(gameState.currentPlayerIndex%gameState.players.size());
+
+        m_unitSpriteBatch.begin();
+        for (Territory t : gameState.territories) {
+            // If we are placing units, only show current player units
+            if (gameState.currentState == GameState.State.INITIAL_UNIT_PLACEMENT && t.owner != currentPlayer)
+                continue;
+
+            synchronized (t.units) {
+                for (Unit u : t.units) {
+                    // Update movement
+                    float angle = updateUnitPosition(u);
+                    // Get texture coordinates
+                    SpriteSheetDimensions dims = new SpriteSheetDimensions("soldier_move", frame / 5);
+                    // Render the texture
+                    m_unitSpriteBatch.draw(TextureHelper.getTexture("soldier_move"),
+                            (u.location.x / gameState.mapData.width) * 2.0f - 1.0f,
+                            (u.location.y / gameState.mapData.height) * 2.0f - 1.0f,
+                            0.1f, 0.1f, dims.u, dims.v, dims.uw, dims.vw, angle, t.owner.color);
+                }
+            }
+        }
+        // Actually render to the screen
+        m_unitSpriteBatch.end();
+        m_unitSpriteBatch.render(camera);
+    }
+
+    private void drawLasers(){
         GLES20.glDisable(GLES20.GL_DEPTH_TEST);
         synchronized (lasers) {
             for (Iterator<Laser> iterator = lasers.iterator(); iterator.hasNext();) {
@@ -177,15 +211,10 @@ public class CoARenderer implements GLSurfaceView.Renderer {
             }
         }
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
-
-        frame++;
-        if(frame >= 100000000){
-            frame = 0;
-        }
     }
 
     // Updates position of unit and returns angle
-    float updateUnitPosition(Unit u){
+    private float updateUnitPosition(Unit u){
         final float SPEED = 2.0f;
         if (u.destination == u.location) return 0.0f;
 
@@ -223,44 +252,18 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         return angle;
     }
 
-    void drawUnits() {
-        Player currentPlayer = gameState.players.get(gameState.currentPlayerIndex%gameState.players.size());
-
-        m_unitSpriteBatch.begin();
+    private void finishTerritories() {
         for (Territory t : gameState.territories) {
-            // If we are placing units, only show current player units
-            if (gameState.currentState == GameState.State.INITIAL_UNIT_PLACEMENT && t.owner != currentPlayer)
-                continue;
-
-            synchronized (t.units) {
-                for (Unit u : t.units) {
-                    // Update movement
-                    float angle = updateUnitPosition(u);
-                    // Get texture coordinates
-                    SpriteSheetDimensions dims = new SpriteSheetDimensions("soldier_move", frame / 5);
-                    // Render the texture
-                    m_unitSpriteBatch.draw(TextureHelper.getTexture("soldier_move"),
-                            (u.location.x / gameState.mapData.width) * 2.0f - 1.0f,
-                            (u.location.y / gameState.mapData.height) * 2.0f - 1.0f,
-                            0.1f, 0.1f, dims.u, dims.v, dims.uw, dims.vw, angle, t.owner.color);
-                }
-            }
+            t.texture = TextureHelper.dataToTexture(t.pixelBuffer, "t" + t.index, t.textureWidth, t.textureHeight);
+            t.pixelBuffer = null;
+            t.mesh = new TerritoryMesh();
+            t.mesh.init(((float)t.textureX / gameState.mapData.width) * 2.0f - 1.0f,
+                    ((float)t.textureY / gameState.mapData.height) * 2.0f - 1.0f,
+                    ((float)t.textureWidth / gameState.mapData.width) * 2.0f,
+                    ((float)t.textureHeight / gameState.mapData.height) * 2.0f,
+                    context);
         }
-        // Actually render to the screen
-        m_unitSpriteBatch.end();
-        m_unitSpriteBatch.render(camera);
-    }
 
-    @Override
-    public void onSurfaceChanged(GL10 unused, int width, int height) {
-        GLES20.glViewport(0, 0, width, height);
-        m_viewportW = width;
-        m_viewportH = height;
-        // Set the projection matrix
-        if (IS_3D) {
-            camera.setSurface(width, height, 0.1f, 10000.0f);
-        } else {
-            camera.ortho(1, 1);
-        }
+        gameState.mapData.isDoneGenerating = false;
     }
 }
