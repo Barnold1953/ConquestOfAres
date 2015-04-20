@@ -252,18 +252,20 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         dx = dx / length;
         dy = dy / length;
 
-        // Update position
-        u.location.x += dx * SPEED;
-        if (dx < 0 && u.location.x < u.destination.x) {
-            u.location.x = u.destination.x;
-        } else if (dx > 0 && u.location.x > u.destination.x){
-            u.location.x = u.destination.x;
-        }
-        u.location.y += dy * SPEED;
-        if (dy < 0 && u.location.y < u.destination.y) {
-            u.location.y = u.destination.y;
-        } else if (dy > 0 && u.location.y > u.destination.y){
-            u.location.y = u.destination.y;
+        // Update position if we aren't defending
+        if (!u.isDefending) {
+            u.location.x += dx * SPEED;
+            if (dx < 0 && u.location.x < u.destination.x) {
+                u.location.x = u.destination.x;
+            } else if (dx > 0 && u.location.x > u.destination.x) {
+                u.location.x = u.destination.x;
+            }
+            u.location.y += dy * SPEED;
+            if (dy < 0 && u.location.y < u.destination.y) {
+                u.location.y = u.destination.y;
+            } else if (dy > 0 && u.location.y > u.destination.y) {
+                u.location.y = u.destination.y;
+            }
         }
 
         // Calculate desired angle

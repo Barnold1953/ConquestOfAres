@@ -5,12 +5,12 @@ package Graphics;
  */
 public class Laser {
     public ColorMesh mesh = new ColorMesh();
-    public float width = 10.0f;
+    public float width = 8.0f;
     public boolean needsFinish = true;
 
     // Returns false when the laser is gone
     public boolean render(float[] vpMatrix) {
-        width -= 0.4f;
+        width -= 0.5f;
         if (width <= 0.0f) return true;
         float alpha = width / 10.0f;
         mesh.renderLines(vpMatrix, width, alpha);

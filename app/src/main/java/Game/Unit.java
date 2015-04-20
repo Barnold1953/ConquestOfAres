@@ -19,13 +19,13 @@ public class Unit {
         hasMoved = true;
         location = new PointF(x,y);
         destination = new PointF(x,y);
-        destination = location;
         type = t;
 
         wrapFrame = new Point(-1,-1);
     }
 
     public boolean inCombat = false;
+    public boolean isDefending = false;
     public Type type;
     public PointF location = null;
     public PointF destination = null;

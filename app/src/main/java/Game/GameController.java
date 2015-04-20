@@ -120,14 +120,27 @@ public class GameController {
 
         Action action = new Action(m_currentPlayer, Action.Category.attack, attacker, defender);
 
-        // Start attack animations
-        for (Unit u : defender.units) u.inCombat = true;
+        // Move attackers into range and start combat animations
+        synchronized (attacker.units) {
+            for (Unit u : attacker.selectedUnits) {
+                u.destination.x = u.location.x + (defender.x - attacker.x) * 0.5f;
+                u.destination.y = u.location.y + (defender.y - attacker.y) * 0.5f;
+            }
+        }
+        synchronized (defender.units) {
+            for (Unit u : defender.units) {
+                u.isDefending = true;
+                u.destination.x = u.location.x + (attacker.x - defender.x) * 0.5f;
+                u.destination.y = u.location.y + (attacker.y - defender.y) * 0.5f;
+            }
+        }
+        SystemClock.sleep(500);
+        // Start combat animations
         for (Unit u : attacker.selectedUnits) u.inCombat = true;
+        for (Unit u : defender.units) u.inCombat = true;
 
         while(defender.units.size() > 0 && attacker.selectedUnits.size() > 0) {
-            // I figure we can change the chance of winning based on the type of unit it is, like tanks are weak to airplanes, airplanes are weak to soldiers, and soldiers are weak to tanks
-            // kind of like a rock-paper-scissors dynamic
-
+            final float accuracy = 5.0f;
             // Random firing animation
             for (int i = 0; i < attacker.units.size() / 2 + 1; i++) {
                 // Attacker fire
@@ -135,18 +148,22 @@ public class GameController {
                 int randomDst = m_gameState.random.nextInt(defender.units.size());
                 Unit src1 = attacker.selectedUnits.get(randomSrc);
                 Unit dst1 = defender.units.get(randomDst);
-                renderer.addLaser(src1.location.x, src1.location.y, dst1.location.x, dst1.location.y,
+                renderer.addLaser(src1.location.x, src1.location.y,
+                        dst1.location.x + (m_gameState.random.nextFloat() * 2.0f - 1.0f) * accuracy,
+                        dst1.location.y + (m_gameState.random.nextFloat() * 2.0f - 1.0f) * accuracy,
                         attacker.owner.fColor[0], attacker.owner.fColor[1], attacker.owner.fColor[2]);
-                SystemClock.sleep(5);
+                SystemClock.sleep(30);
 
                 // Defender fire
                 randomSrc = m_gameState.random.nextInt(defender.units.size());
                 randomDst = m_gameState.random.nextInt(attacker.selectedUnits.size());
                 Unit src2 = defender.units.get(randomSrc);
                 Unit dst2 = attacker.selectedUnits.get(randomDst);
-                renderer.addLaser(src2.location.x, src2.location.y, dst2.location.x, dst2.location.y,
+                renderer.addLaser(src2.location.x, src2.location.y,
+                        dst2.location.x + (m_gameState.random.nextFloat() * 2.0f - 1.0f) * accuracy,
+                        dst2.location.y + (m_gameState.random.nextFloat() * 2.0f - 1.0f) * accuracy,
                         defender.owner.fColor[0], defender.owner.fColor[1], defender.owner.fColor[2]);
-                SystemClock.sleep(5);
+                SystemClock.sleep(30);
             }
 
             if(m_gameState.random.nextInt(2) == 0){
@@ -160,11 +177,15 @@ public class GameController {
                 action.dUnitsLost.add(u);
                 synchronized (defender.units) { defender.units.remove(u); }
             }
-            SystemClock.sleep(100);
         }
 
         // End attack animations
-        for (Unit u : defender.units) u.inCombat = false;
+        for (Unit u : defender.units) {
+            u.destination.x = u.location.x;
+            u.destination.y = u.location.y;
+            u.isDefending = false;
+            u.inCombat = false;
+        }
         for (Unit u : attacker.selectedUnits) u.inCombat = false;
 
         if(defender.units.isEmpty() && !attacker.selectedUnits.isEmpty()){
