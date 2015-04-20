@@ -62,8 +62,8 @@ public class GameController {
         }
         m_currentPlayer = m_gameState.players.get(m_gameState.currentPlayerIndex % m_gameState.players.size());
         if(m_gameState.currentState == GameState.State.PLACING_UNITS) {
-            m_currentPlayer.placeableUnits = 0;
-            //m_currentPlayer.placeableUnits = m_currentPlayer.territories.size() / 2;
+            //m_currentPlayer.placeableUnits = 0;
+            m_currentPlayer.placeableUnits = m_currentPlayer.territories.size() / 2;
         }
         // Check if we should do AI
         if (m_currentPlayer.isAI) {
