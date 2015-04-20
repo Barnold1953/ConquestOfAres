@@ -14,7 +14,7 @@ import Graphics.Quadrilateral;
 public class Unit {
     boolean hasMoved; ///< Can only move once per turn TODO: use this
     public enum Type{
-        soldier, tank, airplane
+        soldier_attack, soldier_idle, soldier_move
     }
 
     public Unit(float x, float y, Type t){
@@ -37,7 +37,7 @@ public class Unit {
     public int frame;
     public int speed = 100;
     public int turnRate = 5;
-    public int angle;
+    public double angle;
     // when health reaches 0, soldier is removed from army.units
     public float health = 100.0f;
     // armor will divide the attacker's damage and then subtract that # from health
@@ -53,6 +53,7 @@ public class Unit {
             path.remove(path.size()-1);
             if(!path.isEmpty()){
                 destination = path.get(path.size()-1).getUnitPlace();
+                type = Type.soldier_move;
                 //destination = new PointF(path.get(path.size()-1).x, path.get(path.size()-1).y);
             }
         }

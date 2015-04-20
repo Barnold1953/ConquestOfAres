@@ -169,6 +169,7 @@ public class GameController {
             }
             unit.frame = 0;
             unit.location = new PointF(source.x, source.y);
+            unit.type = Unit.Type.soldier_move;
 
             destination.units.add(unit);
         }

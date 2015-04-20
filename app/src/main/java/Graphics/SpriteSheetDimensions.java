@@ -10,15 +10,23 @@ public class SpriteSheetDimensions {
 
     public SpriteSheetDimensions(String name){
         switch (name){
-            case "soldier":
+            case "soldier_attack":
                 width = 512;
                 height = 512;
                 frameWidth = 128;
                 frameHeight = 128;
-                //width = 576;
-                //height = 256;
-                //frameWidth = 64;
-                //frameHeight = 64;
+                break;
+            case "soldier_idle":
+                width = 512;
+                height = 512;
+                frameWidth = 128;
+                frameHeight = 128;
+                break;
+            case "soldier_move":
+                width = 512;
+                height = 512;
+                frameWidth = 128;
+                frameHeight = 128;
                 break;
         }
     }

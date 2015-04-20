@@ -33,7 +33,8 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     GameState gameState = null;
     int m_viewportW = 0;
     int m_viewportH = 0;
-    int frame, previousUnitCount = 0;
+    int frame;
+    int previousAttackCount = 0, previousIdleCount = 0, previousMoveCount = 0;
     double[] fTime = new double[100];
     int width, height;
 
@@ -103,7 +104,9 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         TextureHelper.imageToTexture(context, R.drawable.texture1, "test1");
         //TextureHelper.imageToTexture(context, R.drawable.character1walk, "soldier");
-        TextureHelper.imageToTexture(context, R.drawable.man_run, "soldier");
+        TextureHelper.imageToTexture(context, R.drawable.man_run, "soldier_move");
+        TextureHelper.imageToTexture(context, R.drawable.man_idle, "soldier_idle");
+        TextureHelper.imageToTexture(context, R.drawable.man_shoot, "soldier_attack");
 
         Log.d("Setup", "Geometry buffers initialized and filled.");
 
@@ -215,20 +218,40 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         // Make sprites
         SpriteBatchSystem.clear();
 
-        int unitCount = 0;
+        int idleCount = 0, moveCount = 0, attackCount = 0;
         for(Territory t : gameState.territories){
-            unitCount += t.units.size();
+            for(Unit u : t.units) {
+                switch (u.type){
+                    case soldier_attack:
+                        attackCount++;
+                        break;
+                    case soldier_idle:
+                        idleCount++;
+                        break;
+                    case soldier_move:
+                        if(u.destination == u.location){
+                            u.type = Unit.Type.soldier_idle;
+                            idleCount++;
+                        }
+                        else {
+                            moveCount++;
+                        }
+                        break;
+                }
+            }
         }
 
-        SpriteBatchSystem.Initialize(unitCount);
+        SpriteBatchSystem.Initialize(attackCount, idleCount, moveCount);
 
         for (Territory t : gameState.territories) {
             renderUnits(t);
         }
 
-        GeometryHelper.allocateBuffs(previousUnitCount);
+        GeometryHelper.allocateBuffs(previousAttackCount, previousIdleCount, previousMoveCount);
 
-        previousUnitCount = unitCount;
+        previousAttackCount = attackCount;
+        previousIdleCount = idleCount;
+        previousMoveCount = moveCount;
         // Redraw background color
         GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);

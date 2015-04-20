@@ -16,7 +16,6 @@ import java.util.HashMap;
  */
 public class GeometryHelper {
     private static HashMap<String, BatchGeometry> BatchMap = new HashMap<>();
-    private static int unitCount = 0, totalUnits = 0;
 
     private final static float[] quad = {0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f};
     private final static float[] quadNormals = {0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f};
@@ -72,34 +71,37 @@ public class GeometryHelper {
         BatchMap.put("master", bg);
     }
 
-    public static void initializeSoldier(int count){
-        BatchGeometry bg = new BatchGeometry();
-        bg.vertices = new float[count * 18];
-        bg.textureCoordinates = new float[count * 12];
-        bg.colors = new byte[count * 18];
+    public static void initializeSoldier(int attackCount, int idleCount, int moveCount){
+        BatchGeometry attackBatch = new BatchGeometry(), idleBatch = new BatchGeometry(), moveBatch = new BatchGeometry();
+        attackBatch.vertices = new float[attackCount * 18];
+        attackBatch.textureCoordinates = new float[attackCount * 18];
+        attackBatch.colors = new byte[attackCount * 18];
+        idleBatch.vertices = new float[idleCount * 18];
+        idleBatch.textureCoordinates = new float[idleCount * 18];
+        idleBatch.colors = new byte[idleCount * 18];
+        moveBatch.vertices = new float[moveCount * 18];
+        moveBatch.textureCoordinates = new float[moveCount * 18];
+        moveBatch.colors = new byte[moveCount * 18];
 
-        totalUnits = count;
+        attackBatch.total = attackCount;
+        attackBatch.count = 0;
+        idleBatch.total = idleCount;
+        idleBatch.count = 0;
+        moveBatch.total = moveCount;
+        moveBatch.count = 0;
 
-        BatchMap.put("soldier", bg);
+        BatchMap.put("soldier_attack", attackBatch);
+        BatchMap.put("soldier_idle", idleBatch);
+        BatchMap.put("soldier_move", moveBatch);
         //Log.d("Geometry2", ((Integer)BatchMap.get("soldier").vertices.length).toString());
     }
 
     public static void clear(){
         BatchMap.clear();
-        unitCount = 0;
     }
 
     public static void addToBatch(Quadrilateral quad, String name){
-        BatchGeometry bg;
-        if(BatchMap.containsKey(name)) {
-            bg = BatchMap.get(name);
-        }
-        else {
-            bg = new BatchGeometry();
-            bg.vertices = new float[18 * totalUnits];
-            bg.textureCoordinates = new float[12 * totalUnits];
-            bg.colors = new byte[18 * totalUnits];
-        }
+        BatchGeometry bg = BatchMap.get(name);
 
         float[] newV = new float[] {quad.x,quad.y+quad.height,quad.z,
                                     quad.x,quad.y,quad.z,
@@ -129,34 +131,38 @@ public class GeometryHelper {
         }
         //bg.colors = addToFloatArray(bg.colors, temp);
 
-        System.arraycopy(newV, 0, bg.vertices, unitCount * 18, newV.length);
-        System.arraycopy(temp, 0, bg.colors, unitCount*18, temp.length);
+        System.arraycopy(newV, 0, bg.vertices, bg.count * 18, newV.length);
+        System.arraycopy(temp, 0, bg.colors, bg.count*18, temp.length);
 
-        unitCount++;
+        bg.count++;
 
         BatchMap.put(name, bg);
     }
 
-    public static void allocateBuffs(int puc){
-        BatchGeometry bg = BatchMap.get("soldier");
+    public static void allocateBuffs(int pac, int pic, int pmc){
+        String[] buffs = {"soldier_attack", "soldier_idle", "soldier_move"};
+        int[] pCounts = {pac, pic, pmc};
 
-        if(puc < unitCount || bg.vBuff == null) {
-            if(bg.vBuff != null && bg.tcBuff != null && bg.cBuff != null) {
-                bg.vBuff.reset();
-                bg.tcBuff.reset();
-                bg.cBuff.reset();
+        for(int i = 0; i < buffs.length; i++) {
+            BatchGeometry bg = BatchMap.get(buffs[i]);
+            if (pCounts[i] < bg.count || bg.vBuff == null) {
+                if (bg.vBuff != null && bg.tcBuff != null && bg.cBuff != null) {
+                    bg.vBuff.reset();
+                    bg.tcBuff.reset();
+                    bg.cBuff.reset();
+                }
+
+                bg.vBuff = ByteBuffer.allocateDirect(bg.vertices.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
+                bg.tcBuff = ByteBuffer.allocateDirect(bg.textureCoordinates.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
+                bg.cBuff = ByteBuffer.allocateDirect(bg.colors.length).order(ByteOrder.nativeOrder());
             }
 
-            bg.vBuff = ByteBuffer.allocateDirect(bg.vertices.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
-            bg.tcBuff = ByteBuffer.allocateDirect(bg.textureCoordinates.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
-            bg.cBuff = ByteBuffer.allocateDirect(bg.colors.length).order(ByteOrder.nativeOrder());
+            bg.vBuff.put(bg.vertices).position(0);
+            bg.tcBuff.put(bg.textureCoordinates).position(0);
+            bg.cBuff.put(bg.colors).position(0);
+
+            BatchMap.put(buffs[i], bg);
         }
-
-        bg.vBuff.put(bg.vertices).position(0);
-        bg.tcBuff.put(bg.textureCoordinates).position(0);
-        bg.cBuff.put(bg.colors).position(0);
-
-        BatchMap.put("soldier", bg);
     }
 
     //public static FloatBuffer getFrameTexture(String name, float width, float height, float fWidth, float fHeight, int frameX, int frameY){

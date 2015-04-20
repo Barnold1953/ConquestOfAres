@@ -12,4 +12,5 @@ public class BatchGeometry{
     byte[] colors;
     FloatBuffer vBuff, tcBuff;
     ByteBuffer cBuff;
+    int total, count, puc;
 }

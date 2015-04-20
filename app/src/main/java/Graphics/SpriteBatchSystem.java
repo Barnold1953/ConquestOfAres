@@ -39,9 +39,9 @@ public class SpriteBatchSystem {
         ByteBuffer cBuf;
     }
 
-    public static void Initialize(int count){
+    public static void Initialize(int aCount, int iCount, int mCount){
         GeometryHelper.initializeMaster();
-        GeometryHelper.initializeSoldier(count);
+        GeometryHelper.initializeSoldier(aCount, iCount, mCount);
     }
 
     public static void addSprite(String name, Quadrilateral quadrilateral, int rid){
@@ -70,24 +70,29 @@ public class SpriteBatchSystem {
     public static void addUnit(Unit u, float x, float y, byte[] color){
         Quadrilateral quad = new Quadrilateral();
         switch (u.type){
-            case soldier:
-                if(u.destination == u.location) {
-                    quad = Quadrilateral.getQuad(quad, x, y, 0, .1f, .1f, color, u.angle);
-                }
-                else{
-                    double angle;
-                    float yDiff, xDiff;
-                    yDiff = u.destination.y - u.location.y;
-                    xDiff = u.destination.x - u.location.x;
-                    PointF p = new PointF(0.0f, 1.0f);
-                    PointF p1 = new PointF(xDiff, yDiff);
-                    p1 = normalize(p1);
-                    float dp = dotProduct(p, p1);
-                    angle = Math.acos(dp);
-                    if(xDiff > 0.0f) angle = -angle;
-                    quad = Quadrilateral.getQuad(quad, x, y, 0, .1f, .1f, color, angle);
-                }
-                addSprite("soldier", quad, TextureHelper.getTexture("soldier"));
+            case soldier_move:
+                double angle;
+                float yDiff, xDiff;
+                yDiff = u.destination.y - u.location.y;
+                xDiff = u.destination.x - u.location.x;
+                PointF p = new PointF(0.0f, 1.0f);
+                PointF p1 = new PointF(xDiff, yDiff);
+                p1 = normalize(p1);
+                float dp = dotProduct(p, p1);
+                angle = Math.acos(dp);
+                if(xDiff > 0.0f) angle = -angle;
+                u.angle = angle;
+                quad = Quadrilateral.getQuad(quad, x, y, 0, .1f, .1f, color, u.angle);
+                addSprite("soldier_move", quad, TextureHelper.getTexture("soldier_move"));
+                break;
+            case soldier_idle:
+                quad = Quadrilateral.getQuad(quad, x, y, 0, .1f, .1f, color, u.angle);
+                addSprite("soldier_idle", quad, TextureHelper.getTexture("soldier_idle"));
+                break;
+            case soldier_attack:
+                quad = Quadrilateral.getQuad(quad, x, y, 0, .1f, .1f, color, u.angle);
+                addSprite("soldier_attack", quad, TextureHelper.getTexture("soldier_attack"));
+                break;
         }
     }
 }
