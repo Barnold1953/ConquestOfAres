@@ -1,6 +1,7 @@
 package Graphics;
 
 import android.opengl.GLES20;
+import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -59,6 +60,7 @@ public class SpriteBatch {
     // Registers a glyph
     public void draw(int texture, float x, float y, float w, float h, float u, float v, float uw, float vw, byte color[]) {
         SpriteBatchGlyph glyph = new SpriteBatchGlyph();
+        glyph.texture = texture;
         glyph.x = x;
         glyph.y = y;
         glyph.w = w;
@@ -70,6 +72,7 @@ public class SpriteBatch {
         glyph.r = color[0];
         glyph.g = color[1];
         glyph.b = color[2];
+        m_glyphs.add(glyph);
     }
 
     // Ends a frame of rendering
@@ -97,7 +100,7 @@ public class SpriteBatch {
 
             GLES20.glVertexAttribPointer(m_positionHandle, 2, GLES20.GL_FLOAT, false, BYTES_PER_VERTEX, 0);
             GLES20.glVertexAttribPointer(m_TCoordHandle, 2, GLES20.GL_FLOAT, false, BYTES_PER_VERTEX, 8);
-            GLES20.glVertexAttribPointer(m_colorHandle, 3, GLES20.GL_BYTE, false, BYTES_PER_VERTEX, 16);
+            GLES20.glVertexAttribPointer(m_colorHandle, 3, GLES20.GL_BYTE, true, BYTES_PER_VERTEX, 16);
 
             GLES20.glDrawArrays(GLES20.GL_TRIANGLES, b.offset, b.numVertices);
         }
@@ -106,6 +109,12 @@ public class SpriteBatch {
         GLES20.glDisableVertexAttribArray(m_TCoordHandle);
 
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+
+        // Error checking
+        int error = GLES20.glGetError();
+        if (error != GLES20.GL_NO_ERROR) {
+            Log.d("SpriteBatch.render", "E " + error);
+        }
     }
 
     // For sorting glyphs

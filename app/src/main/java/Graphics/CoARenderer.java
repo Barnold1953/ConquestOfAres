@@ -36,6 +36,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     int frame;
     int previousAttackCount = 0, previousIdleCount = 0, previousMoveCount = 0;
     int width, height;
+    SpriteBatch m_unitSpriteBatch = new SpriteBatch();
     LinkedList<Laser> lasers = new LinkedList<Laser>();
 
     DrawHelper dHelper;
@@ -153,24 +154,18 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
     }
 
-    void renderUnits(Territory territory){
+    void drawUnits(Territory territory) {
         Player currentPlayer = gameState.players.get(gameState.currentPlayerIndex%gameState.players.size());
-        if(gameState.currentState == GameState.State.INITIAL_UNIT_PLACEMENT){
-            if(territory.owner == currentPlayer){
-                synchronized (territory.units) {
-                    for (Unit u : territory.units) {
-                        updateUnitPosition(u);
-                        SpriteBatchSystem.addUnit(u, (u.location.x / gameState.mapData.width) * 2 - 1 - (.1f / 2), (u.location.y / gameState.mapData.height) * 2 - 1 - (.1f / 2), territory.owner.color);
-                    }
-                }
-            }
-        }
-        else{
-            synchronized (territory.units) {
-                for (Unit u : territory.units) {
-                    updateUnitPosition(u);
-                    SpriteBatchSystem.addUnit(u, (u.location.x / gameState.mapData.width) * 2 - 1 - (.1f / 2), (u.location.y / gameState.mapData.height) * 2 - 1 - (.1f / 2), territory.owner.color);
-                }
+        if(gameState.currentState == GameState.State.INITIAL_UNIT_PLACEMENT && territory.owner != currentPlayer) return;
+
+        synchronized (territory.units) {
+            for (Unit u : territory.units) {
+                updateUnitPosition(u);
+                SpriteSheetDimensions dims = new SpriteSheetDimensions("soldier_move", frame / 5);
+                m_unitSpriteBatch.draw(TextureHelper.getTexture("soldier_move"),
+                        (u.location.x / gameState.mapData.width) * 2.0f - 1.0f,
+                        (u.location.y / gameState.mapData.height) * 2.0f - 1.0f,
+                        0.1f, 0.1f, dims.u, dims.v, dims.uw, dims.vw, territory.owner.color);
             }
         }
     }
@@ -194,49 +189,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
             gameState.mapData.isDoneGenerating = false;
         }
 
-        int idleCount = 0, moveCount = 0, attackCount = 0;
-        for(Territory t : gameState.territories){
-            synchronized (t.units) {
-                for (Unit u : t.units) {
-                    moveCount++;
-                    switch (u.type) {
-                        case soldier_attack:
-                            attackCount++;
-                            break;
-                        case soldier_idle:
-                            if (u.destination != u.location) {
-                                moveCount++;
-                                u.type = Unit.Type.soldier_move;
-                            } else {
-                                idleCount++;
-                            }
-                            break;
-                        case soldier_move:
-                            if (u.destination == u.location) {
-                                u.type = Unit.Type.soldier_idle;
-                                idleCount++;
-                            } else {
-                                moveCount++;
-                            }
-                            break;
-                    }
-                }
-            }
-        }
-
-        // Make sprites
-        SpriteBatchSystem.clear();
-        SpriteBatchSystem.Initialize(attackCount, idleCount, moveCount);
-
-        for (Territory t : gameState.territories) {
-            renderUnits(t);
-        }
-
-        GeometryHelper.allocateBuffs(previousAttackCount, previousIdleCount, previousMoveCount);
-
-        previousAttackCount = attackCount;
-        previousIdleCount = idleCount;
-        previousMoveCount = moveCount;
         // Redraw background color
         GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
@@ -252,16 +204,13 @@ public class CoARenderer implements GLSurfaceView.Renderer {
             if (t.mesh != null) t.mesh.render(t, t.texture, camera.getVPMatrix());
         }
 
-        Enumeration vEnum = SpriteBatchSystem.sprites.elements();
-
-        while(vEnum.hasMoreElements()){
-            String name = vEnum.nextElement().toString();
-            SpriteBatchSystem.sprite s = SpriteBatchSystem.getSprite(name);
-            SpriteSheetDimensions ssd = new SpriteSheetDimensions(name);
-            GeometryHelper.setFrameTexture(name, ssd.width, ssd.height, ssd.frameWidth, ssd.frameHeight, frame/5);
-
-            dHelper.draw(camera, s.vBuf, s.cBuf, s.tBuf, s.texture, GeometryHelper.getVerticesCount(name), "simple");
+        // Draw sprites
+        m_unitSpriteBatch.begin();
+        for (Territory t : gameState.territories) {
+            drawUnits(t);
         }
+        m_unitSpriteBatch.end();
+        m_unitSpriteBatch.render(camera);
 
         // Render the lasers
         GLES20.glDisable(GLES20.GL_DEPTH_TEST);
