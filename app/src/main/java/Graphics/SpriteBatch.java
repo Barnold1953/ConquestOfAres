@@ -35,7 +35,6 @@ public class SpriteBatch {
     private static final int BYTES_PER_VERTEX = 20;
     private static final int VERTS_PER_QUAD = 6;
 
-
     Vector<SpriteBatchGlyph> m_glyphs = new Vector<SpriteBatchGlyph>();
     Vector<RenderBatch> m_renderBatches = new Vector<RenderBatch>();
 
@@ -58,7 +57,7 @@ public class SpriteBatch {
     }
 
     // Registers a glyph
-    public void draw(int texture, float x, float y, float w, float h, float u, float v, float uw, float vw, byte color[]) {
+    public void draw(int texture, float x, float y, float w, float h, float u, float v, float uw, float vw, float angle, byte color[]) {
         SpriteBatchGlyph glyph = new SpriteBatchGlyph();
         glyph.texture = texture;
         glyph.x = x;
@@ -69,6 +68,7 @@ public class SpriteBatch {
         glyph.v = v;
         glyph.uw = uw;
         glyph.vw = vw;
+        glyph.angle = angle;
         glyph.r = color[0];
         glyph.g = color[1];
         glyph.b = color[2];
@@ -154,9 +154,26 @@ public class SpriteBatch {
                 m_renderBatches.add(batch);
             }
 
+            // Get origin relative points
+            float tlX = -g.w * 0.5f, tlY = g.h * 0.5f; // Top left
+            float blX = -g.w * 0.5f, blY = -g.h * 0.5f; // Bottom left
+            float brX = g.w * 0.5f, brY = -g.h * 0.5f; // Bottom right
+            float trX = g.w * 0.5f, trY = g.h * 0.5f; // Top right
+            // Handle rotation
+            if (g.angle != 0) {
+                tlX = rotateX(tlX, tlY, g.angle);
+                tlY = rotateY(tlX, tlY, g.angle);
+                blX = rotateX(blX, blY, g.angle);
+                blY = rotateY(blX, blY, g.angle);
+                brX = rotateX(brX, brY, g.angle);
+                brY = rotateY(brX, brY, g.angle);
+                trX = rotateX(trX, trY, g.angle);
+                trY = rotateY(trX, trY, g.angle);
+            }
+
             // Add the 6 vertices
-            m_buffer.putFloat(g.x);
-            m_buffer.putFloat(g.y + g.h);
+            m_buffer.putFloat(g.x + tlX);
+            m_buffer.putFloat(g.y + tlY);
             m_buffer.putFloat(g.u);
             m_buffer.putFloat(g.v + g.vw);
             m_buffer.put(g.r);
@@ -164,8 +181,8 @@ public class SpriteBatch {
             m_buffer.put(g.b);
             m_buffer.put(g.a);
 
-            m_buffer.putFloat(g.x);
-            m_buffer.putFloat(g.y);
+            m_buffer.putFloat(g.x + blX);
+            m_buffer.putFloat(g.y + blY);
             m_buffer.putFloat(g.u);
             m_buffer.putFloat(g.v);
             m_buffer.put(g.r);
@@ -173,8 +190,8 @@ public class SpriteBatch {
             m_buffer.put(g.b);
             m_buffer.put(g.a);
 
-            m_buffer.putFloat(g.x + g.w);
-            m_buffer.putFloat(g.y);
+            m_buffer.putFloat(g.x + brX);
+            m_buffer.putFloat(g.y + brY);
             m_buffer.putFloat(g.u + g.uw);
             m_buffer.putFloat(g.v);
             m_buffer.put(g.r);
@@ -182,8 +199,8 @@ public class SpriteBatch {
             m_buffer.put(g.b);
             m_buffer.put(g.a);
 
-            m_buffer.putFloat(g.x + g.w);
-            m_buffer.putFloat(g.y);
+            m_buffer.putFloat(g.x + brX);
+            m_buffer.putFloat(g.y + brY);
             m_buffer.putFloat(g.u + g.uw);
             m_buffer.putFloat(g.v);
             m_buffer.put(g.r);
@@ -191,8 +208,8 @@ public class SpriteBatch {
             m_buffer.put(g.b);
             m_buffer.put(g.a);
 
-            m_buffer.putFloat(g.x + g.w);
-            m_buffer.putFloat(g.y + g.h);
+            m_buffer.putFloat(g.x + trX);
+            m_buffer.putFloat(g.y + trY);
             m_buffer.putFloat(g.u + g.uw);
             m_buffer.putFloat(g.v + g.vw);
             m_buffer.put(g.r);
@@ -200,8 +217,8 @@ public class SpriteBatch {
             m_buffer.put(g.b);
             m_buffer.put(g.a);
 
-            m_buffer.putFloat(g.x);
-            m_buffer.putFloat(g.y + g.h);
+            m_buffer.putFloat(g.x + tlX);
+            m_buffer.putFloat(g.y + tlY);
             m_buffer.putFloat(g.u);
             m_buffer.putFloat(g.v + g.vw);
             m_buffer.put(g.r);
@@ -219,4 +236,11 @@ public class SpriteBatch {
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
     }
 
+    private float rotateX(float x, float y, float angle) {
+        return x * (float)Math.cos(angle) - y * (float)Math.sin(angle);
+    }
+
+    private float rotateY(float x, float y, float angle) {
+        return x * (float)Math.sin(angle) + y * (float)Math.cos(angle);
+    }
 }

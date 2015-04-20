@@ -13,6 +13,7 @@ public class SpriteBatchGlyph {
     float v;
     float uw;
     float vw;
+    float angle;
     byte r;
     byte g;
     byte b;

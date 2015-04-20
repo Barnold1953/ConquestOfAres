@@ -125,10 +125,10 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         GLES20.glDepthMask( true );
     }
 
-    // Updates position of unit
-    void updateUnitPosition(Unit u){
+    // Updates position of unit and returns angle
+    float updateUnitPosition(Unit u){
         final float SPEED = 1.0f;
-        if (u.destination == u.location) return;
+        if (u.destination == u.location) return 0.0f;
 
         // Calculate normal vector towards destination
         float dx = u.destination.x - u.location.x;
@@ -152,6 +152,10 @@ public class CoARenderer implements GLSurfaceView.Renderer {
             u.location.y = u.destination.y;
         }
 
+        // Return angle off of the horizontal
+        float angle = (float)Math.acos(dy);
+        if (dx > 0.0f) angle = -angle;
+        return angle;
     }
 
     void drawUnits(Territory territory) {
@@ -160,12 +164,15 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         synchronized (territory.units) {
             for (Unit u : territory.units) {
-                updateUnitPosition(u);
+                // Update movement
+                float angle = updateUnitPosition(u);
+                // Get texture coordinates
                 SpriteSheetDimensions dims = new SpriteSheetDimensions("soldier_move", frame / 5);
+                // Render the texture
                 m_unitSpriteBatch.draw(TextureHelper.getTexture("soldier_move"),
                         (u.location.x / gameState.mapData.width) * 2.0f - 1.0f,
                         (u.location.y / gameState.mapData.height) * 2.0f - 1.0f,
-                        0.1f, 0.1f, dims.u, dims.v, dims.uw, dims.vw, territory.owner.color);
+                        0.1f, 0.1f, dims.u, dims.v, dims.uw, dims.vw, angle, territory.owner.color);
             }
         }
     }

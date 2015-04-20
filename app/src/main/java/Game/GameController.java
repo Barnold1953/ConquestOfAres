@@ -121,7 +121,7 @@ public class GameController {
 
         Action action = new Action(m_currentPlayer, Action.Category.attack, attacker, defender);
 
-        while(defender.units.size() > 0 && attacker.units.size() > 0){
+        while(defender.units.size() > 0 && attacker.selectedUnits.size() > 0){
             // I figure we can change the chance of winning based on the type of unit it is, like tanks are weak to airplanes, airplanes are weak to soldiers, and soldiers are weak to tanks
             // kind of like a rock-paper-scissors dynamic
 
