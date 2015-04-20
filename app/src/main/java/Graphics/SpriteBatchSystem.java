@@ -72,7 +72,7 @@ public class SpriteBatchSystem {
         switch (u.type){
             case soldier:
                 if(u.destination == u.location) {
-                    quad = Quadrilateral.getQuad(quad, x, y, 0, .1f, .1f, color);
+                    quad = Quadrilateral.getQuad(quad, x, y, 0, .1f, .1f, color, u.angle);
                 }
                 else{
                     double angle;
