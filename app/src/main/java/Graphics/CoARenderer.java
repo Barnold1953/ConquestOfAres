@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -20,7 +18,6 @@ import Game.Player;
 import Game.Territory;
 import Game.Unit;
 import Generation.GpuGenerator;
-import Generation.MapData;
 import Generation.MapGenerator;
 import Utils.PreciseTimer;
 import utkseniordesign.conquestofares.R;
@@ -36,12 +33,14 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     GameState gameState = null;
     int m_viewportW = 0;
     int m_viewportH = 0;
-    int frame, previousUnitCount = 0;
-    double[] fTime = new double[100];
+    int frame;
+    int previousAttackCount = 0, previousIdleCount = 0, previousMoveCount = 0;
     int width, height;
+    int m_soldierMoveTexture = 0;
+    int m_soldierAttackTexture = 0;
+    int m_soldierIdleTexture = 0;
+    SpriteBatch m_unitSpriteBatch = new SpriteBatch();
     LinkedList<Laser> lasers = new LinkedList<Laser>();
-
-    DrawHelper dHelper;
 
     final boolean IS_3D = false; ///< Temporary: determines if we are rendering in 3D or 2D
 
@@ -83,7 +82,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         context = c;
 
         camera = new Camera();
-        dHelper = new DrawHelper(camera);
         width = w;
         height = h;
 
@@ -104,18 +102,15 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         Log.d("Setup", "Surface created.");
         try {
-            //programHandle = ShaderHelper.compileShader(context, R.string.simple_vert, R.string.animate_frag, "animate");
-            //dHelper.setProgHandles(programHandle, "animate");
             programHandle = ShaderHelper.compileShader(context, R.string.simple_vert, R.string.texture_frag, "simple");
-            dHelper.setProgHandles(programHandle, "simple");
         }
         catch (IOException e){
             Log.d("Shader", "Error occurred during compilation");
         }
 
-        TextureHelper.imageToTexture(context, R.drawable.texture1, "test1");
-        //TextureHelper.imageToTexture(context, R.drawable.character1walk, "soldier");
-        TextureHelper.imageToTexture(context, R.drawable.man_run, "soldier");
+        m_soldierMoveTexture = TextureHelper.imageToTexture(context, R.drawable.man_run, "soldier_move");
+        m_soldierIdleTexture = TextureHelper.imageToTexture(context, R.drawable.man_idle, "soldier_idle");
+        m_soldierAttackTexture = TextureHelper.imageToTexture(context, R.drawable.man_shoot, "soldier_attack");
 
         Log.d("Setup", "Geometry buffers initialized and filled.");
 
@@ -125,181 +120,39 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         GLES20.glDepthMask( true );
     }
 
-    float[] getSlope(Unit u){
-        if(u.frame == u.speed){
-            u.destinationStep();
-        }
-
-        float[] slope = new float[2];
-
-        /*if(u.destination != u.location){
-            Log.d("slope", "destination: (" + u.destination.x + ", " + u.destination.y + ") location: (" + u.location.x + ", " + u.location.y + ")");
-            Log.d("slope", "width: " + width + ", height: " + height);
-        }*/
-        if(Math.abs(u.destination.x - u.location.x) > width / 3){
-            //Log.d("slope", "horizontal wrap");
-            slope[0] = -(u.destination.x - u.location.x) / u.speed;
-            if(u.wrapFrame.x == -1){
-                for(int i = 0; i < u.speed; i++){
-                    if(u.location.x + slope[0] * i > width){
-                        u.wrapFrame.x = i;
-                        break;
-                    }
-                }
-            }
-            if(u.wrapFrame.x <= u.frame){
-                slope[0] = width - (u.location.x + slope[0] * u.wrapFrame.x) + u.location.x + slope[0] * u.frame;
-            }
-            else{
-                slope[0] = u.location.x + slope[0] * u.frame;
-            }
-        }
-        else{
-            slope[0] = (u.destination.x - u.location.x) / u.speed;
-            slope[0] = u.location.x + slope[0] * u.frame;
-        }
-
-        if(Math.abs(u.destination.y - u.location.y) > height / 3){
-            Log.d("slope", "vertical wrap");
-            slope[1] = -(u.destination.y - u.location.y) / u.speed;
-            if(u.wrapFrame.y == -1){
-                for(int i = 0; i < u.speed; i++){
-                    if(u.location.y + slope[1] * i > height){
-                        u.wrapFrame.y = i;
-                        break;
-                    }
-                }
-            }
-            if(u.wrapFrame.y <= u.frame){
-                slope[1] = height - (u.location.y + slope[1] * u.wrapFrame.y) + u.location.y + slope[1] * u.frame;
-            }
-            else{
-                slope[1] = u.location.y + slope[1] * u.frame;
-            }
-        }
-        else{
-            slope[1] = (u.destination.y - u.location.y) / u.speed;
-            slope[1] = u.location.y + slope[1] * u.frame;
-        }
-
-        u.frame++;
-        return slope;
-    }
-
-    void renderUnits(Territory territory){
-        Player currentPlayer = gameState.players.get(gameState.currentPlayerIndex%gameState.players.size());
-        if(gameState.currentState == GameState.State.INITIAL_UNIT_PLACEMENT){
-            if(territory.owner == currentPlayer){
-                for (Unit u : territory.units) {
-                    float[] slope = getSlope(u);
-                    SpriteBatchSystem.addUnit(u, (slope[0]/gameState.mapData.width) * 2 - 1 - (.1f / 2), (slope[1]/gameState.mapData.height) * 2 - 1 - (.1f / 2), territory.owner.color);
-                }
-            }
-        }
-        else{
-            for (Unit u : territory.units) {
-                float[] slope = getSlope(u);
-                SpriteBatchSystem.addUnit(u, (slope[0]/gameState.mapData.width) * 2 - 1 - (.1f / 2), (slope[1]/gameState.mapData.height) * 2 - 1 - (.1f / 2), territory.owner.color);
-            }
-        }
-    }
-
     @Override
     public void onDrawFrame(GL10 unused) {
-       // Upload mapData texture
-        PreciseTimer timer = new PreciseTimer();
+
+        // Upload mapData texture (Happens once)
         if (gameState != null && gameState.mapData.isDoneGenerating) {
-            for (Territory t : gameState.territories) {
-                t.texture = TextureHelper.dataToTexture(t.pixelBuffer, "t" + t.index, t.textureWidth, t.textureHeight);
-                t.pixelBuffer = null;
-                t.mesh = new TerritoryMesh();
-                t.mesh.init(((float)t.textureX / gameState.mapData.width) * 2.0f - 1.0f,
-                        ((float)t.textureY / gameState.mapData.height) * 2.0f - 1.0f,
-                        ((float)t.textureWidth / gameState.mapData.width) * 2.0f,
-                        ((float)t.textureHeight / gameState.mapData.height) * 2.0f,
-                        context);
-            }
-
-            Log.d("Line", "Got here");
-            gameState.mapData.isDoneGenerating = false;
+            finishTerritories();
         }
 
-        // Make sprites
-        SpriteBatchSystem.clear();
-
-        int unitCount = 0;
-        for(Territory t : gameState.territories){
-            unitCount += t.units.size();
-        }
-
-        SpriteBatchSystem.Initialize(unitCount);
-
-        for (Territory t : gameState.territories) {
-            renderUnits(t);
-        }
-
-        GeometryHelper.allocateBuffs(previousUnitCount);
-
-        previousUnitCount = unitCount;
-        // Redraw background color
+        // Clear color and depth buffers
         GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
-        // Update generation
+
+        // Update GPU generation
         if (GpuGenerator.hasGenRequest) {
             GpuGenerator.updateGen(context);
             MapGenerator.finishGeneration((int)gameState.mapData.width, (int)gameState.mapData.height);
             GLES20.glViewport(0, 0, m_viewportW, m_viewportH);
         }
 
-        //programHandle = ShaderHelper.getShader("simple");
+        // Render territories
         for (Territory t: gameState.mapData.territories) {
             t.updateAnimation();
             if (t.mesh != null) t.mesh.render(t, t.texture, camera.getVPMatrix());
         }
 
-        Enumeration vEnum = SpriteBatchSystem.sprites.elements();
-        //programHandle = ShaderHelper.getShader("animate");
-        //GLES20.glUseProgram(programHandle);
-        while(vEnum.hasMoreElements()){
-            String name = vEnum.nextElement().toString();
-            SpriteBatchSystem.sprite s = SpriteBatchSystem.getSprite(name);
-            SpriteSheetDimensions ssd = new SpriteSheetDimensions(name);
-            GeometryHelper.setFrameTexture(name, ssd.width, ssd.height, ssd.frameWidth, ssd.frameHeight, frame/5);
-
-            dHelper.draw(camera, s.vBuf, s.cBuf, s.tBuf, s.texture, GeometryHelper.getVerticesCount(name), "simple");
-        }
+        // Draw sprites
+        drawUnits();
 
         // Render the lasers
-        GLES20.glDisable(GLES20.GL_DEPTH_TEST);
-        synchronized (lasers) {
-            for (Iterator<Laser> iterator = lasers.iterator(); iterator.hasNext();) {
-                Laser l = iterator.next();
-                if (l.needsFinish) {
-                    l.needsFinish = false;
-                    l.mesh.finish(context);
-                }
-                if (l.render(camera.getVPMatrix())) {
-                    iterator.remove();
-                }
+        drawLasers();
 
-            }
-        }
-        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
-
-        fTime[frame % 100] = timer.stop();
+        // Count frames for animation purposes
         frame++;
-        if(frame >= 100000000){
-            frame = 0;
-        }
-        /*GLES20.glFinish();
-        if(frame % 100 == 0 && frame / 100 > 0) {
-            Double avgTime = 0.0;
-            for (int i = 0; i < 100; i++) {
-                avgTime += fTime[i];
-            }
-            avgTime /= 100.0;
-            Log.d("*TIME render:", avgTime.toString() + " Units: " + unitCount);
-        }*/
     }
 
     @Override
@@ -313,5 +166,143 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         } else {
             camera.ortho(1, 1);
         }
+    }
+
+    // Only used by drawUnits for randomness in animation
+    private int fastHash(int x) {
+        x = (x ^ 61) ^ (x >> 16);
+        x = x + (x << 3);
+        x = x ^ (x >> 4);
+        x = x * 0x27d4eb2d;
+        x = x ^ (x >> 15);
+        return x;
+    }
+
+    private void drawUnits() {
+        Player currentPlayer = gameState.players.get(gameState.currentPlayerIndex%gameState.players.size());
+
+        m_unitSpriteBatch.begin();
+        for (Territory t : gameState.territories) {
+            // If we are placing units, only show current player units
+            if (gameState.currentState == GameState.State.INITIAL_UNIT_PLACEMENT && t.owner != currentPlayer)
+                continue;
+
+            synchronized (t.units) {
+                for (Unit u : t.units) {
+                    // Update movement
+                    updateUnitPosition(u);
+                    // Get texture coordinates. We add id * 7 + id to get some randomness
+                    SpriteSheetDimensions dims = new SpriteSheetDimensions("soldier_move", frame / 5 + fastHash(u.id));
+                    // Get texture
+                    int texture;
+                    switch (u.type) {
+                        case soldier_attack:
+                            texture = m_soldierAttackTexture;
+                            break;
+                        case soldier_move:
+                            texture = m_soldierMoveTexture;
+                            break;
+                        default:
+                            texture = m_soldierIdleTexture;
+                            break;
+                    }
+
+                    // Render the texture
+                    m_unitSpriteBatch.draw(texture,
+                            (u.location.x / gameState.mapData.width) * 2.0f - 1.0f,
+                            (u.location.y / gameState.mapData.height) * 2.0f - 1.0f,
+                            0.1f, 0.1f, dims.u, dims.v, dims.uw, dims.vw, u.angle, t.owner.color);
+                }
+            }
+        }
+        // Actually render to the screen
+        m_unitSpriteBatch.end();
+        m_unitSpriteBatch.render(camera);
+    }
+
+    private void drawLasers(){
+        GLES20.glDisable(GLES20.GL_DEPTH_TEST);
+        synchronized (lasers) {
+            for (Iterator<Laser> iterator = lasers.iterator(); iterator.hasNext();) {
+                Laser l = iterator.next();
+                if (l.needsFinish) {
+                    l.needsFinish = false;
+                    l.mesh.finish(context);
+                }
+                if (l.render(camera.getVPMatrix())) {
+                    iterator.remove();
+                }
+            }
+        }
+        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+    }
+
+    // Updates position of unit
+    private void updateUnitPosition(Unit u){
+        final float SPEED = 2.0f;
+        if (u.destination == u.location) {
+            u.type = u.inCombat ? Unit.Type.soldier_attack : Unit.Type.soldier_idle;
+            return;
+        }
+
+        // Calculate normal vector towards destination
+        float dx = u.destination.x - u.location.x;
+        float dy = u.destination.y - u.location.y;
+        float length = (float)Math.sqrt(dx * dx + dy * dy);
+        // Don't want to divide by 0
+        if (length == 0.0f) {
+            u.type = u.inCombat ? Unit.Type.soldier_attack : Unit.Type.soldier_idle;
+            u.location.x = u.destination.x;
+            u.location.y = u.destination.y;
+            return;
+        }
+        u.type = u.inCombat ? Unit.Type.soldier_attack : Unit.Type.soldier_move;
+
+        // Normalize
+        dx = dx / length;
+        dy = dy / length;
+
+        // Update position if we aren't defending
+        if (!u.isDefending) {
+            u.location.x += dx * SPEED;
+            if (dx < 0 && u.location.x < u.destination.x) {
+                u.location.x = u.destination.x;
+            } else if (dx > 0 && u.location.x > u.destination.x) {
+                u.location.x = u.destination.x;
+            }
+            u.location.y += dy * SPEED;
+            if (dy < 0 && u.location.y < u.destination.y) {
+                u.location.y = u.destination.y;
+            } else if (dy > 0 && u.location.y > u.destination.y) {
+                u.location.y = u.destination.y;
+            }
+        }
+
+        // Calculate desired angle
+        float angle = (float)Math.acos(dy);
+        if (dx > 0.0f) angle = -angle;
+        // Adjust actual angle
+        if (u.angle < angle) {
+            u.angle += 0.1f;
+            if (u.angle > angle) u.angle = angle;
+        } else if (u.angle > angle) {
+            u.angle -= 0.1f;
+            if (u.angle < angle) u.angle = angle;
+        }
+    }
+
+    private void finishTerritories() {
+        for (Territory t : gameState.territories) {
+            t.texture = TextureHelper.dataToTexture(t.pixelBuffer, "t" + t.index, t.textureWidth, t.textureHeight);
+            t.pixelBuffer = null;
+            t.mesh = new TerritoryMesh();
+            t.mesh.init(((float)t.textureX / gameState.mapData.width) * 2.0f - 1.0f,
+                    ((float)t.textureY / gameState.mapData.height) * 2.0f - 1.0f,
+                    ((float)t.textureWidth / gameState.mapData.width) * 2.0f,
+                    ((float)t.textureHeight / gameState.mapData.height) * 2.0f,
+                    context);
+        }
+
+        gameState.mapData.isDoneGenerating = false;
     }
 }
