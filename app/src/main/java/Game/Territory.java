@@ -131,7 +131,7 @@ public class Territory {
             PointF placementCoords = getUnitPlace();
             Unit unit = new Unit(placementCoords.x,placementCoords.y,type);
             //unit.destinationStep();
-            units.add(unit);
+            synchronized (units) { units.add(unit); }
             owner.placeableUnits--;
             return true;
         }
@@ -146,7 +146,7 @@ public class Territory {
             }
         }
         if(unit != null) {
-            units.remove(units.get(0));
+            synchronized (units) { units.remove(units.get(0)); }
             owner.placeableUnits++;
             return true;
         }
