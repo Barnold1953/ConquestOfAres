@@ -123,12 +123,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         float[] slope = new float[2];
 
-        /*if(u.destination != u.location){
-            Log.d("slope", "destination: (" + u.destination.x + ", " + u.destination.y + ") location: (" + u.location.x + ", " + u.location.y + ")");
-            Log.d("slope", "width: " + width + ", height: " + height);
-        }*/
         if(Math.abs(u.destination.x - u.location.x) > width / 3){
-            //Log.d("slope", "horizontal wrap");
             slope[0] = -(u.destination.x - u.location.x) / u.speed;
             if(u.wrapFrame.x == -1){
                 for(int i = 0; i < u.speed; i++){
@@ -226,7 +221,13 @@ public class CoARenderer implements GLSurfaceView.Renderer {
                         attackCount++;
                         break;
                     case soldier_idle:
-                        idleCount++;
+                        if(u.destination != u.location){
+                            moveCount++;
+                            u.type = Unit.Type.soldier_move;
+                        }
+                        else {
+                            idleCount++;
+                        }
                         break;
                     case soldier_move:
                         if(u.destination == u.location){
