@@ -195,7 +195,7 @@ public class GameController {
     }
 
     /// Returns the territory at a specific point
-    Territory getTerritoryAtPoint(float x, float y) {
+    public Territory getTerritoryAtPoint(float x, float y) {
         return MapGenerator.getClosestTerritory(x, y, m_gameState.mapData);
     }
 

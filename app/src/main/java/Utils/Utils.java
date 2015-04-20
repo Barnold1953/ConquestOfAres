@@ -57,4 +57,6 @@ public class Utils {
     }
 
     public static int fastFloor(float num) { return (int)(num+.001);}
+
+    public static int fastFloor(double num) { return (int)(num+.001);}
 }

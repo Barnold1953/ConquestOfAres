@@ -1,5 +1,6 @@
 package Generation;
 import android.content.Context;
+import android.graphics.Point;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -9,6 +10,8 @@ import java.util.*;
 import Game.Territory;
 import Graphics.ColorMesh;
 import Utils.Utils;
+import simplevoronoi.GraphEdge;
+import simplevoronoi.Voronoi;
 
 /**
  * Created by brb55_000 on 1/21/2015.
@@ -73,6 +76,11 @@ public class MapGenerator {
         float dx, dy;
 
         mapData.territoryIndices = new int[Utils.fastFloor(height)][Utils.fastFloor(width)];
+
+        // set array as uninitialized
+        for(int i = 0; i < mapData.territoryIndices.length; i++){
+            Arrays.fill(mapData.territoryIndices[i],0);
+        }
 
         // Determine bounds for placing territories based on wrap mode
         float startX = 0.0f, startY = 0.0f, genWidth = width, genHeight = height;
@@ -177,29 +185,149 @@ public class MapGenerator {
             }
         }
 
+        // set indices
+        for(int i=0; i < mapData.territories.size(); i++) mapData.territories.get(i).index = i;
+
+        // create list of indices
+        double xs[] = new double[mapData.territories.size()];
+        double ys[] = new double[mapData.territories.size()];
+        for(int i=0; i < mapData.territories.size(); i++) {
+            xs[i] = mapData.territories.get(i).x;
+            ys[i] = mapData.territories.get(i).y;
+        }
+
+
+        // set all diagram edges to -1
         float c;
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int tIndex = getClosestTerritoryIndex((float)x, (float)y, mapData.territories);
-                Territory t = mapData.territories.get(tIndex);
-                if (x < t.textureX) {
-                    t.textureX = x;
-                } else if (x > t.maxX) {
-                    t.maxX = x;
-                }
-                if (y < t.textureY) {
-                    t.textureY = y;
-                } else if (y > t.maxY) {
-                    t.maxY = y;
-                }
-                mapData.territoryIndices[y][x] = tIndex;
+        Voronoi veronoi = new Voronoi(0);
+        List<GraphEdge> veronoiDiagram = veronoi.generateVoronoi(xs,ys,startX,genWidth-1,startY,genHeight-1);
+        for(GraphEdge edge : veronoiDiagram) {
+            // check to see if the difference is greater in the x or y direction
+            Boolean basedY = Math.abs((edge.y2 - edge.y1)/(edge.x2 - edge.x1)) < 1;
+
+            // get the length of the line to be drawn, as well as the point to start
+            int lineLength;
+            double slope;
+            int initial, initialSecondary;
+            if(basedY) {
+                lineLength = Math.abs(Utils.fastFloor(edge.x1) - Utils.fastFloor(edge.x2));
+                initial = Utils.fastFloor(edge.x1);
+                initialSecondary = Utils.fastFloor(edge.y1);
+                slope = (edge.y2 - edge.y1)/(edge.x2 - edge.x1);
+            } else {
+                lineLength = Math.abs(Utils.fastFloor(edge.y1) - Utils.fastFloor(edge.y2));
+                initial = Utils.fastFloor(edge.y1);
+                initialSecondary = Utils.fastFloor(edge.x1);
+                slope = (edge.x2 - edge.x1)/(edge.y2 - edge.y1);
+            }
+            for(int i=0; i <= lineLength; i++) {
+                int firstCoord = Utils.fastFloor(slope*i) + initialSecondary;
+                int secondCoord = initial + i;
+                if(!basedY) mapData.territoryIndices[secondCoord][firstCoord] = 1;
+                else mapData.territoryIndices[firstCoord][secondCoord] = 1;
+
             }
         }
 
-        // Generate all the textures for the territories
+        /*// now do a depth first search to do everything else
+        for(Territory territory : mapData.territories) {
+            int intialx = Utils.fastFloor(territory.x);
+            int initialy = Utils.fastFloor(territory.y);
+
+            // saves unexplored coordinate paths
+            Stack<Point> freeCoords = new Stack<>();
+            freeCoords.push(new Point(intialx,initialy));
+            while(!freeCoords.empty()) {
+                Point position = freeCoords.pop();
+                if(mapData.territoryIndices[position.y][position.x] != -2 ) continue;
+                while(true) {
+                    mapData.territoryIndices[Utils.fastFloor(position.y)][Utils.fastFloor(position.x)] = 0;
+                    if(position.x > territory.maxX) territory.maxX = position.x;
+                    if(position.y > territory.maxY) territory.maxY = position.y;
+                    if(position.x < territory.textureX) territory.textureX = position.x;
+                    if(position.y < territory.textureY) territory.textureY = position.y;
+
+                    // pick a direction to fill in, if it hasn't been filled in.
+                    // if there are other possible options, save them on the stack for later
+                    Boolean madeSelection = false;
+                    if(position.y < genHeight - 1 && mapData.territoryIndices[position.y + 1][position.x] == -2) {
+                        position.y++;
+                        madeSelection = true;
+                    }
+                    if(position.x < genWidth-1 && mapData.territoryIndices[position.y][position.x+1] == -2) {
+                        if(!madeSelection) {
+                            position.x++;
+                            madeSelection = true;
+                        }
+                        else freeCoords.push(new Point(position.x+1,position.y));
+                    }
+                    if(position.y > 0 && mapData.territoryIndices[position.y-1][position.x] == -2) {
+                        if(!madeSelection) {
+                            position.y--;
+                            madeSelection = true;
+                        }
+                        else freeCoords.push(new Point(position.x,position.y-1));
+                    }
+                    if(position.x > 0 && mapData.territoryIndices[position.y][position.x-1] == -2) {
+                        if(!madeSelection) position.x--;
+                        else freeCoords.push(new Point(position.x-1,position.y));
+                    }
+                    else break;
+                }
+            }
+        }
+
+        for(int i=0; i < height; i++) {
+            for(int j=0; j < width; j++) {
+                if(mapData.territoryIndices[i][j] == -2 || mapData.territoryIndices[i][j] == -1) {
+                    mapData.territoryIndices[i][j] = 0;
+                }
+            }
+        }*/
+
+        for(int i=0; i < mapData.territories.size(); i++) {
+            if(i==0) {
+                Territory t = mapData.territories.get(i);
+                t.textureWidth = width;
+                t.textureHeight = height;
+                t.pixelBuffer = ByteBuffer.allocateDirect(t.textureHeight * t.textureWidth * 4).order(ByteOrder.nativeOrder());
+                for (int y = 0; y < height; y++) {
+                    for (int x = 0; x < width; x++) {
+                        if (mapData.territoryIndices[y][x] == 0) {
+                            t.pixelBuffer.put((byte) 0);
+                            t.pixelBuffer.put((byte) 0);
+                            t.pixelBuffer.put((byte) 255);
+                            t.pixelBuffer.put((byte) 255);
+                        }
+                    }
+                }
+            } else if(i==1) {
+                Territory t = mapData.territories.get(i);
+                t.textureWidth = width;
+                t.textureHeight = height;
+                t.pixelBuffer = ByteBuffer.allocateDirect(t.textureHeight * t.textureWidth * 4).order(ByteOrder.nativeOrder());
+                for (int y = 0; y < height; y++) {
+                    for (int x = 0; x < width; x++) {
+                        if (mapData.territoryIndices[y][x] == 0) {
+                            t.pixelBuffer.put((byte) 0);
+                            t.pixelBuffer.put((byte) 255);
+                            t.pixelBuffer.put((byte) 0);
+                            t.pixelBuffer.put((byte) 255);
+                        }
+                    }
+                }
+            }
+            else {
+                Territory t = mapData.territories.get(i);
+                t.textureWidth = 0;
+                t.textureHeight = 0;
+                t.pixelBuffer = ByteBuffer.allocateDirect(0).order(ByteOrder.nativeOrder());
+            }
+        }
+
+       /* // Generate all the textures for the territories
         for (int i = 0; i < mapData.territories.size(); i++) {
             Territory t = mapData.territories.get(i);
-            t.index = i;
             t.textureWidth = t.maxX - t.textureX;
             t.textureHeight = t.maxY - t.textureY;
             t.pixelBuffer = ByteBuffer.allocateDirect(t.textureHeight * t.textureWidth * 4).order(ByteOrder.nativeOrder());
@@ -218,6 +346,9 @@ public class MapGenerator {
                             newIndex = mapData.territoryIndices[y][x + 1];
                             if (newIndex != i) {
                                 // Add neighbor territory if needed
+                                if(newIndex > mapData.territories.size()) {
+                                    Log.d("","");
+                                }
                                 nextTerritory = mapData.territories.get(newIndex);
                                 if (!t.neighbors.contains(nextTerritory)) {
                                     t.neighbors.add(nextTerritory);
@@ -281,7 +412,7 @@ public class MapGenerator {
                     }
                 }
             }
-        }
+        }*/
 
         // Add graph lines
         float r, g, b;
