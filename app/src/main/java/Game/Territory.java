@@ -43,7 +43,7 @@ public class Territory {
     }
 
     public Vector<Territory> neighbors = new Vector<Territory>(); ///< Pointers to neighbor territories
-    public List<Unit> units = new CopyOnWriteArrayList<>(); ///< Pointer to residing armies
+    public List<Unit> units = new ArrayList<>(); ///< Pointer to residing armies
     public Vector<Unit> selectedUnits = new Vector<>(); ///< Pointer to units selected for movement/attack
     public Player owner = null; ///< Owning player
     public int power = 0; ///< Power of the territory
@@ -61,6 +61,7 @@ public class Territory {
     private final float MIN_BLEND = 0.35f;
     private final float BLEND_SPEED = 0.01f;
     private boolean m_isIncreasing = true;
+    private static Random m_random = new Random(new Date().getTime());
 
     public void select() {
         if (!isSelected) {
@@ -120,32 +121,17 @@ public class Territory {
     }
 
     PointF getUnitPlace() {
-        PointF placeCoords = null;
-        Random r = new Random();
-        float spread = 30.0f;
-        int direction = r.nextInt();
-        switch (direction%4){
-            case 0:
-                placeCoords = new PointF(x + r.nextFloat() * spread, y + r.nextFloat() * spread);
-                break;
-            case 1:
-                placeCoords = new PointF(x - r.nextFloat() * spread, y + r.nextFloat() * spread);
-                break;
-            case 2:
-                placeCoords = new PointF(x + r.nextFloat() * spread, y - r.nextFloat() * spread);
-                break;
-            default:
-                placeCoords = new PointF(x - r.nextFloat() * spread, y - r.nextFloat() * spread);
-                break;
-        }
-        return placeCoords;
+        final float spread = 30.0f;
+        return new PointF(x + (m_random.nextFloat() * 2.0f - 1.0f) * spread,
+                          y + (m_random.nextFloat() * 2.0f - 1.0f) * spread);
     }
 
     public boolean addUnit(Unit.Type type) {
         if(owner.placeableUnits > 0) {
             PointF placementCoords = getUnitPlace();
             Unit unit = new Unit(placementCoords.x,placementCoords.y,type);
-            units.add(unit);
+            //unit.destinationStep();
+            synchronized (units) { units.add(unit); }
             owner.placeableUnits--;
             return true;
         }
@@ -160,7 +146,7 @@ public class Territory {
             }
         }
         if(unit != null) {
-            units.remove(units.get(0));
+            synchronized (units) { units.remove(units.get(0)); }
             owner.placeableUnits++;
             return true;
         }

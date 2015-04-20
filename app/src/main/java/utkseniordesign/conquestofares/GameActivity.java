@@ -1,13 +1,16 @@
 package utkseniordesign.conquestofares;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.opengl.GLSurfaceView;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -41,6 +44,7 @@ public class GameActivity extends Activity {
     private CoARenderer coaRenderer;
     private GameSettings gameSettings;
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_gamescreen );
@@ -63,7 +67,9 @@ public class GameActivity extends Activity {
         mGLSurfaceView = ( GLSurfaceView ) findViewById( R.id.glRenderArea );
         mGLSurfaceView.setEGLContextClientVersion(2);
         mGLSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
-        coaRenderer = new CoARenderer(this);
+        Point size = new Point();
+        getWindowManager().getDefaultDisplay().getSize(size);
+        coaRenderer = new CoARenderer(this, size.x, size.y);
         gameController = new GameController();
 
         mGLSurfaceView.setRenderer(coaRenderer);
@@ -174,23 +180,25 @@ public class GameActivity extends Activity {
     public void handleUnitMove(float x, float y) {
         Log.d("GameActivity", "HandleUnitMove called");
         Territory moveTo = gameController.getTerritoryAtPoint(x, y);
-        if(gameController.getGameState().selectedTerritory.neighbors.contains(moveTo) && moveTo.owner == gameController.getGameState().selectedTerritory.owner) {
+        Territory selectedTerritory = gameController.getGameState().selectedTerritory;
+        if(selectedTerritory.neighbors.contains(moveTo) && moveTo.owner == selectedTerritory.owner) {
             gameController.moveUnits(gameController.getGameState().selectedTerritory, moveTo);
-            gameController.getGameState().selectedTerritory.selectedUnits.removeAllElements();
-            gameController.getGameState().selectedTerritory.unselectNeighbors();
-            gameController.getGameState().selectedTerritory.select();
-            territoryPanel.update(gameController.getGameState().selectedTerritory);
+            selectedTerritory.selectedUnits.removeAllElements();
+            selectedTerritory.unselectNeighbors();
+            selectedTerritory.select();
+            territoryPanel.update(selectedTerritory);
         }
     }
 
     public void handleUnitAttack(float x, float y){
         Territory attack = gameController.getTerritoryAtPoint(x,y);
-        if(gameController.getGameState().selectedTerritory.neighbors.contains(attack) && attack.owner != gameController.getGameState().selectedTerritory.owner && attack.owner != null) {
-            gameController.attack(gameController.getGameState().selectedTerritory, attack, gameController.getGameState().selectedTerritory.selectedUnits.size());
-            gameController.getGameState().selectedTerritory.selectedUnits.removeAllElements();
-            gameController.getGameState().selectedTerritory.unselectNeighbors();
-            gameController.getGameState().selectedTerritory.select();
-            territoryPanel.update(gameController.getGameState().selectedTerritory);
+        Territory selectedTerritory = gameController.getGameState().selectedTerritory;
+        if(selectedTerritory.neighbors.contains(attack) && attack.owner != selectedTerritory.owner && attack.owner != null) {
+            gameController.attack(selectedTerritory, attack, coaRenderer);
+            selectedTerritory.selectedUnits.removeAllElements();
+            selectedTerritory.unselectNeighbors();
+            selectedTerritory.select();
+            territoryPanel.update(selectedTerritory);
         }
 
     }

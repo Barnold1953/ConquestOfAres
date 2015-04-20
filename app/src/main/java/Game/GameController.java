@@ -4,6 +4,7 @@ package Game;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -12,8 +13,7 @@ import java.util.*;
 import Generation.MapData;
 import Generation.MapGenerator;
 import Generation.MapGenerationParams;
-import Graphics.Quadrilateral;
-import Graphics.SpriteBatchSystem;
+import Graphics.CoARenderer;
 import Utils.Device;
 import utkseniordesign.conquestofares.GameActivity;
 
@@ -30,6 +30,9 @@ public class GameController {
     private GameSettings m_gameSettings = null; ///< Settings
     private GameEngine m_gameEngine = new GameEngine(); ///< Initializes the game
     private Player m_currentPlayer = null;
+    private boolean m_isAttacking = false;
+    private Territory m_defender;
+    private Territory m_attacker;
     public Boolean stateHasChanged = false;
 
     /// Initializes a game by setting up game state and map
@@ -61,6 +64,7 @@ public class GameController {
         }
         m_currentPlayer = m_gameState.players.get(m_gameState.currentPlayerIndex % m_gameState.players.size());
         if(m_gameState.currentState == GameState.State.PLACING_UNITS) {
+            //m_currentPlayer.placeableUnits = 0;
             m_currentPlayer.placeableUnits = m_currentPlayer.territories.size() / 2;
         }
         // Check if we should do AI
@@ -112,35 +116,90 @@ public class GameController {
 
     /// Returns the territory at a specific point
     public Territory getTerritoryAtPoint(float x, float y) {
-        return MapGenerator.getClosestTerritory(x, y, m_gameState.territories);
+        return MapGenerator.getClosestTerritory(x, y, m_gameState.mapData);
     }
-
 
     public boolean attack(Territory attacker, Territory defender, int numAttackers){
         Action action = new Action(m_currentPlayer, Action.Category.ATTACK, attacker, defender);
 
-        while(defender.units.size() > 0 && numAttackers > 0){
-            // I figure we can change the chance of winning based on the type of unit it is, like tanks are weak to airplanes, airplanes are weak to soldiers, and soldiers are weak to tanks
-            // kind of like a rock-paper-scissors dynamic
-
-            if(m_gameState.random.nextInt() % 2 == 0){
-                action.sUnitsLost.add(attacker.units.get(attacker.units.size()-1));
-                numAttackers--;
-                attacker.selectedUnits.remove(attacker.selectedUnits.size()-1);
-                attacker.units.remove(attacker.units.size()-1);
-            }
-            else{
-                action.dUnitsLost.add(defender.units.get(defender.units.size()-1));
-                defender.units.remove(defender.units.size()-1);
+        // Move attackers into range and start combat animations
+        synchronized (attacker.units) {
+            for (Unit u : attacker.selectedUnits) {
+                u.destination.x = u.location.x + (defender.x - attacker.x) * 0.5f;
+                u.destination.y = u.location.y + (defender.y - attacker.y) * 0.5f;
             }
         }
-        if(defender.units.isEmpty() && numAttackers > 0){
+        synchronized (defender.units) {
+            for (Unit u : defender.units) {
+                u.isDefending = true;
+                u.destination.x = u.location.x + (attacker.x - defender.x) * 0.5f;
+                u.destination.y = u.location.y + (attacker.y - defender.y) * 0.5f;
+            }
+        }
+        SystemClock.sleep(500);
+        // Start combat animations
+        for (Unit u : attacker.selectedUnits) u.inCombat = true;
+        for (Unit u : defender.units) u.inCombat = true;
+
+        while(defender.units.size() > 0 && attacker.selectedUnits.size() > 0) {
+            final float accuracy = 5.0f;
+            // Random firing animation
+            for (int i = 0; i < attacker.units.size() / 2 + 1; i++) {
+                // Attacker fire
+                int randomSrc = m_gameState.random.nextInt(attacker.selectedUnits.size());
+                int randomDst = m_gameState.random.nextInt(defender.units.size());
+                Unit src1 = attacker.selectedUnits.get(randomSrc);
+                Unit dst1 = defender.units.get(randomDst);
+                renderer.addLaser(src1.location.x, src1.location.y,
+                        dst1.location.x + (m_gameState.random.nextFloat() * 2.0f - 1.0f) * accuracy,
+                        dst1.location.y + (m_gameState.random.nextFloat() * 2.0f - 1.0f) * accuracy,
+                        attacker.owner.fColor[0], attacker.owner.fColor[1], attacker.owner.fColor[2]);
+                SystemClock.sleep(25);
+
+                // Defender fire
+                randomSrc = m_gameState.random.nextInt(defender.units.size());
+                randomDst = m_gameState.random.nextInt(attacker.selectedUnits.size());
+                Unit src2 = defender.units.get(randomSrc);
+                Unit dst2 = attacker.selectedUnits.get(randomDst);
+                renderer.addLaser(src2.location.x, src2.location.y,
+                        dst2.location.x + (m_gameState.random.nextFloat() * 2.0f - 1.0f) * accuracy,
+                        dst2.location.y + (m_gameState.random.nextFloat() * 2.0f - 1.0f) * accuracy,
+                        defender.owner.fColor[0], defender.owner.fColor[1], defender.owner.fColor[2]);
+                SystemClock.sleep(25);
+            }
+
+            if(m_gameState.random.nextInt(2) == 0){
+                Unit u = attacker.selectedUnits.get(attacker.selectedUnits.size()-1);
+                action.sUnitsLost.add(u);
+                attacker.selectedUnits.remove(u);
+                synchronized (attacker.units) { attacker.units.remove(u); }
+            }
+            else{
+                Unit u = defender.units.get(defender.units.size()-1);
+                action.dUnitsLost.add(u);
+                synchronized (defender.units) { defender.units.remove(u); }
+            }
+        }
+
+        // End attack animations
+        for (Unit u : defender.units) {
+            u.destination.x = u.location.x;
+            u.destination.y = u.location.y;
+            u.isDefending = false;
+            u.inCombat = false;
+        }
+        for (Unit u : attacker.selectedUnits) u.inCombat = false;
+
+        if(defender.units.isEmpty() && !attacker.selectedUnits.isEmpty()){
             Player p = defender.owner;
             defender.owner.removeTerritory(defender);
             attacker.owner.addTerritory(defender);
             moveUnits(attacker, defender);
             if(p.territories.isEmpty()){
                 m_gameState.players.remove(p);
+                if(m_gameState.players.size() == 1){
+                    Log.d("WINNER", "Player " + m_gameState.players.get(0).name + " has won!");
+                }
             }
         }
 
@@ -150,30 +209,21 @@ public class GameController {
     public void moveUnits(Territory source, Territory destination){
         Action action = new Action(m_currentPlayer, Action.Category.MOVE_UNIT, source, destination);
 
+        synchronized (destination.units) {
+            synchronized (source.units) {
+                for (Unit unit : source.selectedUnits) {
+                    action.sUnitsLost.add(unit);
+                    action.dUnitsGained.add(unit);
 
-        for(Unit unit : source.selectedUnits ) {
-            action.sUnitsLost.add(unit);
-            action.dUnitsGained.add(unit);
-            m_gameState.actions.add(action);
-            source.units.remove(unit);
+                    unit.destination = destination.getUnitPlace();
 
-            if(source.neighbors.contains(destination)){
-                unit.destination = new PointF(destination.x,destination.y);
+                    source.units.remove(unit);
+                    destination.units.add(unit);
+                }
             }
-            else {
-                unit.path = new PathFinding().getPath(source, destination);
-                unit.destination = new PointF(unit.path.get(unit.path.size()-1).x,unit.path.get(unit.path.size()-1).y);
-            }
-            unit.frame = 0;
-            unit.location = new PointF(source.x, source.y);
-
-            destination.units.add(unit);
         }
-
         source.selectedUnits.clear();
 
-        //addUnit(destination, destination.x, destination.y, unit.type);
-
-        //source.owner.unitsInFlight.add(unit);
+        m_gameState.actions.add(action);
     }
 }

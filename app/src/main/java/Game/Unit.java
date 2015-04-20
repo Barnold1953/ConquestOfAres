@@ -1,11 +1,10 @@
 package Game;
 
+import android.graphics.Point;
 import android.graphics.PointF;
 
 import java.util.Enumeration;
 import java.util.Vector;
-
-import Graphics.Quadrilateral;
 
 /**
  * Created by brb55_000 on 3/6/2015.
@@ -13,7 +12,7 @@ import Graphics.Quadrilateral;
 public class Unit {
     boolean hasMoved; ///< Can only move once per turn TODO: use this
     public enum Type{
-        soldier, tank, airplane
+        soldier_attack, soldier_idle, soldier_move
     }
 
     public Unit(float x, float y, Type t){
@@ -21,28 +20,26 @@ public class Unit {
         location = new PointF(x,y);
         destination = new PointF(x,y);
         type = t;
+        id = idCounter++;
+        wrapFrame = new Point(-1,-1);
     }
 
+    public boolean inCombat = false;
+    public boolean isDefending = false;
     public Type type;
     public PointF location = null;
     public PointF destination = null;
+    public Point wrapFrame;
     public Vector<Territory> path = null;
-    public int frame;
+    public int speed = 100;
+    public int turnRate = 5;
+    public float angle = 0.0f;
     // when health reaches 0, soldier is removed from army.units
     public float health = 100.0f;
     // armor will divide the attacker's damage and then subtract that # from health
     public float armor;
     // damage will increase or decrease based on the type of units fighting
     public float damage;
-
-    public void destinationStep(){// calculates the location
-        frame = 0;
-        location = destination;
-        if(path != null && !path.isEmpty()) {
-            path.remove(path.size()-1);
-            if(!path.isEmpty()){
-                destination = new PointF(path.get(path.size()-1).x, path.get(path.size()-1).y);
-            }
-        }
-    }
+    public int id = 0; ///< unique ID
+    private static int idCounter = 0; ///< for giving units unique IDs for animation offsets and such
 }

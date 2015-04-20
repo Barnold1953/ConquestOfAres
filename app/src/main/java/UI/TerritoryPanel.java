@@ -78,7 +78,7 @@ public class TerritoryPanel extends LinearLayout {
         addUnitButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!currentTerritory.addUnit(Unit.Type.soldier)) {
+                if (!currentTerritory.addUnit(Unit.Type.soldier_idle)) {
                     YoYo.with(Techniques.Shake).duration(500).playOn(parentActivity.getGamePlayBanner().counterLabel);
                 } else if(currentTerritory.owner.placeableUnits == 0 && (state == GameState.State.PLACING_UNITS || state == GameState.State.INITIAL_UNIT_PLACEMENT)) { parentActivity.setCheckMark(true); }
                 parentActivity.getGamePlayBanner().changeContent();
@@ -88,7 +88,7 @@ public class TerritoryPanel extends LinearLayout {
         subtractUnitButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!currentTerritory.removeUnits(Unit.Type.soldier)) {
+                if(!currentTerritory.removeUnits(Unit.Type.soldier_idle)) {
                     YoYo.with(Techniques.Shake).duration(500).playOn(emptyIndicator);
                 } else if(currentTerritory.owner.placeableUnits == 1 && (state == GameState.State.PLACING_UNITS || state == GameState.State.INITIAL_UNIT_PLACEMENT)) { parentActivity.setCheckMark(false); }
                 parentActivity.getGamePlayBanner().changeContent();
@@ -128,7 +128,9 @@ public class TerritoryPanel extends LinearLayout {
             militaryPanel = (LinearLayout)findViewById(R.id.militaryPanel);
         }
         currentTerritory = territory;
-        if(territory.owner != parentActivity.getGameController().getCurrentPlayer())
+        if(territory.owner != parentActivity.getGameController().getCurrentPlayer()
+                || parentActivity.getGameController().getGameState().currentState != GameState.State.INITIAL_UNIT_PLACEMENT
+                && parentActivity.getGameController().getGameState().currentState != GameState.State.PLACING_UNITS)
         {
             if(ownerButtonsVisible) {
                 // if they're visible, but they shouldn't be, hide them smoothly
