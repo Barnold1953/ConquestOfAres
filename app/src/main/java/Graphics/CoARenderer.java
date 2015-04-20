@@ -2,6 +2,10 @@ package Graphics;
 
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Vector;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -29,14 +33,13 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     int programHandle;
     Context context;
     Camera camera;
-    MapData mapData;
     GameState gameState = null;
     int m_viewportW = 0;
     int m_viewportH = 0;
     int frame, previousUnitCount = 0;
     double[] fTime = new double[100];
     int width, height;
-
+    LinkedList<Laser> lasers = new LinkedList<Laser>();
 
     DrawHelper dHelper;
 
@@ -65,6 +68,15 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
     public void toggleTerrain() {
 
+    }
+
+    public void addLaser(float sx, float sy, float dx, float dy, float r, float g, float b) {
+        synchronized (lasers) {
+            Laser l = new Laser();
+            l.mesh.addVertex(sx / gameState.mapData.width * 2.0f - 1.0f, sy / gameState.mapData.height * 2.0f - 1.0f, 0.0f, r, g, b);
+            l.mesh.addVertex(dx / gameState.mapData.width * 2.0f - 1.0f, dy / gameState.mapData.height * 2.0f - 1.0f, 0.0f, r, g, b);
+            lasers.add(l);
+        }
     }
 
     public CoARenderer(Context c, int w, int h) {
@@ -257,6 +269,22 @@ public class CoARenderer implements GLSurfaceView.Renderer {
             dHelper.draw(camera, s.vBuf, s.cBuf, s.tBuf, s.texture, GeometryHelper.getVerticesCount(name), "simple");
         }
 
+        // Render the lasers
+        GLES20.glDisable(GLES20.GL_DEPTH_TEST);
+        synchronized (lasers) {
+            for (Iterator<Laser> iterator = lasers.iterator(); iterator.hasNext();) {
+                Laser l = iterator.next();
+                if (l.needsFinish) {
+                    l.needsFinish = false;
+                    l.mesh.finish(context);
+                }
+                if (l.render(camera.getVPMatrix())) {
+                    iterator.remove();
+                }
+
+            }
+        }
+        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
 
         fTime[frame % 100] = timer.stop();
         frame++;

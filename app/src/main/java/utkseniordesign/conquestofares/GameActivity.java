@@ -192,7 +192,7 @@ public class GameActivity extends Activity {
     public void handleUnitAttack(float x, float y){
         Territory attack = gameController.getTerritoryAtPoint(x,y);
         if(gameController.getGameState().selectedTerritory.neighbors.contains(attack) && attack.owner != gameController.getGameState().selectedTerritory.owner && attack.owner != null) {
-            gameController.attack(gameController.getGameState().selectedTerritory, attack, gameController.getGameState().selectedTerritory.selectedUnits.size());
+            gameController.attack(gameController.getGameState().selectedTerritory, attack, gameController.getGameState().selectedTerritory.selectedUnits.size(), coaRenderer);
             gameController.getGameState().selectedTerritory.selectedUnits.removeAllElements();
             gameController.getGameState().selectedTerritory.unselectNeighbors();
             gameController.getGameState().selectedTerritory.select();
