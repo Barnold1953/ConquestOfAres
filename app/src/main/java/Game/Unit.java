@@ -25,6 +25,7 @@ public class Unit {
         wrapFrame = new Point(-1,-1);
     }
 
+    public boolean inCombat = false;
     public Type type;
     public PointF location = null;
     public PointF destination = null;

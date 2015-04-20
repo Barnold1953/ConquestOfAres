@@ -36,6 +36,9 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     int frame;
     int previousAttackCount = 0, previousIdleCount = 0, previousMoveCount = 0;
     int width, height;
+    int m_soldierMoveTexture = 0;
+    int m_soldierAttackTexture = 0;
+    int m_soldierIdleTexture = 0;
     SpriteBatch m_unitSpriteBatch = new SpriteBatch();
     LinkedList<Laser> lasers = new LinkedList<Laser>();
 
@@ -105,10 +108,9 @@ public class CoARenderer implements GLSurfaceView.Renderer {
             Log.d("Shader", "Error occurred during compilation");
         }
 
-        TextureHelper.imageToTexture(context, R.drawable.texture1, "test1");
-        TextureHelper.imageToTexture(context, R.drawable.man_run, "soldier_move");
-        TextureHelper.imageToTexture(context, R.drawable.man_idle, "soldier_idle");
-        TextureHelper.imageToTexture(context, R.drawable.man_shoot, "soldier_attack");
+        m_soldierMoveTexture = TextureHelper.imageToTexture(context, R.drawable.man_run, "soldier_move");
+        m_soldierIdleTexture = TextureHelper.imageToTexture(context, R.drawable.man_idle, "soldier_idle");
+        m_soldierAttackTexture = TextureHelper.imageToTexture(context, R.drawable.man_shoot, "soldier_attack");
 
         Log.d("Setup", "Geometry buffers initialized and filled.");
 
@@ -181,8 +183,22 @@ public class CoARenderer implements GLSurfaceView.Renderer {
                     updateUnitPosition(u);
                     // Get texture coordinates
                     SpriteSheetDimensions dims = new SpriteSheetDimensions("soldier_move", frame / 5);
+                    // Get texture
+                    int texture;
+                    switch (u.type) {
+                        case soldier_attack:
+                            texture = m_soldierAttackTexture;
+                            break;
+                        case soldier_move:
+                            texture = m_soldierMoveTexture;
+                            break;
+                        default:
+                            texture = m_soldierIdleTexture;
+                            break;
+                    }
+
                     // Render the texture
-                    m_unitSpriteBatch.draw(TextureHelper.getTexture("soldier_move"),
+                    m_unitSpriteBatch.draw(texture,
                             (u.location.x / gameState.mapData.width) * 2.0f - 1.0f,
                             (u.location.y / gameState.mapData.height) * 2.0f - 1.0f,
                             0.1f, 0.1f, dims.u, dims.v, dims.uw, dims.vw, u.angle, t.owner.color);
@@ -214,7 +230,10 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     // Updates position of unit
     private void updateUnitPosition(Unit u){
         final float SPEED = 2.0f;
-        if (u.destination == u.location) return;
+        if (u.destination == u.location) {
+            u.type = u.inCombat ? Unit.Type.soldier_attack : Unit.Type.soldier_idle;
+            return;
+        }
 
         // Calculate normal vector towards destination
         float dx = u.destination.x - u.location.x;
@@ -222,10 +241,13 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         float length = (float)Math.sqrt(dx * dx + dy * dy);
         // Don't want to divide by 0
         if (length == 0.0f) {
+            u.type = u.inCombat ? Unit.Type.soldier_attack : Unit.Type.soldier_idle;
             u.location.x = u.destination.x;
             u.location.y = u.destination.y;
             return;
         }
+        u.type = u.inCombat ? Unit.Type.soldier_attack : Unit.Type.soldier_move;
+
         // Normalize
         dx = dx / length;
         dy = dy / length;
@@ -244,11 +266,10 @@ public class CoARenderer implements GLSurfaceView.Renderer {
             u.location.y = u.destination.y;
         }
 
-        // Handle angle
-        // TODO: Make this smoother
+        // Calculate desired angle
         float angle = (float)Math.acos(dy);
         if (dx > 0.0f) angle = -angle;
-        Log.d("ANGLE ", "A " + angle);
+        // Adjust actual angle
         if (u.angle < angle) {
             u.angle += 0.1f;
             if (u.angle > angle) u.angle = angle;

@@ -120,7 +120,11 @@ public class GameController {
 
         Action action = new Action(m_currentPlayer, Action.Category.attack, attacker, defender);
 
-        while(defender.units.size() > 0 && attacker.selectedUnits.size() > 0){
+        // Start attack animations
+        for (Unit u : defender.units) u.inCombat = true;
+        for (Unit u : attacker.selectedUnits) u.inCombat = true;
+
+        while(defender.units.size() > 0 && attacker.selectedUnits.size() > 0) {
             // I figure we can change the chance of winning based on the type of unit it is, like tanks are weak to airplanes, airplanes are weak to soldiers, and soldiers are weak to tanks
             // kind of like a rock-paper-scissors dynamic
 
@@ -149,15 +153,20 @@ public class GameController {
                 Unit u = attacker.selectedUnits.get(attacker.selectedUnits.size()-1);
                 action.sUnitsLost.add(u);
                 attacker.selectedUnits.remove(u);
-                attacker.units.remove(u);
+                synchronized (attacker.units) { attacker.units.remove(u); }
             }
             else{
                 Unit u = defender.units.get(defender.units.size()-1);
                 action.dUnitsLost.add(u);
-                defender.units.remove(u);
+                synchronized (defender.units) { defender.units.remove(u); }
             }
             SystemClock.sleep(100);
         }
+
+        // End attack animations
+        for (Unit u : defender.units) u.inCombat = false;
+        for (Unit u : attacker.selectedUnits) u.inCombat = false;
+
         if(defender.units.isEmpty() && !attacker.selectedUnits.isEmpty()){
             Player p = defender.owner;
             defender.owner.removeTerritory(defender);
@@ -195,11 +204,5 @@ public class GameController {
         source.selectedUnits.clear();
 
         m_gameState.actions.add(action);
-
-
-
-        //addUnit(destination, destination.x, destination.y, unit.type);
-
-        //source.owner.unitsInFlight.add(unit);
     }
 }
