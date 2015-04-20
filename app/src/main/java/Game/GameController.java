@@ -152,7 +152,7 @@ public class GameController {
                         dst1.location.x + (m_gameState.random.nextFloat() * 2.0f - 1.0f) * accuracy,
                         dst1.location.y + (m_gameState.random.nextFloat() * 2.0f - 1.0f) * accuracy,
                         attacker.owner.fColor[0], attacker.owner.fColor[1], attacker.owner.fColor[2]);
-                SystemClock.sleep(30);
+                SystemClock.sleep(25);
 
                 // Defender fire
                 randomSrc = m_gameState.random.nextInt(defender.units.size());
@@ -163,7 +163,7 @@ public class GameController {
                         dst2.location.x + (m_gameState.random.nextFloat() * 2.0f - 1.0f) * accuracy,
                         dst2.location.y + (m_gameState.random.nextFloat() * 2.0f - 1.0f) * accuracy,
                         defender.owner.fColor[0], defender.owner.fColor[1], defender.owner.fColor[2]);
-                SystemClock.sleep(30);
+                SystemClock.sleep(25);
             }
 
             if(m_gameState.random.nextInt(2) == 0){

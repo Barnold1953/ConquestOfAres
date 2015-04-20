@@ -104,7 +104,7 @@ public class SpriteBatch {
             // Set attribute pointers
             GLES20.glVertexAttribPointer(m_positionHandle, 2, GLES20.GL_FLOAT, false, BYTES_PER_VERTEX, 0);
             GLES20.glVertexAttribPointer(m_TCoordHandle, 2, GLES20.GL_FLOAT, false, BYTES_PER_VERTEX, 8);
-            GLES20.glVertexAttribPointer(m_colorHandle, 3, GLES20.GL_BYTE, true, BYTES_PER_VERTEX, 16);
+            GLES20.glVertexAttribPointer(m_colorHandle, 3, GLES20.GL_UNSIGNED_BYTE, true, BYTES_PER_VERTEX, 16);
             // Render the batch with offset and numVertices
             GLES20.glDrawArrays(GLES20.GL_TRIANGLES, b.offset, b.numVertices);
         }

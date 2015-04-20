@@ -51,6 +51,7 @@
         <item>MiddleEarth</item>
     </string-array>
     <string name="simple.vert">
+                #version 110\n
                 uniform mat4 uMVPMatrix;\n
                 \n
                 attribute vec2 vPosition;\n
@@ -67,6 +68,7 @@
                 }\n
     </string>
     <string name="texture.frag">
+                #version 110\n
                 precision mediump float;\n
                 \n
                 uniform sampler2D texture;\n
@@ -75,10 +77,13 @@
                 \n
                 void main() {\n
                   vec4 tex = texture2D(texture, tCoords);\n
-                  gl_FragColor = tex + 0.00001 * mix(tex, vec4(color,tex.a), .1);\n
+                  vec3 pColor = mix(tex.rgb, color, 0.2) * 1.3;
+                  pColor = clamp(pColor, 0.0, 1.0);
+                  gl_FragColor = vec4(pColor, tex.a);\n
                 }\n
     </string>
     <string name="map.vert">
+                #version 110\n
                 uniform mat4 unMVPMatrix;\n
                 \n
                 attribute vec2 vPosition;\n
@@ -92,6 +97,7 @@
                 }\n
     </string>
     <string name="map.frag">
+                #version 110\n
                 precision mediump float;\n
                 \n
                 uniform sampler2D unTexture;\n
@@ -107,6 +113,7 @@
                 }\n
     </string>
     <string name="color.vert">
+                #version 110\n
                 uniform mat4 uMVPMatrix;\n
                 uniform float unAlpha;\n
                 \n
@@ -121,6 +128,7 @@
                 }\n
     </string>
     <string name="color.frag">
+                #version 110\n
                 precision mediump float;\n
                 \n
                 varying vec4 color;\n
@@ -130,6 +138,8 @@
                 }\n
     </string>
      <string name="gen.vert">
+                #version 110\n
+                precision mediump float;\n
                 attribute vec2 vPosition;\n
                 varying vec2 fPos;\n
                 void main() {\n
@@ -138,6 +148,8 @@
                 }\n
     </string>
     <string name="gen.frag">
+                #version 110\n
+                precision mediump float;\n
                 varying vec2 fPos;\n
                 \n
                 vec3 mod289(vec3 x) {\n
