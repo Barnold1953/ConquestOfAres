@@ -73,6 +73,7 @@ public class GameEngine {
            p.color[0] = playerColors[i][0];
            p.color[1] = playerColors[i][1];
            p.color[2] = playerColors[i][2];
+           p.fColor = Utils.Utils.byteColorToFloat(p.color);
            p.placeableUnits = 10;
            p.name = "Player " + Integer.toString(i + 1);
            m_gameState.players.add(p);

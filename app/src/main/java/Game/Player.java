@@ -12,6 +12,7 @@ public class Player {
     public int placeableUnits;
     public boolean isAI = true; ///< True when controlled by AI
     public byte[] color = new byte[3]; ///< Players army color
+    public float[] fColor;
     // TODO: Statistics?
     // TODO: Networking stuff
 

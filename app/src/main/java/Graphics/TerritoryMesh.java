@@ -38,7 +38,6 @@ public class TerritoryMesh {
 
     public void init(float x, float y, float w, float h, Context context) {
 
-        Log.d("INIT: ", Float.toString(x) + " " + Float.toString(y) + " " + Float.toString(w));
         // Make the box
         vertexVec.add(x);
         vertexVec.add(y + h);
