@@ -20,7 +20,7 @@ public class Unit {
         location = new PointF(x,y);
         destination = new PointF(x,y);
         type = t;
-
+        id = idCounter++;
         wrapFrame = new Point(-1,-1);
     }
 
@@ -40,4 +40,6 @@ public class Unit {
     public float armor;
     // damage will increase or decrease based on the type of units fighting
     public float damage;
+    public int id = 0; ///< unique ID
+    private static int idCounter = 0; ///< for giving units unique IDs for animation offsets and such
 }

@@ -168,6 +168,16 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         }
     }
 
+    // Only used by drawUnits for randomness in animation
+    private int fastHash(int x) {
+        x = (x ^ 61) ^ (x >> 16);
+        x = x + (x << 3);
+        x = x ^ (x >> 4);
+        x = x * 0x27d4eb2d;
+        x = x ^ (x >> 15);
+        return x;
+    }
+
     private void drawUnits() {
         Player currentPlayer = gameState.players.get(gameState.currentPlayerIndex%gameState.players.size());
 
@@ -181,8 +191,8 @@ public class CoARenderer implements GLSurfaceView.Renderer {
                 for (Unit u : t.units) {
                     // Update movement
                     updateUnitPosition(u);
-                    // Get texture coordinates
-                    SpriteSheetDimensions dims = new SpriteSheetDimensions("soldier_move", frame / 5);
+                    // Get texture coordinates. We add id * 7 + id to get some randomness
+                    SpriteSheetDimensions dims = new SpriteSheetDimensions("soldier_move", frame / 5 + fastHash(u.id));
                     // Get texture
                     int texture;
                     switch (u.type) {
