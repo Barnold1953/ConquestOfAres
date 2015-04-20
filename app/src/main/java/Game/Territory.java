@@ -19,14 +19,14 @@ public class Territory {
     }
     // Copy constructor
     public Territory(Territory b) {
-        this.neighbors = b.neighbors;
-        this.units = b.units;
-        this.owner = b.owner;
-        this.units = new Vector<Unit>(b.units);
-        this.units = new Vector<Unit>(b.selectedUnits);
-        if (b.owner != null) {
-            this.owner = new Player(b.owner);
+        for (Territory t : b.neighbors) {
+            this.neighbors.add(t);
         }
+        this.units = b.units;
+        for (Unit u : b.units) {
+            this.units.add(u);
+        }
+        this.owner = b.owner;
         this.power = b.power;
         this.x = b.x;
         this.y = b.y;
@@ -47,7 +47,6 @@ public class Territory {
     public Vector<Unit> selectedUnits = new Vector<>(); ///< Pointer to units selected for movement/attack
     public Player owner = null; ///< Owning player
     public int power = 0; ///< Power of the territory
-    public int economy = 0;
     public float x; ///< x coordinate of center
     public float y; ///< y coordinate of center
     public float height; ///< Terrain height value TODO: Use this for something maybe? Or remove it?
