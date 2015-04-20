@@ -123,13 +123,19 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
     // Updates position of unit and returns angle
     float updateUnitPosition(Unit u){
-        final float SPEED = 1.0f;
+        final float SPEED = 2.0f;
         if (u.destination == u.location) return 0.0f;
 
         // Calculate normal vector towards destination
         float dx = u.destination.x - u.location.x;
         float dy = u.destination.y - u.location.y;
         float length = (float)Math.sqrt(dx * dx + dy * dy);
+        // Don't want to divide by 0
+        if (length == 0.0f) {
+            u.location.x = u.destination.x;
+            u.location.y = u.destination.y;
+            return 0.0f;
+        }
         // Normalize
         dx = dx / length;
         dy = dy / length;
@@ -138,13 +144,13 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         u.location.x += dx * SPEED;
         if (dx < 0 && u.location.x < u.destination.x) {
             u.location.x = u.destination.x;
-        } else if (u.location.x > u.destination.x){
+        } else if (dx > 0 && u.location.x > u.destination.x){
             u.location.x = u.destination.x;
         }
         u.location.y += dy * SPEED;
         if (dy < 0 && u.location.y < u.destination.y) {
             u.location.y = u.destination.y;
-        } else if (u.location.y > u.destination.y){
+        } else if (dy > 0 && u.location.y > u.destination.y){
             u.location.y = u.destination.y;
         }
 

@@ -116,6 +116,7 @@ public class GameController {
     }
 
     public boolean attack(Territory attacker, Territory defender, CoARenderer renderer){
+        if (attacker.selectedUnits.size() == attacker.units.size()) return false;
 
         Action action = new Action(m_currentPlayer, Action.Category.attack, attacker, defender);
 
@@ -174,9 +175,8 @@ public class GameController {
     }
 
     public void moveUnits(Territory source, Territory destination){
-        if(source.selectedUnits.size() == source.units.size()){
-            return;
-        }
+        if (source.selectedUnits.size() == source.units.size()) return;
+
         Action action = new Action(m_currentPlayer, Action.Category.moveUnit, source, destination);
 
         synchronized (destination.units) {
@@ -186,6 +186,8 @@ public class GameController {
                     action.dUnitsGained.add(unit);
 
                     unit.destination = destination.getUnitPlace();
+
+                    Log.d("UNIT ", "L " + unit.location.x + " " + unit.location.y + " " + unit.destination.x + " " + unit.destination.y);
 
                     source.units.remove(unit);
                     destination.units.add(unit);
