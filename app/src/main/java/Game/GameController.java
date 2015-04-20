@@ -13,8 +13,6 @@ import Generation.MapData;
 import Generation.MapGenerator;
 import Generation.MapGenerationParams;
 import Graphics.CoARenderer;
-import Graphics.Quadrilateral;
-import Graphics.SpriteBatchSystem;
 import Utils.Device;
 import utkseniordesign.conquestofares.GameActivity;
 

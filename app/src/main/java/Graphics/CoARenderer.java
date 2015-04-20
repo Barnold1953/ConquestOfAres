@@ -39,8 +39,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     SpriteBatch m_unitSpriteBatch = new SpriteBatch();
     LinkedList<Laser> lasers = new LinkedList<Laser>();
 
-    DrawHelper dHelper;
-
     final boolean IS_3D = false; ///< Temporary: determines if we are rendering in 3D or 2D
 
     // Camera lookAt
@@ -81,7 +79,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         context = c;
 
         camera = new Camera();
-        dHelper = new DrawHelper(camera);
         width = w;
         height = h;
 
@@ -105,7 +102,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
             //programHandle = ShaderHelper.compileShader(context, R.string.simple_vert, R.string.animate_frag, "animate");
             //dHelper.setProgHandles(programHandle, "animate");
             programHandle = ShaderHelper.compileShader(context, R.string.simple_vert, R.string.texture_frag, "simple");
-            dHelper.setProgHandles(programHandle, "simple");
         }
         catch (IOException e){
             Log.d("Shader", "Error occurred during compilation");
