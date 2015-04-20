@@ -61,6 +61,7 @@ public class Territory {
     private final float MIN_BLEND = 0.35f;
     private final float BLEND_SPEED = 0.01f;
     private boolean m_isIncreasing = true;
+    private static Random m_random = new Random(new Date().getTime());
 
     public void select() {
         if (!isSelected) {
@@ -120,25 +121,9 @@ public class Territory {
     }
 
     PointF getUnitPlace() {
-        PointF placeCoords = null;
-        Random r = new Random(new Date().getTime() + units.size());
-        float spread = 30.0f;
-        int direction = r.nextInt();
-        switch (direction%4){
-            case 0:
-                placeCoords = new PointF(x + r.nextFloat() * spread, y + r.nextFloat() * spread);
-                break;
-            case 1:
-                placeCoords = new PointF(x - r.nextFloat() * spread, y + r.nextFloat() * spread);
-                break;
-            case 2:
-                placeCoords = new PointF(x + r.nextFloat() * spread, y - r.nextFloat() * spread);
-                break;
-            default:
-                placeCoords = new PointF(x - r.nextFloat() * spread, y - r.nextFloat() * spread);
-                break;
-        }
-        return placeCoords;
+        final float spread = 30.0f;
+        return new PointF(x + (m_random.nextFloat() * 2.0f - 1.0f) * spread,
+                          y + (m_random.nextFloat() * 2.0f - 1.0f) * spread);
     }
 
     public boolean addUnit(Unit.Type type) {

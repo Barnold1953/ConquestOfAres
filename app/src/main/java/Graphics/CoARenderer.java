@@ -195,18 +195,17 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         // Redraw background color
         GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
-        // Update generation
+        // Update GPU generation
         if (GpuGenerator.hasGenRequest) {
             GpuGenerator.updateGen(context);
             MapGenerator.finishGeneration((int)gameState.mapData.width, (int)gameState.mapData.height);
             GLES20.glViewport(0, 0, m_viewportW, m_viewportH);
         }
-
+        // Render territories
         for (Territory t: gameState.mapData.territories) {
             t.updateAnimation();
             if (t.mesh != null) t.mesh.render(t, t.texture, camera.getVPMatrix());
         }
-
         // Draw sprites
         m_unitSpriteBatch.begin();
         for (Territory t : gameState.territories) {
@@ -227,7 +226,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
                 if (l.render(camera.getVPMatrix())) {
                     iterator.remove();
                 }
-
             }
         }
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
