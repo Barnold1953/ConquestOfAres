@@ -142,6 +142,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
             t.updateAnimation();
             if (t.mesh != null) t.mesh.render(t, t.texture, camera.getVPMatrix());
         }
+
         // Draw sprites
         drawUnits();
 
@@ -150,9 +151,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         // Count frames for animation purposes
         frame++;
-        if(frame >= 100000000){
-            frame = 0;
-        }
     }
 
     @Override
@@ -180,14 +178,14 @@ public class CoARenderer implements GLSurfaceView.Renderer {
             synchronized (t.units) {
                 for (Unit u : t.units) {
                     // Update movement
-                    float angle = updateUnitPosition(u);
+                    updateUnitPosition(u);
                     // Get texture coordinates
                     SpriteSheetDimensions dims = new SpriteSheetDimensions("soldier_move", frame / 5);
                     // Render the texture
                     m_unitSpriteBatch.draw(TextureHelper.getTexture("soldier_move"),
                             (u.location.x / gameState.mapData.width) * 2.0f - 1.0f,
                             (u.location.y / gameState.mapData.height) * 2.0f - 1.0f,
-                            0.1f, 0.1f, dims.u, dims.v, dims.uw, dims.vw, angle, t.owner.color);
+                            0.1f, 0.1f, dims.u, dims.v, dims.uw, dims.vw, u.angle, t.owner.color);
                 }
             }
         }
@@ -213,10 +211,10 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
     }
 
-    // Updates position of unit and returns angle
-    private float updateUnitPosition(Unit u){
+    // Updates position of unit
+    private void updateUnitPosition(Unit u){
         final float SPEED = 2.0f;
-        if (u.destination == u.location) return 0.0f;
+        if (u.destination == u.location) return;
 
         // Calculate normal vector towards destination
         float dx = u.destination.x - u.location.x;
@@ -226,7 +224,7 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         if (length == 0.0f) {
             u.location.x = u.destination.x;
             u.location.y = u.destination.y;
-            return 0.0f;
+            return;
         }
         // Normalize
         dx = dx / length;
@@ -246,10 +244,18 @@ public class CoARenderer implements GLSurfaceView.Renderer {
             u.location.y = u.destination.y;
         }
 
-        // Return angle off of the horizontal
+        // Handle angle
+        // TODO: Make this smoother
         float angle = (float)Math.acos(dy);
         if (dx > 0.0f) angle = -angle;
-        return angle;
+        Log.d("ANGLE ", "A " + angle);
+        if (u.angle < angle) {
+            u.angle += 0.1f;
+            if (u.angle > angle) u.angle = angle;
+        } else if (u.angle > angle) {
+            u.angle -= 0.1f;
+            if (u.angle < angle) u.angle = angle;
+        }
     }
 
     private void finishTerritories() {

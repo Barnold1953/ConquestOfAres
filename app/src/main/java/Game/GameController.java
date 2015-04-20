@@ -187,8 +187,6 @@ public class GameController {
 
                     unit.destination = destination.getUnitPlace();
 
-                    Log.d("UNIT ", "L " + unit.location.x + " " + unit.location.y + " " + unit.destination.x + " " + unit.destination.y);
-
                     source.units.remove(unit);
                     destination.units.add(unit);
                 }

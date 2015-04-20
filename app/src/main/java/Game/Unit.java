@@ -21,7 +21,6 @@ public class Unit {
         destination = new PointF(x,y);
         destination = location;
         type = t;
-        angle = 0;
 
         wrapFrame = new Point(-1,-1);
     }
@@ -33,7 +32,7 @@ public class Unit {
     public Vector<Territory> path = null;
     public int speed = 100;
     public int turnRate = 5;
-    public double angle;
+    public float angle = 0.0f;
     // when health reaches 0, soldier is removed from army.units
     public float health = 100.0f;
     // armor will divide the attacker's damage and then subtract that # from health

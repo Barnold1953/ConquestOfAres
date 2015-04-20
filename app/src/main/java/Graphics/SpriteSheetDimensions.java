@@ -37,8 +37,9 @@ public class SpriteSheetDimensions {
 
         // Texture coordinates
         uw = frameWidth / width;
-        vw = -frameHeight / height;
+        vw = frameHeight / height;
         u = frameX * uw;
         v = frameY * vw + vw;
+        vw = -vw;
     }
 }
