@@ -37,19 +37,23 @@ public class UnitIcon extends ImageView {
                 boolean attaking = state.currentState == GameState.State.ATTACKING ? true : false;
                 if(state.currentState == GameState.State.ATTACKING || state.currentState == GameState.State.FORTIFYING ) {
                     if(!selected) {
-                        if(state.selectedTerritory.selectedUnits.size() == 0) {
-                            state.selectedTerritory.unselect();
-                            state.selectedTerritory.selectNeighbors(attaking);
+                        synchronized (state.selectedTerritory.selectedUnits) {
+                            if (state.selectedTerritory.selectedUnits.size() == 0) {
+                                state.selectedTerritory.unselect();
+                                state.selectedTerritory.selectNeighbors(attaking);
+                            }
+                            setBackgroundColor(getResources().getColor(R.color.darkBlue));
+                            state.selectedTerritory.selectedUnits.add(state.selectedTerritory.units.get(soldierId));
                         }
-                        setBackgroundColor(getResources().getColor(R.color.darkBlue));
-                        state.selectedTerritory.selectedUnits.add(state.selectedTerritory.units.get(soldierId));
                         selected = true;
                     } else {
                         setBackgroundColor(getResources().getColor(R.color.lightGrey));
-                        state.selectedTerritory.selectedUnits.remove(state.selectedTerritory.units.get(soldierId));
-                        if(state.selectedTerritory.selectedUnits.size() == 0) {
-                            state.selectedTerritory.unselectNeighbors();
-                            state.selectedTerritory.select();
+                        synchronized (state.selectedTerritory.selectedUnits) {
+                            state.selectedTerritory.selectedUnits.remove(state.selectedTerritory.units.get(soldierId));
+                            if (state.selectedTerritory.selectedUnits.size() == 0) {
+                                state.selectedTerritory.unselectNeighbors();
+                                state.selectedTerritory.select();
+                            }
                         }
                         selected = false;
                     }
