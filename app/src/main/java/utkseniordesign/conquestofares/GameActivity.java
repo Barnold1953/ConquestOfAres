@@ -25,7 +25,6 @@ import Game.GameState;
 import Game.Territory;
 import Game.GameSettings;
 import Graphics.CoARenderer;
-import Sound.SoundControls;
 import Sound.SoundManager;
 import UI.GamePlayBanner;
 import UI.TerritoryPanel;
@@ -45,7 +44,6 @@ public class GameActivity extends Activity {
     private GameController gameController;
     private CoARenderer coaRenderer;
     private GameSettings gameSettings;
-    private SoundControls soundControls;
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     protected void onCreate( Bundle savedInstanceState ) {
@@ -74,7 +72,7 @@ public class GameActivity extends Activity {
         getWindowManager().getDefaultDisplay().getSize(size);
         coaRenderer = new CoARenderer(this, size.x, size.y);
         gameController = new GameController();
-        soundControls = new SoundControls(this);
+        SoundManager.init(this);
 
         mGLSurfaceView.setRenderer(coaRenderer);
 
@@ -215,12 +213,6 @@ public class GameActivity extends Activity {
             YoYo.with(Techniques.RollOut).duration(500).playOn(checkMark);
         }
     }
-
-    public void scream(){ soundControls.scream(); }
-
-    public void laser(){ soundControls.laser(); }
-
-    public void march(){ soundControls.march(); }
 
     public GamePlayBanner getGamePlayBanner() {
         return gamePlayBanner;

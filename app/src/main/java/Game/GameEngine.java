@@ -74,7 +74,7 @@ public class GameEngine {
            p.color[1] = playerColors[i][1];
            p.color[2] = playerColors[i][2];
            p.fColor = Utils.Utils.byteColorToFloat(p.color);
-           p.placeableUnits = 20;
+           p.placeableUnits = 5;
            p.name = "Player " + Integer.toString(i + 1);
            m_gameState.players.add(p);
        }
@@ -105,38 +105,5 @@ public class GameEngine {
                 break;
         }
         m_gameState.currentState = GameState.State.INITIAL_UNIT_PLACEMENT;
-    }
-
-    /// Sets up all the initial armies
-    private void initUnits(int unitsPerTerritory) {
-        /* Random r = new Random();
-        int totalUnits = unitsPerTerritory * m_gameState.territories.size();
-        int unitsPerPlayer = totalUnits / m_gameState.players.size();
-        for (Player p : m_gameState.players) {
-            int unitsRemaining = unitsPerPlayer;
-            for (Territory t : p.territories) {
-                for (int i = 0; i < unitsPerTerritory && unitsRemaining != 0; i++) {
-                    p.extraUnits++;
-                    int direction = r.nextInt();
-                    float spread = 30.0f;
-                    switch (direction%4){
-                        case 0:
-                            m_gameController.addUnit(t, t.x + r.nextFloat() * spread, t.y + r.nextFloat() * spread, Unit.Type.soldier);
-                            break;
-                        case 1:
-                            m_gameController.addUnit(t, t.x - r.nextFloat() * spread, t.y + r.nextFloat() * spread, Unit.Type.soldier);
-                            break;
-                        case 2:
-                            m_gameController.addUnit(t, t.x + r.nextFloat() * spread, t.y - r.nextFloat() * spread, Unit.Type.soldier);
-                            break;
-                        case 3:
-                            m_gameController.addUnit(t, t.x - r.nextFloat() * spread, t.y - r.nextFloat() * spread, Unit.Type.soldier);
-                            break;
-                    }
-                    //m_gameController.addUnit(t, t.x + r.nextFloat() * 60.0f, t.y + r.nextFloat() * 60.0f, Unit.Type.soldier);
-                    //m_gameController.addUnit(t, t.x, t.y, Unit.Type.soldier);
-                }
-            }
-        }*/
     }
 }

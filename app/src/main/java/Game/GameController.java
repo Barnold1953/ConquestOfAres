@@ -13,7 +13,7 @@ import Generation.MapData;
 import Generation.MapGenerator;
 import Generation.MapGenerationParams;
 import Graphics.CoARenderer;
-import Sound.SoundControls;
+import Sound.SoundManager;
 import Utils.Device;
 import utkseniordesign.conquestofares.GameActivity;
 
@@ -155,7 +155,7 @@ public class GameController {
                         dst1.location.x + (m_gameState.random.nextFloat() * 2.0f - 1.0f) * accuracy,
                         dst1.location.y + (m_gameState.random.nextFloat() * 2.0f - 1.0f) * accuracy,
                         attacker.owner.fColor[0], attacker.owner.fColor[1], attacker.owner.fColor[2]);
-                m_gameActivity.laser();
+                SoundManager.getLaser();
                 SystemClock.sleep(25);
 
                 // Defender fire
@@ -167,21 +167,21 @@ public class GameController {
                         dst2.location.x + (m_gameState.random.nextFloat() * 2.0f - 1.0f) * accuracy,
                         dst2.location.y + (m_gameState.random.nextFloat() * 2.0f - 1.0f) * accuracy,
                         defender.owner.fColor[0], defender.owner.fColor[1], defender.owner.fColor[2]);
-                m_gameActivity.laser();
+                SoundManager.getLaser();
                 SystemClock.sleep(25);
             }
 
             if(m_gameState.random.nextInt(2) == 0){
                 Unit u = attacker.selectedUnits.get(attacker.selectedUnits.size()-1);
                 action.sUnitsLost.add(u);
-                m_gameActivity.scream();
+                SoundManager.getScream();
                 attacker.selectedUnits.remove(u);
                 synchronized (attacker.units) { attacker.units.remove(u); }
             }
             else{
                 Unit u = defender.units.get(defender.units.size()-1);
                 action.dUnitsLost.add(u);
-                m_gameActivity.scream();
+                SoundManager.getScream();
                 synchronized (defender.units) { defender.units.remove(u); }
             }
         }
@@ -199,8 +199,8 @@ public class GameController {
             Player p = defender.owner;
             defender.owner.removeTerritory(defender);
             attacker.owner.addTerritory(defender);
+            //SoundManager.march();
             moveUnits(attacker, defender);
-            m_gameActivity.march();
             if(p.territories.isEmpty()){
                 m_gameState.players.remove(p);
                 if(m_gameState.players.size() == 1){

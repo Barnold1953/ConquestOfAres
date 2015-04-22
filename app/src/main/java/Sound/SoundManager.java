@@ -4,6 +4,7 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.util.Log;
 
@@ -23,7 +24,7 @@ public class SoundManager {
     private static int screamTot = 0, laserTot = 0;
     private static int loaded = 0;
     private static int[] screamID, laserID;
-    private static int marchID;
+    private static int marchID, marchPlay;
 
     private static int getResId(String resName, Class<?> c){
         try{
@@ -80,7 +81,11 @@ public class SoundManager {
         float mVol = (float) audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         float vol = aVol / mVol;
 
-        soundPool.play(marchID, vol, vol, 1, 0, 1f);
+        marchPlay = soundPool.play(marchID, vol, vol, 1, 0, 1f);
+    }
+
+    public static void stopMarch(){
+        soundPool.stop(marchPlay);
     }
 
     public static void getScream(){
