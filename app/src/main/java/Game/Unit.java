@@ -31,8 +31,6 @@ public class Unit {
     public PointF destination = null;
     public Point wrapFrame;
     public Vector<Territory> path = null;
-    public int speed = 100;
-    public int turnRate = 5;
     public float angle = 0.0f;
     // when health reaches 0, soldier is removed from army.units
     public float health = 100.0f;

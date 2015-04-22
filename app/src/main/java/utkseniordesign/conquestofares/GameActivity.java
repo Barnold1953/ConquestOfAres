@@ -25,6 +25,7 @@ import Game.GameState;
 import Game.Territory;
 import Game.GameSettings;
 import Graphics.CoARenderer;
+import Sound.SoundManager;
 import UI.GamePlayBanner;
 import UI.TerritoryPanel;
 import Utils.Device;
@@ -71,12 +72,13 @@ public class GameActivity extends Activity {
         getWindowManager().getDefaultDisplay().getSize(size);
         coaRenderer = new CoARenderer(this, size.x, size.y);
         gameController = new GameController();
+        SoundManager.init(this);
 
         mGLSurfaceView.setRenderer(coaRenderer);
 
         // Init the game
         final GameState gameState = new GameState();
-        gameController.initGame(gameState, gameSettings);
+        gameController.initGame(gameState, gameSettings, this);
         coaRenderer.setGameState(gameState);
 
         createScreen();
