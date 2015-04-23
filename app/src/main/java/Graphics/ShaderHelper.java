@@ -21,6 +21,10 @@ import utkseniordesign.conquestofares.R;
 public class ShaderHelper {
     static HashMap<String, Integer> shaders = new HashMap<>();
 
+    public static void clearAll() {
+        shaders.clear();
+    }
+
     public static int compileShader(Context context, int vertID, int fragID, String shader) throws IOException{
 
         String filePath = "@raw/";

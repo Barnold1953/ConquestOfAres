@@ -90,6 +90,7 @@ public class GameActivity extends Activity {
         // The activity must call the GL surface view's onResume() on activity onResume().
         super.onResume();
         mGLSurfaceView.onResume();
+        coaRenderer.onResume();
     }
 
     @Override

@@ -57,6 +57,8 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     final float upZ = 0.0f;
     boolean showTerrain = false;
     boolean showLines = false;
+    boolean m_needsLoad = true;
+    boolean m_hasLoadedTerritories = false;
 
     public void setGameState(GameState gameState) {
         this.gameState = gameState;
@@ -102,6 +104,14 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 
         Log.d("Setup", "Surface created.");
+
+        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+        GLES20.glEnable(GLES20.GL_TEXTURE_2D);
+        GLES20.glDepthFunc( GLES20.GL_LEQUAL );
+        GLES20.glDepthMask( true );
+    }
+
+    public void loadResources() {
         try {
             programHandle = ShaderHelper.compileShader(context, R.string.simple_vert, R.string.texture_frag, "simple");
         }
@@ -112,20 +122,17 @@ public class CoARenderer implements GLSurfaceView.Renderer {
         m_soldierMoveTexture = TextureHelper.imageToTexture(context, R.drawable.man_run, "soldier_move");
         m_soldierIdleTexture = TextureHelper.imageToTexture(context, R.drawable.man_idle, "soldier_idle");
         m_soldierAttackTexture = TextureHelper.imageToTexture(context, R.drawable.man_shoot, "soldier_attack");
-
-        Log.d("Setup", "Geometry buffers initialized and filled.");
-
-        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
-        GLES20.glEnable(GLES20.GL_TEXTURE_2D);
-        GLES20.glDepthFunc( GLES20.GL_LEQUAL );
-        GLES20.glDepthMask( true );
     }
 
     @Override
     public void onDrawFrame(GL10 unused) {
 
+        if (m_needsLoad) {
+            reload();
+        }
+
         // Upload mapData texture (Happens once)
-        if (gameState != null && gameState.mapData.isDoneGenerating) {
+        if (gameState != null && gameState.mapData.isDoneGenerating && !m_hasLoadedTerritories) {
             finishTerritories();
         }
 
@@ -154,6 +161,24 @@ public class CoARenderer implements GLSurfaceView.Renderer {
 
         // Count frames for animation purposes
         frame++;
+    }
+
+    // Needs to reload everything
+    public void onResume() {
+        m_needsLoad = true;
+    }
+
+    public void reload() {
+        ShaderHelper.clearAll();
+        loadResources();
+        lasers.clear();
+        m_unitSpriteBatch.m_vbo = null;
+        ColorMesh.m_programHandle = 0;
+        TerritoryMesh.m_programHandle = 0;
+        if (gameState != null && gameState.mapData.isDoneGenerating) {
+            finishTerritories();
+        }
+        m_needsLoad = false;
     }
 
     @Override
@@ -293,9 +318,9 @@ public class CoARenderer implements GLSurfaceView.Renderer {
     }
 
     private void finishTerritories() {
+        Log.d("hello", "LOL");
         for (Territory t : gameState.territories) {
             t.texture = TextureHelper.dataToTexture(t.pixelBuffer, "t" + t.index, t.textureWidth, t.textureHeight);
-            t.pixelBuffer = null;
             t.mesh = new TerritoryMesh();
             t.mesh.init(((float)t.textureX / gameState.mapData.width) * 2.0f - 1.0f,
                     ((float)t.textureY / gameState.mapData.height) * 2.0f - 1.0f,
@@ -304,6 +329,6 @@ public class CoARenderer implements GLSurfaceView.Renderer {
                     context);
         }
 
-        gameState.mapData.isDoneGenerating = false;
+        m_hasLoadedTerritories = true;
     }
 }
