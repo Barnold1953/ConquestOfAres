@@ -23,7 +23,7 @@ public class SpriteBatch {
     }
 
     // Buffers
-    private IntBuffer m_vbo = null;
+    public IntBuffer m_vbo = null;
     private ByteBuffer m_buffer;
     // Uniform handles
     private int m_positionHandle;

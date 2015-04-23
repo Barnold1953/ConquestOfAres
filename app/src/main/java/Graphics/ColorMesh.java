@@ -31,7 +31,7 @@ public class ColorMesh {
     private static int m_colorHandle;
     private static int m_mvpHandle;
     private static int m_alphaHandle;
-    private static int m_programHandle = 0;
+    public static int m_programHandle = 0;
 
     /// Adds a vertex to the mesh. Make sure capacity is set
     public void addVertex(float x, float y, float z, float r, float g, float b) {

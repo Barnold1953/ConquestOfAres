@@ -32,7 +32,7 @@ public class TerritoryMesh {
     private static int m_textureHandle;
     private static int m_mvpHandle;
     private static int m_colorHandle;
-    private static int m_programHandle = 0;
+    public static int m_programHandle = 0;
     private static int m_sColorHandle;
     private static int m_blendHandle;
 
